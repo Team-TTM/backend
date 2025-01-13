@@ -1,0 +1,25 @@
+# Node modules
+node_modules/
+
+# Logs
+npm-debug.log*
+yarn-error.log*
+
+# Cache
+.npm/
+.yarn/
+
+# Build / Distribution
+dist/
+build/
+
+# Système de fichiers
+.DS_Store
+Thumbs.db
+
+# IDE / Éditeurs
+.vscode/
+.idea/
+
+# Environnement
+.env
