@@ -1,19 +1,31 @@
-const { MongoClient } = require('mongodb');
+const mongoose = require('mongoose');
 const path = require("path");
+const importerXlsx = require('../services/importXlxs');
 require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 
-
-
-const client = new MongoClient(process.env.MONGO_DB_URL);
+// Chargement des variables d'environnement
+const MONGO_DB_URL = process.env.MONGO_DB_URL;
+const MONGO_DB_NAME = process.env.MONGO_DB_NAME;
+const XLSX_FILE = 'export_adherents_27-11-2024.xlsx';
 
 async function connectToDb() {
     try {
-        await client.connect();
-        console.log('Connexion établie avec MongoDB');
-        return client.db(process.env.MONG0_DB_NAME);
-    } catch (err) {
-        console.error('Erreur de connexion à MongoDB', err);
-        process.exit(1);
+        // Connexion à la base de données
+        await mongoose.connect(MONGO_DB_URL, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+            dbName: MONGO_DB_NAME,
+
+        });
+        console.log('✅ Connexion établie avec MongoDB');
+
+
+        // Importation du fichier XLSX
+        await importerXlsx(path.resolve(__dirname, '../data', XLSX_FILE));
+        } catch (err) {
+        // Gestion des erreurs
+        console.error('❌ Erreur lors de la connexion ou de l\'importation :', err.message);
+        process.exit(1); // Quitte le processus avec une erreur
     }
 }
 

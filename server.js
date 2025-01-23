@@ -1,21 +1,17 @@
 const express = require('express');
 const logger = require('morgan');
 const path = require('path');
-
-const indexRouter = require('./routes/index')
-const usersRouter = require('./routes/user')
+const connectToDb = require('./models/db'); // Connexion MongoDB
 
 const app = express();
+const port = 3000;
+
+const indexRouter = require('./routes/index');
+const usersRouter = require('./routes/user');
 
 app.use(logger('dev')) // 'dev' affiche un format de log compact avec méthode, URL, et statut
-
-
-// app.use(express.static(path.join(__dirname, 'dist')));
-
 app.use('/', indexRouter);
-
 app.use(express.json());
-
 app.use('/users', usersRouter);
 
 app.use((req, res, next) => {
@@ -33,9 +29,16 @@ app.use((error, req, res, next) => {
     });
 });
 
-const port = 3000;
-app.listen(port, () => {
-    console.log(`Serveur en écoute sur http://localhost:${port}`);
-});
+connectToDb()
+    .then((db) => {
+        app.locals.db = db;
+        app.listen(port, () => {
+            console.log(`Serveur en écoute sur http://localhost:${port}`);
+        });
+    })
+    .catch((err) => {
+        console.error('Erreur de connexion à MongoDB :', err);
+        process.exit(1);
+    });
 
 
