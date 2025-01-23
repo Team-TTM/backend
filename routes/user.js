@@ -1,31 +1,63 @@
 const express = require('express');
 const router = express.Router();
+const axios = require('axios')
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 
-router.post('/auth/google', (req, res) => {
-    const token = req.body.token;
-    if (!token) {
-        return res.status(400).json({
-            error:"Le token Google est requis pour l'authentification."
-        });
-    }
+const GOOGLE_OAUTH_URL = process.env.GOOGLE_OAUTH_URL;
 
-    console.log(`Paramètres : token=${token},`);
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 
-    // TODO: Ajouter la logique pour vérifier et valider le token Google
-    const isValidToken = false;
+const GOOGLE_ACCESS_TOKEN_URL = process.env.GOOGLE_ACCESS_TOKEN_URL;
 
-    if (!isValidToken) {
-        return res.status(401).json({
-            error: "Le token Google est invalide ou expiré."
-        });
-    }
-    // TODO sauvergarder le token
-    res.status(200).json({
-        message:
-            `connected by google`
-    });
+const GOOGLE_CALLBACK_URL = "http://localhost:3000/users/auth/google/callback";
+
+const GOOGLE_OAUTH_SCOPES = [
+
+    "https%3A//www.googleapis.com/auth/userinfo.email",
+
+    "https%3A//www.googleapis.com/auth/userinfo.profile",
+
+];
+router.get('/auth', (req, res) => {
+    const state = "some_state";
+    const scopes = GOOGLE_OAUTH_SCOPES.join(" ");
+    const GOOGLE_OAUTH_CONSENT_SCREEN_URL = `${GOOGLE_OAUTH_URL}?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${GOOGLE_CALLBACK_URL}&access_type=offline&response_type=code&state=${state}&scope=${scopes}`;
+    res.redirect(GOOGLE_OAUTH_CONSENT_SCREEN_URL);
 });
+
+
+router.get('/auth/google', async (req, res) => {
+    console.log(req.query);
+    const {code} = req.query;
+    const data = {
+        code,
+        client_id: process.env.GOOGLE_CLIENT_ID,
+        client_secret: process.env.GOOGLE_CLIENT_SECRET,
+        redirect_uri: 'http://localhost:3000/users/auth/google',
+        grant_type: "authorization_code",
+    }
+    try {
+        const response = await axios.post(GOOGLE_ACCESS_TOKEN_URL, data, {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded', // Déclare que les données sont envoyées sous forme de x-www-form-urlencoded
+            },
+        });
+        const access_token_data = response.data;
+        console.log(access_token_data);
+        //TODO sauvergarder le token
+        //TODO ENVOYER LE TOKEN
+        res.status(200).json({
+            message : `connected by facebook token`
+        })
+    } catch (error) {
+        console.error("Error fetching access token:", error);
+        res.status(500).json({error: "Une erreur s'est produite lors de la récupération du token."});
+    }
+});
+
 router.post('/auth/facebook', (req, res) => {
     const token = req.body;
     if (!token) {
