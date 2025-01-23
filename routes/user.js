@@ -104,5 +104,9 @@ router.post('/licence-check', (req, res) => {
 
 });
 
+router.get('/auth', (req, res) => {
+    // TODO retourné la page de connexion
+});
+
 module.exports = router;
 
