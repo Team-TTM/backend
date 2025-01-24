@@ -5,7 +5,7 @@ const path = require('path');
 const { getGoogleUserId , findUserByGoogleID } = require('../services/userService.js');
 const Adherant = require('../models/Adherant');
 const User = require("../models/Users");
-const { googleAuthController } = require("../controllers/authController");
+const { googleAuthController ,facebookAuthController } = require("../controllers/authController");
 
 require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 const jwt = require('jsonwebtoken');
@@ -31,29 +31,7 @@ router.get('/auth', (req, res) => {
 
 router.get("/auth/google", googleAuthController);
 
-router.post('/auth/facebook', (req, res) => {
-    const token = req.body;
-    if (!token) {
-        return res.status(400).json({
-            error: "Le token Facebook est requis pour l'authentification."
-        });
-    }
-    console.log(`Paramètres : token=${token},`);
-
-    // TODO: Ajouter la logique pour vérifier et valider le token Facebook
-    const isValidToken = true;
-    if (!isValidToken) {
-        return res.status(401).json({
-            error: "Le token Facebook est invalide ou expiré."
-        });
-    }
-    // TODO sauvergarder le token dans une collection limité
-    res.status(200).json({
-        // token : toekn
-        message : `connected by facebook token`
-    })
-
-});
+router.post('/auth/facebook', facebookAuthController);
 
 router.post('/licence-check', async (req, res) => {
     const {token, service, licence} = req.body;
