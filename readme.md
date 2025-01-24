@@ -91,6 +91,12 @@ Méthode : POST
 URL : /users/licence-check
 Description : Cette route vérifie si une licence est valide pour un utilisateur, en fonction du service utilisé (Google ou Facebook).
 
+
+axios.get('/some-protected-route', {
+headers: {
+'Authorization': `Bearer ${token}`,  // Envoi du token dans l'en-tête Authorization
+}
+});
 Requête :
 •	Body (JSON) :
 ```bash

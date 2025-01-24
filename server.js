@@ -1,6 +1,5 @@
 const express = require('express');
 const logger = require('morgan');
-const path = require('path');
 const connectToDb = require('./models/db'); // Connexion MongoDB
 
 const app = express();

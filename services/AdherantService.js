@@ -124,4 +124,9 @@ async function importerXlsx(fichierXlsx) {
     }
 }
 
-module.exports = importerXlsx;
+
+async function checkAdherantLicence(licence) {
+    return Adherant.exists({_id: licence});
+}
+
+module.exports = {importerXlsx, checkAdherantLicence};
