@@ -2,10 +2,10 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios')
 const path = require('path');
-const { getGoogleUserId , findUserByGoogleID } = require('../services/authService.js');
+const { getGoogleUserId , findUserByGoogleID } = require('../services/userService.js');
 const Adherant = require('../models/Adherant');
 const User = require("../models/Users");
-
+const { googleAuthController } = require("../controllers/authController");
 
 require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 const jwt = require('jsonwebtoken');
@@ -29,56 +29,7 @@ router.get('/auth', (req, res) => {
     res.redirect(GOOGLE_OAUTH_CONSENT_SCREEN_URL);
 });
 
-
-router.get('/auth/google', async (req, res) => {
-    const {code} = req.query;
-    const data = {
-        code,
-        client_id: process.env.GOOGLE_CLIENT_ID,
-        client_secret: process.env.GOOGLE_CLIENT_SECRET,
-        redirect_uri: process.env.GOOGLE_CALLBACK_URL,
-        grant_type: "authorization_code",
-    }
-    console.log(data);
-    try {
-        const response = await axios.post(process.env.GOOGLE_ACCESS_TOKEN_URL, data, {
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded', // Déclare que les données sont envoyées sous forme de x-www-form-urlencoded
-            },
-        });
-        const { access_token } = response.data;
-
-        const userResponse = await getGoogleUserId(access_token);
-        const { sub: googleUserId} = userResponse;
-
-        if (!googleUserId) {
-            return res.status(500).json({ error: "Impossible de récupérer l'ID utilisateur Google." });
-        }
-        await User.collection.drop();
-        let user= await  findUserByGoogleID(googleUserId);
-        if (!user) {
-            user = new User({
-                googleId: googleUserId,
-            });
-            await user.save();
-        }
-        const licenceExiste = await User.exists({ licence: { $exists: true } })
-        const token = jwt.sign(
-            { userID: user._id },
-            process.env.JWT_SECRET,
-            { expiresIn: '24h' }
-        );
-        res.status(200).json({
-            token,
-            message: licenceExiste
-                ? `Connecté avec Google`
-                : `Connecté avec Google, vérification de la licence nécessaire`,
-        });
-    } catch (error) {
-        console.error("Error fetching access token:", error);
-        res.status(500).json({error: "Une erreur s'est produite lors de la récupération du token."});
-    }
-});
+router.get("/auth/google", googleAuthController);
 
 router.post('/auth/facebook', (req, res) => {
     const token = req.body;
