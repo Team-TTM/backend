@@ -1,5 +1,4 @@
 const xlsx = require('xlsx');
-const mongoose = require('mongoose');
 const Adherant = require('../models/Adherant');
 
 function convertirDate(dateStr) {
