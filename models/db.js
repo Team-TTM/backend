@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const path = require("path");
-const importerXlsx = require('../services/importXlxs');
+const importerXlsx = require('../services/AdherantService');
 require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 
 // Chargement des variables d'environnement

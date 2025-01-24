@@ -54,6 +54,7 @@ router.post('/auth/facebook', (req, res) => {
     })
 
 });
+
 router.post('/licence-check', async (req, res) => {
     const {token, service, licence} = req.body;
 
@@ -106,18 +107,6 @@ router.post('/licence-check', async (req, res) => {
 
 });
 
-router.get('/auth', (req, res) => {
-    // TODO retourné la page de connexion
-});
+
 
 module.exports = router;
-
-// const newUser = new User({
-//     id_licence: licence,
-//     conexion: {
-//         googleId: googleToken[token],
-//     },
-// });
-// newUser.save()
-//     .then(user => console.log('Utilisateur créé:', user))
-//     .catch(err => console.error('Erreur:', err.message));

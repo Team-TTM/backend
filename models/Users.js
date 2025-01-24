@@ -29,8 +29,6 @@ const userSchema = new mongoose.Schema({
 });
 
 
-// Créer le modèle à partir du schéma
-
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;

@@ -4,10 +4,18 @@ const findUserByGoogleID = async (googleId) => {
     return User.findOne({googleId});
 };
 
+const findUserByFacebookID = async (facebookID) => {
+    return User.findOne(facebookID);
+};
+
 const createUser = async (userData) => {
     const user = new User(userData);
     await user.save();
     return user;
 };
 
-module.exports = { findUserByGoogleID, createUser };
+
+const checkLicence = async (user) => {
+    return User.exists({ licence: { $exists: true } });
+};
+module.exports = {findUserByGoogleID, findUserByFacebookID, createUser , checkLicence};
