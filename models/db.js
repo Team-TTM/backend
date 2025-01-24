@@ -12,8 +12,6 @@ async function connectToDb() {
     try {
         // Connexion à la base de données
         await mongoose.connect(MONGO_DB_URL, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
             dbName: MONGO_DB_NAME,
 
         });

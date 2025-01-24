@@ -24,7 +24,6 @@ const userSchema = new mongoose.Schema({
     facebookId:{
         type:String,
         unique: true,
-
     }
 });
 
