@@ -1,24 +1,9 @@
 const mongoose = require('mongoose');
 
-const conexionSchema = new mongoose.Schema({
-    googleId: {
-        type:String,
-        required: false,
-        unique: true,
-    },
-    facebookId:{
-        type:String,
-        required: false,
-        unique: true,
-    }
 
-});
-
-// Définir le schéma pour les utilisateurs
 const userSchema = new mongoose.Schema({
-    id_licence: {
+    numero_licence: {
         type: String,
-        required: true,
         unique: true,
     },
     role: {
@@ -32,13 +17,20 @@ const userSchema = new mongoose.Schema({
         required: true,
         default: false,
     },
-    conexion: conexionSchema,
+    googleId: {
+        type:String,
+        unique: true,
+    },
+    facebookId:{
+        type:String,
+        unique: true,
 
-
+    }
 });
 
 
 // Créer le modèle à partir du schéma
+
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;

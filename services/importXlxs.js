@@ -122,11 +122,6 @@ async function importerXlsx(fichierXlsx) {
         console.log(`✅ Importation terminée avec succès. ${adherents.length} documents insérés.`);
     } catch (err) {
         console.error('❌ Erreur lors de l\'importation :', err.message);
-    } finally {
-        if (mongoose.connection.readyState === 1) {
-            await mongoose.connection.close();
-            console.log('🔌 Connexion MongoDB fermée.');
-        }
     }
 }
 
