@@ -9,7 +9,7 @@
     "import:db": "node model/db.js",
     "build": "cd ../frontend && npm run build && rm -rf ../backend/dist && cp -r ../frontend/dist ../backend/ && cd ../backend ",
     "clean" : "rm -rf ../backend/dist",
-    "clean-bd" : "node scripts/reset-db.js"
+    "clean-bd" : "node database/reset-db.js"
   },
   "keywords": [],
   "author": "",

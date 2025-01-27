@@ -25,6 +25,7 @@ async function transformerDonneesEnAdherants(donnees) {
                     prenom: row['Prénom'] || null,
                     nom: row['Nom'] || null,
                     nomUsage: null,
+                //     TODO
                 },
                 dateNaissance: convertirDate(row['Date de naissance']) || null,
                 sexe: row['Sexe'] ? row['Sexe'].toUpperCase() : null,
@@ -125,7 +126,9 @@ async function importerXlsx(fichierXlsx) {
 
 
 async function checkAdherantLicence(num_licence) {
-    return Adherant.exists({licence : {numero :num_licence}});
+    if (await Adherant.exists({"licence.numero": num_licence})) {
+        return true;
+    }
+    return false;
 }
-
-module.exports = {importerXlsx, checkAdherantLicence,resetUserBdAdherant};
+module.exports = {importerXlsx, checkAdherantLicence};
