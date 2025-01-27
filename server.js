@@ -7,11 +7,15 @@ const port = 3000;
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/user');
+const assetssRouter = require('./routes/assets');
 
 app.use(logger('dev')) // 'dev' affiche un format de log compact avec méthode, URL, et statut
 app.use('/', indexRouter);
 app.use(express.json());
+
 app.use('/users', usersRouter);
+
+app.use('/assets', assetssRouter);
 
 app.use((req, res, next) => {
     const error = new Error('Ressource non trouvée');
