@@ -17,10 +17,9 @@ async function transformerDonneesEnAdherants(donnees) {
     const adherants = [];
 
     for (const row of donnees) {
-        const existe = await Adherant.exists({ _id: row['Numéro de licence'] });
+        const existe = await checkAdherantLicence(row['Numéro de licence']);
         if (!existe) {
             adherants.push({
-                _id: row['Numéro de licence'] || null,
                 statut: row['Statut'] || null,
                 nom: {
                     prenom: row['Prénom'] || null,
@@ -55,7 +54,8 @@ async function transformerDonneesEnAdherants(donnees) {
                     autorisationParentale: row['Autorisation parentale pour les mineurs'] === 'Oui',
                 },
                 licence: {
-                    type: row['Type de licence'] || null,
+                    numero :  row['Numéro de licence'],
+                    type: row['Type de licence'],
                     longue: row['Licence longue'] === 'Oui',
                     demiTarif: row['Licence demi-tarif'] === 'Oui',
                     horsClub: row['Licence hors club (licence individuelle)'] === 'Oui',
@@ -110,8 +110,6 @@ async function insererAdherantsDansMongoDB(adherants) {
 
 async function importerXlsx(fichierXlsx) {
     try {
-        // suprime la bd pour le dev
-        // await Adherant.collection.drop();
         console.log('📂 Chargement du fichier Excel...');
         const donnees = chargerDonneesExcel(fichierXlsx);
         console.log('🔄 Conversion des données..');
@@ -125,8 +123,9 @@ async function importerXlsx(fichierXlsx) {
 }
 
 
-async function checkAdherantLicence(licence) {
-    return Adherant.exists({_id: licence});
+
+async function checkAdherantLicence(num_licence) {
+    return Adherant.exists({licence : {numero :num_licence}});
 }
 
-module.exports = {importerXlsx, checkAdherantLicence};
+module.exports = {importerXlsx, checkAdherantLicence,resetUserBdAdherant};

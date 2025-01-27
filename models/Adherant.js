@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const AdherantSchema = new Schema({
-    _id : { type: String, required: true },
     statut: { type: String, required: true },
     nom: {
         prenom: { type: String, required: true },
@@ -38,6 +37,7 @@ const AdherantSchema = new Schema({
         autorisationParentale: { type: Boolean, required: true }
     },
     licence: {
+        numero : {type : String , required: true,unique : true},
         type: { type: String, required: true },
         longue: { type: Boolean, required: true },
         demiTarif: { type: Boolean, required: true },
