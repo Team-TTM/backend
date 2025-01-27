@@ -17,7 +17,6 @@ async function connectToDb() {
         });
         console.log('✅ Connexion établie avec MongoDB');
 
-
         // Importation du fichier XLSX
         await importerXlsx(path.resolve(__dirname, '../data', XLSX_FILE));
         } catch (err) {
