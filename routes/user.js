@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth')
-const { googleAuthController ,facebookAuthController ,licenceSingInContoller,authRedirectController } = require("../controllers/authController");
+const passport = require('passport');
+const { googleAuthController ,facebookAuthController ,licenceSingInContoller} = require("../controllers/authController");
 
 
 
@@ -9,7 +10,7 @@ const { googleAuthController ,facebookAuthController ,licenceSingInContoller,aut
 
 router.post("/auth/google", googleAuthController);
 
-router.get('/auth/facebook', facebookAuthController);
+router.post('/auth/facebook', passport.authenticate('facebook-token', {session: false}),facebookAuthController);
 
 router.post('/licence-check',auth,licenceSingInContoller);
 

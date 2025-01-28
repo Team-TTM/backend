@@ -8,8 +8,8 @@
     "dev": "nodemon server.js",
     "import:db": "node model/db.js",
     "build": "cd ../frontend && npm run build && rm -rf ../backend/dist && cp -r ../frontend/dist ../backend/ && cd ../backend ",
-    "clean" : "rm -rf ../backend/dist",
-    "clean-bd" : "node database/reset-db.js"
+    "clean": "rm -rf ../backend/dist",
+    "clean-bd": "node database/reset-db.js"
   },
   "keywords": [],
   "author": "",
@@ -29,6 +29,10 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.9.5",
     "morgan": "^1.10.0",
+    "passport": "^0.7.0",
+    "passport-facebook": "^3.0.0",
+    "passport-facebook-token": "^4.0.0",
+    "passport-google-token": "^0.1.2",
     "xlsx": "^0.18.5"
   }
 }
