@@ -13,10 +13,9 @@ passport.use(new FacebookTokenStrategy({
 }, facebookAuthVerify));
 
 passport.use(new GoogleTokenStrategy({
-    clientID: 'VOTRE_GOOGLE_CLIENT_ID',
-    clientSecret: 'VOTRE_GOOGLE_CLIENT_SECRET'
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET
 }, googleAuthVerify));  // Utiliser le contrôleur comme callback
 
-module.exports = passport;
 
 module.exports = passport;
