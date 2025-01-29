@@ -11,7 +11,6 @@ const getGoogleAccessToken = async (code) => {
         }, {
             headers: { "Content-Type": "application/x-www-form-urlencoded" }
         });
-
         return response.data.access_token;
     } catch (error) {
         console.error("Error fetching Google access token:", error);

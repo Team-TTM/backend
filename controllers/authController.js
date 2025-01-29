@@ -2,31 +2,10 @@ const userService = require("../services/userService");
 const {checkAdherantLicence} = require("../services/adherantService");
 const jwt = require("jsonwebtoken");
 const path = require("path");
+const {getGoogleAccessToken, getGoogleUserInfo} = require("../services/googleAuthService");
 require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 
 
-const googleAuthVerify = async (accessToken, profile) => {
-    try {
-        let user = await userService.findUserByGoogleId(profile.id);
-
-        if (!user) {
-            user = await userService.createUser({googleId: profile.id});
-        }
-
-        const licenceExiste = await userService.doesUserHaveLicence(user);
-
-        // Générer un token JWT
-        const token = jwt.sign(
-            { userId: user._id.toString() },
-            process.env.JWT_SECRET,
-            { expiresIn: "24h" }
-        );
-        return done(null, {token, licenceExiste });
-    } catch (error) {
-        console.error("Erreur dans Facebook Auth:", error);
-        return done(error);
-    }
-};
 
 
 
@@ -120,18 +99,41 @@ const facebookAuthController = async (req, res) => {
         message: "Connecté by Facebook",
         licence: licenceExiste
     });
-};
-const googleAuthController = (req, res) => {
-    if (req.user) {
-        const { token, licenceExiste } = req.user;
-        res.status(200).json({
-            token,
-            message: "Connecté by Facebook",
-            licenceExiste
-        });
-    } else {
-        res.status(400).json({ error: 'Échec de l\'authentification Google' });
+};const googleAuthController = async (req, res) => {
+    try {
+        const { code } = req.query;
+
+        const access_token = await getGoogleAccessToken(code);
+        if (!access_token) {
+            return res.status(500).json({ error: "Échec de récupération du token Google" });
+        }
+
+        const userInfo = await getGoogleUserInfo(access_token);
+        if (!userInfo?.sub) {
+            return res.status(500).json({ error: "Impossible de récupérer l'ID utilisateur Google." });
+        }
+
+        let user =
+            await userService.findUserByGoogleId(userInfo.sub);
+        if (!user) {
+            user = await userService.createUser({ googleId: userInfo.sub });
+        }
+
+        const licenceExiste = await userService.doesUserHaveLicence(user);
+        const token = jwt.sign(
+            { userId: user._id.toString()},
+            process.env.JWT_SECRET,
+            { expiresIn: "24h" }
+        );
+        if (licenceExiste) {
+            res.redirect(`http://localhost:3000/users/connected?token=${token}`);
+        }else{
+            res.redirect(`http://localhost:3000/users/signup?token=${token}`);
+        }
+
+    } catch (error) {
+        console.error("Error in Google Auth:", error);
+        res.status(500).json({ error: "Une erreur s'est produite lors de l'authentification Google." });
     }
 };
-
-module.exports = { googleAuthController, facebookAuthController ,licenceSingInContoller,facebookAuthVerify,googleAuthVerify};
+module.exports = { googleAuthController, facebookAuthController ,licenceSingInContoller,facebookAuthVerify};
