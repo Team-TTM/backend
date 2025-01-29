@@ -5,7 +5,7 @@ const passport = require('passport');
 const authController = require("../controllers/authController");
 const path = require("path");
 
-router.post('/google/callback',(req, res) => {
+router.get('/google/callback',(req, res) => {
     const url = req.url;
     const headers = req.rawHeaders;
     const body = req.body;  // Si tu as un corps de requête
@@ -16,6 +16,8 @@ router.post('/google/callback',(req, res) => {
     console.log('Body:', body);
     console.log('Params:', params);
     res.sendFile(path.join(__dirname, '..','dist', 'index.html'));
+
+
 });
 router.post("/auth/google", passport.authenticate('google-token', { session: false }),authController.googleAuthController);
 
