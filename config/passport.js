@@ -1,7 +1,6 @@
 
 const passport = require('passport');
 const FacebookStrategy = require('passport-facebook').Strategy;
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const authController = require('../controllers/authController'); // Importer le contrôleur
 const path = require("path");
 require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
