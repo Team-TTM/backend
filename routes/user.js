@@ -5,6 +5,11 @@ const passport = require('passport');
 const authController = require("../controllers/authController");
 const path = require("path");
 
+router.post('/google/callback',(req, res) => {
+    const url = req.url;
+    const headers = req.rawHeaders;
+    const body = req.body;  // Si tu as un corps de requête
+    const params = req.query;  // Si tu as des paramètres de requête
 
     console.log('URL:', url);
     console.log('Headers:', headers);

@@ -1,21 +1,36 @@
 
 const passport = require('passport');
-const FacebookTokenStrategy = require('passport-facebook-token');
-const GoogleTokenStrategy = require('passport-google-token');
-const { googleAuthVerify ,facebookAuthVerify} = require('../controllers/authController'); // Importer le contrôleur
+const FacebookStrategy = require('passport-facebook').Strategy;
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const authController = require('../controllers/authController'); // Importer le contrôleur
 const path = require("path");
 require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 
 
-passport.use(new FacebookTokenStrategy({
+passport.use(new FacebookStrategy({
     clientID: process.env.FACEBOOK_CLIENT_ID,
     clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
-}, facebookAuthVerify));
+}, async (accessToken, refreshToken, profile, done) => {
+    try {
+        const userData = await authController.facebookAuthVerify(accessToken, profile);
+        done(null, userData);
+    } catch (error) {
+        done(error, null);
+    }
+}));
 
-passport.use(new GoogleTokenStrategy({
+passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET
-}, googleAuthVerify));  // Utiliser le contrôleur comme callback
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackUrl: process.env.GOOGLE_CALLBACK_URL,
+}, async (accessToken, refreshToken, profile, done) => {
+    try {
+        const userData = await authController.googleAuthVerify(accessToken, profile);
+        done(null, userData);
+    } catch (error) {
+        done(error, null);
+    }
+}));
 
 
 module.exports = passport;

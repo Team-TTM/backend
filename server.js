@@ -13,11 +13,11 @@ const assetssRouter = require('./routes/assets');
 require('./config/passport');
 
 app.use(logger('dev')) // 'dev' affiche un format de log compact avec méthode, URL, et statut
-app.use('/', indexRouter);
 app.use(passport.initialize());
 app.use(express.json());
 app.use('/users', usersRouter);
 app.use('/assets', assetssRouter);
+app.use(indexRouter);
 
 app.use((req, res, next) => {
     const error = new Error('Ressource non trouvée');
