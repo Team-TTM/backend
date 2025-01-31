@@ -11,7 +11,6 @@ const getGoogleAccessToken = async (code) => {
         }, {
             headers: { "Content-Type": "application/x-www-form-urlencoded" }
         });
-
         return response.data.access_token;
     } catch (error) {
         console.error("Error fetching Google access token:", error);
@@ -24,7 +23,6 @@ const getGoogleUserInfo = async (access_token) => {
         const response = await axios.get("https://www.googleapis.com/oauth2/v3/userinfo", {
             headers: { Authorization: `Bearer ${access_token}` }
         });
-
         return response.data;
     } catch (error) {
         console.error("Error fetching Google user info:", error);

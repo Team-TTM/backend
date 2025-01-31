@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const path = require("path");
-const {importerXlsx} = require('../services/AdherantService');
+const {importerXlsx} = require('../services/adherantService');
 require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 
 // Chargement des variables d'environnement
@@ -16,7 +16,6 @@ async function connectToDb() {
 
         });
         console.log('✅ Connexion établie avec MongoDB');
-
 
         // Importation du fichier XLSX
         await importerXlsx(path.resolve(__dirname, '../data', XLSX_FILE));
