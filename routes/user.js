@@ -14,7 +14,7 @@ router.get('/auth/facebook', passport.authenticate('facebook'));
 
 router.get('/auth/facebook/callback', passport.authenticate('facebook', {session: false}),authController.facebookAuthController);
 
-router.post('/licence-check',authenticateJWT,authController.licenceSingInContoller);
+router.post('/licence-check',authenticateJWT,authController.licenceSignInController);
 
 router.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '..','dist', 'index.html'));

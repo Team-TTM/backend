@@ -1,58 +1,67 @@
 const userService = require("../services/userService");
 const {checkAdherantLicence} = require("../services/adherantService");
-const jwt = require("jsonwebtoken");
 const path = require("path");
+const {createToken} = require("../services/tokenService");
 require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 
 
 
-const licenceSingInContoller = async (req, res) => {
-    const  {licence} = req.body;
-    const {userId} = req.auth;
+const licenceSignInController = async (req, res) => {
+    const { licence } = req.body;
+    const { userId } = req.auth;
 
     if (!licence) {
         return res.status(400).json({
-            error: "Paramètres requis manquant : licence"
+            error: "Le paramètre 'licence' est requis."
         });
     }
 
     try {
-        console.log(licence);
+        console.log("Vérification de la licence:", licence);
         const isLicenceValid = await checkAdherantLicence(licence);
 
         if (!isLicenceValid) {
             return res.status(404).json({
-                error: `Licence ${licence} introuvable .`
+                error: `Licence ${licence} introuvable.`
             });
         }
 
-        console.log("check user = ",userId);
-        const isUserValid = await userService.doesUserExistById(userId);
-        console.log(isUserValid);
-
-        if (!isUserValid) {
-            return res.status(404).json({
-                error: "Utilisateur introuvable"
-            });
+        const user = await userService.findUserByUserId(userId);
+        if (!user) {
+            return res.status(404).json({ error: "Utilisateur non trouvé." });
         }
-        const userIdexist =
-            await userService.findUserByLicence(licence);
 
-        if (userIdexist) {
-            await userService.mergeUserFacebookAndGoogleIds(userIdexist, userId);
-            return res.status(200).json({
-                message: `Utilisateur déjà lié à la licence. Fusion des comptes réussie.`
-            });
-        }else {
+        const existingUser = await userService.findUserByLicence(licence);
+        if (existingUser) {
+            if ((user.googleId && !existingUser.facebookId) || (user.facebookId && !existingUser.googleId)) {
+                // Fusionner les comptes si l'un est Google et l'autre est Facebook
+                await userService.mergeUserFacebookAndGoogleIds(existingUser, userId);
+                const token = createToken(existingUser._id);
+                const updatedUser = await userService.findUserByUserId(existingUser._id);
+
+                return res.status(200).json({
+                    token,
+                    user: updatedUser,
+                    message: `Fusion des comptes réussie (Facebook et Google).`
+                });
+            } else {
+                return res.status(400).json({
+                    error: "Fusion impossible : deux comptes du même type (Facebook ou Google) détectés."
+                });
+            }
+        } else {
+            // Si la licence n'est pas encore associée, l'associer à l'utilisateur
             await userService.updateUserLicence(userId, licence);
+            const updatedUser = await userService.findUserByUserId(userId);
+
             return res.status(200).json({
-                user: await userService.findUserByUserId(userId),
+                user: updatedUser,
                 message: `Licence ${licence} associée à l'utilisateur avec succès.`
             });
         }
 
     } catch (error) {
-        console.error("Error in Licence  :", error);
+        console.error("Erreur dans l'authentification de la licence pour l'utilisateur", userId, error);
         res.status(500).json({
             error: "Une erreur s'est produite lors de l'authentification de la licence."
         });
@@ -77,13 +86,9 @@ const handleAuthVerification = async (platform, profile, done) => {
                 : await userService.createUser({ facebookId: platformId });
         }
 
-        const licenceExiste = await userService.doesUserHaveLicence(user);
+        const licenceExiste = await userService.doesUserHaveLicence(user._id);
 
-        const token = jwt.sign(
-            { userId: user._id.toString() },
-            process.env.JWT_SECRET,
-            { expiresIn: "24h" }
-        );
+        const token = createToken(user);
 
         return done(null, { token, licenceExiste });
     } catch (error) {
@@ -120,4 +125,4 @@ const googleAuthController = (req, res) => handleAuthRedirection(req, res, "Goog
 
 const facebookAuthController = (req, res) => handleAuthRedirection(req, res, "Facebook");
 
-module.exports = { googleAuthController, facebookAuthController ,googleAuthVerify,licenceSingInContoller,facebookAuthVerify};
+module.exports = { googleAuthController, facebookAuthController ,googleAuthVerify,licenceSignInController,facebookAuthVerify};
