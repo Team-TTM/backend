@@ -9,7 +9,7 @@ require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 
 
 
-const facebookAuthVerify = async (accessToken, profile) => {
+const facebookAuthVerify = async (accessToken, profile,done) => {
     try {
 
         const facebookId = profile.id;
@@ -90,15 +90,21 @@ const licenceSingInContoller = async (req, res) => {
 };
 
 const facebookAuthController = async (req, res) => {
-    if (!req.user) {
-        return res.status(401).json({ error: "Échec de l'authentification Facebook." });
+    try {
+        if (!req.user) {
+            return res.status(401).json({ error: "Utilisateur non authentifié" });
+        }
+
+        const { token, licenceExiste } = req.user;
+        const redirectUrl = licenceExiste
+            ? `http://localhost:3000/users/connected?token=${token}`
+            : `http://localhost:3000/users/verify-licence?token=${token}`; // Correction ici : demande la licence si elle n'existe pas
+
+        res.redirect(redirectUrl);
+    } catch (error) {
+        console.error("Erreur dans facebookAuthController:", error);
+        res.status(500).json({ error: "Erreur lors de la redirection après authentification" });
     }
-    const {token, licenceExiste } = req.user;
-    return res.json({
-        token,
-        message: "Connecté by Facebook",
-        licence: licenceExiste
-    });
 };
 
 const googleAuthController3 = async (req, res) => {
