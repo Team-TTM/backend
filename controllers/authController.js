@@ -2,38 +2,8 @@ const userService = require("../services/userService");
 const {checkAdherantLicence} = require("../services/adherantService");
 const jwt = require("jsonwebtoken");
 const path = require("path");
-const {getGoogleAccessToken, getGoogleUserInfo} = require("../services/googleAuthService");
 require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 
-
-
-
-
-const facebookAuthVerify = async (accessToken, profile,done) => {
-    try {
-
-        const facebookId = profile.id;
-
-        let user = await userService.findUserByFacebookId(facebookId);
-        if (!user) {
-            user = await userService.createUser({ facebookId });
-        }
-
-        const licenceExiste = await userService.doesUserHaveLicence(user);
-
-        // Générer un token JWT
-        const token = jwt.sign(
-            { userId: user._id.toString() },
-            process.env.JWT_SECRET,
-            { expiresIn: "24h" }
-        );
-        // Retourner l'utilisateur avec les infos nécessaires
-        return done(null, {token, licenceExiste });
-    } catch (error) {
-        console.error("Erreur dans Facebook Auth:", error);
-        return done(error);
-    }
-};
 
 
 const licenceSingInContoller = async (req, res) => {
@@ -89,105 +59,65 @@ const licenceSingInContoller = async (req, res) => {
     }
 };
 
-const facebookAuthController = async (req, res) => {
+const handleAuthVerification = async (platform, profile, done) => {
     try {
-        if (!req.user) {
-            return res.status(401).json({ error: "Utilisateur non authentifié" });
+        const platformId = profile.id; // Identifiant spécifique à la plateforme (Google ou Facebook)
+
+        // Recherche de l'utilisateur via l'ID de la plateforme
+        let user;
+        if (platform === 'google') {
+            user = await userService.findUserByGoogleId(platformId);
+        } else if (platform === 'facebook') {
+            user = await userService.findUserByFacebookId(platformId);
         }
 
-        const { token, licenceExiste } = req.user;
-        const redirectUrl = licenceExiste
-            ? `http://localhost:3000/users/connected?token=${token}`
-            : `http://localhost:3000/users/verify-licence?token=${token}`; // Correction ici : demande la licence si elle n'existe pas
-
-        res.redirect(redirectUrl);
-    } catch (error) {
-        console.error("Erreur dans facebookAuthController:", error);
-        res.status(500).json({ error: "Erreur lors de la redirection après authentification" });
-    }
-};
-
-const googleAuthController3 = async (req, res) => {
-    try {
-        const { code } = req.query;
-
-        const access_token = await getGoogleAccessToken(code);
-        if (!access_token) {
-            return res.status(500).json({ error: "Échec de récupération du token Google" });
-        }
-
-        const userInfo = await getGoogleUserInfo(access_token);
-        if (!userInfo?.sub) {
-            return res.status(500).json({ error: "Impossible de récupérer l'ID utilisateur Google." });
-        }
-
-        let user =
-            await userService.findUserByGoogleId(userInfo.sub);
         if (!user) {
-            user = await userService.createUser({ googleId: userInfo.sub });
-        }
-
-        const licenceExiste = await userService.doesUserHaveLicence(user);
-        const token = jwt.sign(
-            { userId: user._id.toString()},
-            process.env.JWT_SECRET,
-            { expiresIn: "24h" }
-        );
-        if (licenceExiste) {
-            res.redirect(`http://localhost:3000/users/connected?token=${token}`);
-        }else{
-            res.redirect(`http://localhost:3000/users/verify-licence?token=${token}`);
-        }
-
-    } catch (error) {
-        console.error("Error in Google Auth:", error);
-        res.status(500).json({ error: "Une erreur s'est produite lors de l'authentification Google." });
-    }
-};
-
-
-const googleAuthVerify = async (accessToken, profile, done) => {
-    try {
-        const googleId = profile.id;
-
-        let user = await userService.findUserByGoogleId(googleId); // Correction ici : `findUserByGoogleId` au lieu de `findUserByFacebookId`
-        if (!user) {
-            user = await userService.createUser({ googleId });
+            user = platform === 'google'
+                ? await userService.createUser({ googleId: platformId })
+                : await userService.createUser({ facebookId: platformId });
         }
 
         const licenceExiste = await userService.doesUserHaveLicence(user);
 
-        // Générer un token JWT
         const token = jwt.sign(
             { userId: user._id.toString() },
             process.env.JWT_SECRET,
             { expiresIn: "24h" }
         );
 
-        // Retourner l'utilisateur avec les infos nécessaires
         return done(null, { token, licenceExiste });
     } catch (error) {
-        console.error("Erreur dans Google Auth:", error);
+        console.error(`Erreur dans ${platform} Auth:`, error);
         return done(error);
     }
 };
 
-const googleAuthController = async (req, res) => {
+const googleAuthVerify = (accessToken, profile, done) => handleAuthVerification('google', profile, done);
+const facebookAuthVerify = (accessToken, profile, done) => handleAuthVerification('facebook', profile, done);
+
+
+const handleAuthRedirection = async (req, res, platform) => {
     try {
         if (!req.user) {
             return res.status(401).json({ error: "Utilisateur non authentifié" });
         }
 
         const { token, licenceExiste } = req.user;
+
         const redirectUrl = licenceExiste
             ? `http://localhost:3000/users/connected?token=${token}`
-            : `http://localhost:3000/users/verify-licence?token=${token}`; // Correction ici : demande la licence si elle n'existe pas
+            : `http://localhost:3000/users/verify-licence?token=${token}`;
 
-        res.redirect(redirectUrl);
+        return res.redirect(redirectUrl);
     } catch (error) {
-        console.error("Erreur dans googleAuthController:", error);
-        res.status(500).json({ error: "Erreur lors de la redirection après authentification" });
+        console.error(`Erreur dans ${platform}AuthController:`, error);
+        return res.status(500).json({ error: "Erreur lors de la redirection après authentification" });
     }
 };
+
+
+const googleAuthController = (req, res) => handleAuthRedirection(req, res, "Google");
+
+const facebookAuthController = (req, res) => handleAuthRedirection(req, res, "Facebook");
 
 module.exports = { googleAuthController, facebookAuthController ,googleAuthVerify,licenceSingInContoller,facebookAuthVerify};
