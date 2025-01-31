@@ -17,7 +17,6 @@ const licenceSignInController = async (req, res) => {
     }
 
     try {
-        console.log("Vérification de la licence:", licence);
         const isLicenceValid = await checkAdherantLicence(licence);
 
         if (!isLicenceValid) {
@@ -33,7 +32,7 @@ const licenceSignInController = async (req, res) => {
 
         const existingUser = await userService.findUserByLicence(licence);
         if (existingUser) {
-            if ((user.googleId && !existingUser.facebookId) || (user.facebookId && !existingUser.googleId)) {
+            if ((user.googleId && existingUser.facebookId) || (user.facebookId && existingUser.googleId)) {
                 // Fusionner les comptes si l'un est Google et l'autre est Facebook
                 await userService.mergeUserFacebookAndGoogleIds(existingUser, userId);
                 const token = createToken(existingUser._id);
@@ -88,7 +87,7 @@ const handleAuthVerification = async (platform, profile, done) => {
 
         const licenceExiste = await userService.doesUserHaveLicence(user._id);
 
-        const token = createToken(user);
+        const token = createToken(user._id);
 
         return done(null, { token, licenceExiste });
     } catch (error) {
