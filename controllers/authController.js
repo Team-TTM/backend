@@ -32,7 +32,8 @@ const licenceSignInController = async (req, res) => {
 
         const existingUser = await userService.findUserByLicence(licence);
         if (existingUser) {
-            if ((user.googleId && existingUser.facebookId) || (user.facebookId && existingUser.googleId)) {
+            if ((user.googleId && existingUser.facebookId && !user.facebookId &&  !existingUser.googleId) ||
+                (user.facebookId && existingUser.googleId && !user.googleId &&  !existingUser.facebookId )){
                 // Fusionner les comptes si l'un est Google et l'autre est Facebook
                 await userService.mergeUserFacebookAndGoogleIds(existingUser, userId);
                 const token = createToken(existingUser._id);
