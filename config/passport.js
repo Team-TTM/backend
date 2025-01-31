@@ -1,23 +1,37 @@
 
+// const FacebookStrategy = require('passport-facebook').Strategy;
 const passport = require('passport');
-const FacebookStrategy = require('passport-facebook').Strategy;
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const authController = require('../controllers/authController'); // Importer le contrôleur
 const path = require("path");
 require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 
 
-passport.use(new FacebookStrategy({
-    clientID: process.env.FACEBOOK_CLIENT_ID,
-    clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
+// passport.use(new FacebookStrategy({
+//     clientID: process.env.FACEBOOK_CLIENT_ID,
+//     clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
+// }, async (accessToken, refreshToken, profile, done) => {
+//     try {
+//         const userData = await authController.facebookAuthVerify(accessToken, profile);
+//         done(null, userData);
+//     } catch (error) {
+//         done(error, null);
+//     }
+// }));
+
+
+passport.use(new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: process.env.GOOGLE_CALLBACK_URL,
+    scope: ["email", "profile", "openid"],
 }, async (accessToken, refreshToken, profile, done) => {
     try {
-        const userData = await authController.facebookAuthVerify(accessToken, profile);
-        done(null, userData);
+        await authController.googleAuthVerify(accessToken, profile,done);
     } catch (error) {
-        done(error, null);
+        done(error);
     }
 }));
-
 
 
 
