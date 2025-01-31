@@ -28,7 +28,7 @@ const licenceSignInController = async (req, res) => {
 
         const user = await userService.findUserByUserId(userId);
         if (!user) {
-            return res.status(404).json({ error: "Utilisateur non trouvé." });
+            return res.status(403).json({ error: "Utilisateur non trouvé." });
         }
 
         const existingUser = await userService.findUserByLicence(licence);
@@ -39,7 +39,7 @@ const licenceSignInController = async (req, res) => {
                 const token = createToken(existingUser._id);
                 const updatedUser = await userService.findUserByUserId(existingUser._id);
 
-                return res.status(200).json({
+                return res.status(201).json({
                     token,
                     user: updatedUser,
                     message: `Fusion des comptes réussie (Facebook et Google).`
