@@ -70,6 +70,7 @@ const mergeUserFacebookAndGoogleIds = async (userId1, userId2) => {
 
     // Si l'utilisateur 1 possède un ID Google et l'utilisateur 2 possède un ID Facebook
     if (user1.googleId && user2.facebookId) {
+        await deleteUserById(userId2);
         await User.updateOne(
             { _id: userId1 },
             { $set: { facebookId: user2.facebookId } }
@@ -77,6 +78,7 @@ const mergeUserFacebookAndGoogleIds = async (userId1, userId2) => {
     }
     // Si l'utilisateur 1 possède un ID Facebook et l'utilisateur 2 possède un ID Google
     else if (user1.facebookId && user2.googleId) {
+        await deleteUserById(userId2);
         await User.updateOne(
             { _id: userId1 },
             { $set: { googleId: user2.googleId } }
@@ -85,7 +87,7 @@ const mergeUserFacebookAndGoogleIds = async (userId1, userId2) => {
         throw new Error("Fusion impossible, les utilisateurs ne possèdent pas des comptes différents (Google et Facebook)");
     }
 
-    await deleteUserById(userId2);  // Suppression de l'utilisateur 2 après fusion
+     // Suppression de l'utilisateur 2 après fusion
 };
 
 module.exports = {
