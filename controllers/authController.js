@@ -45,7 +45,7 @@ const licenceSignInController = async (req, res) => {
                     message: `Fusion des comptes réussie (Facebook et Google).`
                 });
             } else {
-                return res.status(400).json({
+                return res.status(402).json({
                     error: "Fusion impossible : deux comptes du même type (Facebook ou Google) détectés."
                 });
             }
@@ -116,7 +116,7 @@ const handleAuthRedirection = async (req, res, platform) => {
         return res.redirect(redirectUrl);
     } catch (error) {
         console.error(`Erreur dans ${platform}AuthController:`, error);
-        return res.status(500).json({ error: "Erreur lors de la redirection après authentification" });
+        return res.status(501).json({ error: "Erreur lors de la redirection après authentification" });
     }
 };
 
