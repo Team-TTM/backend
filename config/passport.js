@@ -1,8 +1,8 @@
-
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
-const authController = require('../controllers/authController'); // Importer le contrôleur
+const {googleAuthVerify, facebookAuthVerify} = require("../services/AuthVerify");
+
 const path = require("path");
 require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 
@@ -14,7 +14,7 @@ passport.use(new FacebookStrategy({
 
 }, async (accessToken, refreshToken, profile, done) => {
     try {
-         await authController.facebookAuthVerify(accessToken, profile,done);
+        await facebookAuthVerify(accessToken, profile, done);
     } catch (error) {
         done(error, null);
     }
@@ -28,12 +28,11 @@ passport.use(new GoogleStrategy({
     scope: ["email", "profile", "openid"],
 }, async (accessToken, refreshToken, profile, done) => {
     try {
-        await authController.googleAuthVerify(accessToken, profile,done);
+        await googleAuthVerify(accessToken, profile, done);
     } catch (error) {
         done(error);
     }
 }));
-
 
 
 module.exports = passport;
