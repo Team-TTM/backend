@@ -5,6 +5,7 @@ const userSchema = new mongoose.Schema({
     licence: {
         type: String,
         unique: true,
+        sparse: true,  // Permet que ce champ soit vide ou non défini tout en maintenant l'unicité
     },
     role: {
         type : String,
