@@ -1,120 +1,55 @@
-# Déploiement de l'Application
+# Projet Backend Node.js
 
-Voici les étapes pour lancer le serveur en local, en partant de la construction du frontend jusqu'à l'exécution du serveur backend.
+## Description
 
-## Étapes à suivre
+Ce projet est une application backend construite avec Node.js et Express.  
+Il intègre des fonctionnalités d'authentification via Google et Facebook en utilisant Passport.js, ainsi que des opérations sur la base de données.
 
-1. **Construire le frontend**
-   -   Aller dans le dossier `frontend` :
-     ```bash
-     cd frontend
-     ```
-   - construire le build du frontend qui sera dans le `fronted/dist` :
-     ```bash
-     npm run build
-     ```
+## Prérequis
 
-2. **Déplacer le frontend dans le backend**
-   - Revenir à la racine du projet :
-     ```bash
-     cd ..
-     ```
-   - Copier le dossier `dist` généré dans le frontend vers le `backend` :
-     ```bash
-     cp -r frontend/dist backend/
-     ```
+- Node.js (version 18.20.4 ou ultérieure)
+- npm (version 10.7.0 ou ultérieure)
+- Une base de données (MongoDB)
 
-3. **Lancer le serveur local**
-   - Aller dans le dossier `backend` :
-     ```bash
-     cd backend
-     ```
-   - Démarre le serveur en local avec la commande :
-     ```bash
-     npm run start
-     ```
+## Installation
 
-## Résumé des commandes
+1. Clonez le dépôt :
 
-# Documentation des Routes API
+git clone https://github.com/votre-utilisateur/votre-repo.git
+cd votre-repo
 
-Base URL : /users
+2. Installez les dépendances :
 
+npm install
 
-1. Authentification via Google
+3. Configurez les variables d'environnement en créant un fichier `.env` à la racine du projet et en y ajoutant les informations nécessaires (ex: identifiants OAuth, informations de connexion à la base de données).
 
-Méthode : POST
-URL : /users/auth/google
-Description : Cette route permet d’authentifier un utilisateur via Google.
+## Scripts npm
 
-Requête :
-•	Body (JSON) :
-```bash
-  {
-  "token": "string"
-  }
-```
-	•	token : Le token d’identification généré par Google.
+- **`start`** : Compile le frontend et démarre le serveur.
+- **`dev`** : Démarre le serveur en mode développement avec `nodemon`.
+- **`import:db`** : Exécute le script pour importer des données dans la base de données.
+- **`build`** : Construit le frontend et met à jour le dossier `dist` du backend.
+- **`clean`** : Supprime le dossier `dist` du backend.
+- **`clean-bd`** : Réinitialise la base de données.
+- **`lint`** : Analyse le code avec ESLint.
 
-Réponse :
+## Routes d'authentification
 
-	•	Réponses :
-	•	200 OK : { "message": "connected by google" }
-	•	400 Bad Request : { "error": "Le token Google est requis pour l'authentification." }
-	•	401 Unauthorized : { "error": "Le token Google est invalide ou expiré." }
+Le projet utilise Passport.js pour gérer l'authentification via Google et Facebook.
 
-2. Authentification via Facebook
+### **Google Authentication**
+- `GET users/auth/google` : Redirige l'utilisateur vers la page de connexion Google.
+- `GET users/auth/google/callback` : Callback après l'authentification Google, renvoie un token d'authentification.
 
-Méthode : POST
-URL : /users/auth/facebook
-Description : Cette route permet d’authentifier un utilisateur via Facebook.
+### **Facebook Authentication**
+- `GET users/auth/facebook` : Redirige l'utilisateur vers la page de connexion Facebook.
+- `GET users/auth/facebook/callback` : Callback après l'authentification Facebook, renvoie un token d'authentification.
 
-Requête :
-•	Body (JSON) :
-```bash
-{
-"token": "string"
-}
-```
-	•	token : Le token d’identification généré par Facebook.
+### **Licence Check**
+- `POST /licence-check` : Vérifie la licence de l'utilisateur. Cette route nécessite un token d'identification dans l'en-tête de la requête.
 
-Réponse :
+## Remarques
 
-    •	Réponses :
-    •	200 OK : { "message": "connected by facebook" }
-    •	400 Bad Request : { "error": "Le token Facebook est requis pour l'authentification." }
-    •	401 Unauthorized : { "error": "Le token Facebook est invalide ou expiré." }
-
-3. Vérification de licence
-
-Méthode : POST
-URL : /users/licence-check
-Description : Cette route vérifie si une licence est valide pour un utilisateur, en fonction du service utilisé (Google ou Facebook).
-
-
-axios.get('/some-protected-route', {
-headers: {
-'Authorization': `Bearer ${token}`,  // Envoi du token dans l'en-tête Authorization
-}
-});
-Requête :
-•	Body (JSON) :
-```bash
-{
-"token": "string",
-"service": "string",
-"licence": "string"
-}
-```
-	•	token : Le token de l’utilisateur.
-	•	service : Le service utilisé pour l’authentification. Valeurs possibles :
-	•	"g" : Google.
-	•	"f" : Facebook.
-	•	licence : Le numéro de licence à vérifier.
-
-Réponse :
-
-    •   200 OK : { "message": "Licence checked for token and service." }
-	•	400 Bad Request : { "error": "Token, service, et licence sont requis pour vérifier la licence." }
-	•	404 Not Found : { "error": "Licence introuvable pour le service." }
-
+- Assurez-vous que les scripts liés à la base de données sont bien configurés.
+- Après authentification, le token reçu doit être stocké côté client et inclus dans les requêtes pour accéder aux routes protégées.
