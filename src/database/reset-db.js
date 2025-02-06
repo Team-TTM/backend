@@ -3,7 +3,7 @@ const Users = require('../models/Users');
 const Adherant = require("../models/Adherant");  // Exemple avec un modèle User
 
 const path = require("path");
-require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
+require('dotenv').config({ path: path.resolve(__dirname, '../../../.env') });
 
 // Chargement des variables d'environnement
 const MONGO_DB_URL = process.env.MONGO_DB_URL;

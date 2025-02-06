@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const authenticateJWT = require('../middleware/authenticateJWT')
 const passport = require('passport');
+authenticateJWT = require('../middleware/auth');
 const authController = require("../controllers/authController");
 const path = require("path");
 
@@ -17,6 +17,6 @@ router.get('/auth/facebook/callback', passport.authenticate('facebook', {session
 router.post('/licence-check',authenticateJWT,authController.licenceSignInController);
 
 router.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '..','dist', 'index.html'));
+    res.sendFile(path.join(__dirname, '..','..','dist', 'index.html'));
 });
 module.exports = router;

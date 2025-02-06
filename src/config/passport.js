@@ -1,10 +1,11 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
-const {googleAuthVerify, facebookAuthVerify} = require("../services/AuthVerify");
+
 
 const path = require("path");
-require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
+const {facebookAuthVerify, googleAuthVerify} = require("../controllers/authController");
+require('dotenv').config({ path: path.resolve(__dirname, '../../../.env') });
 
 
 passport.use(new FacebookStrategy({

@@ -1,13 +1,13 @@
 const express = require('express');
 const logger = require('morgan');
-const connectToDb = require('./database/init-db'); // Connexion MongoDB
-const passport = require("./config/passport");
+const connectToDb = require('./src/database/init-db'); // Connexion MongoDB
+const passport = require("./src/config/passport");
 const app = express();
 const port = 3000;
 
-const indexRouter = require('./routes/index');
-const usersRouter = require('./routes/user');
-const assetsRouter = require('./routes/assets');
+const indexRouter = require('./src/routes/index');
+const usersRouter = require('./src/routes/user');
+const assetsRouter = require('./src/routes/assets');
 
 app.use(logger('dev'));
 app.use(passport.initialize());
