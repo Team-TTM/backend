@@ -4,7 +4,7 @@ const FacebookStrategy = require('passport-facebook').Strategy;
 
 
 const path = require("path");
-const {facebookAuthVerify, googleAuthVerify} = require("../controllers/authController");
+const {facebookAuthVerify, googleAuthVerify} = require("../services/AuthVerify");
 require('dotenv').config({ path: path.resolve(__dirname, '../../../.env') });
 
 
