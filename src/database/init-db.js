@@ -1,29 +1,30 @@
-const mongoose = require('mongoose');
+const { Client } = require('pg');
 const path = require("path");
 const {importerXlsx} = require('../services/adherantService');
 require('dotenv').config({ path: path.resolve(__dirname, '../../../.env') });
 
-// Chargement des variables d'environnement
-const MONGO_DB_URL = process.env.MONGO_DB_URL;
-const MONGO_DB_NAME = process.env.MONGO_DB_NAME;
-const XLSX_FILE = 'export_adherents_27-11-2024.xlsx';
+const client = new Client({
+    user: process.env.POSTGRESQL_USER,
+    host: process.env.POSTGRESQL_URL,
+    database: process.env.POSTGRESQL_DATABASE,
+    password: process.env.POSTGRESQL_PASSWORD,
+    port: process.env.POSTGRESQL_PORT
+});
 
-async function connectToDb() {
+async function connectToDb(options) {
     try {
         // Connexion à la base de données
-        await mongoose.connect(MONGO_DB_URL, {
-            dbName: MONGO_DB_NAME,
-
-        });
-        console.log('✅ Connexion établie avec MongoDB');
+        await client.connect(options);
+        console.log('✅ Connexion établie avec PostGre');
 
         // Importation du fichier XLSX
-        await importerXlsx(path.resolve(__dirname, '../../data', XLSX_FILE));
+        // await importerXlsx(path.resolve(__dirname, '../../data', XLSX_FILE));
         } catch (err) {
         // Gestion des erreurs
-        console.error('❌ Erreur lors de la connexion ou de l\'importation :', err.message);
+        console.error('❌Erreur de connexion à la base de données PostgreSQL', err);
         process.exit(1); // Quitte le processus avec une erreur
     }
 }
 
-module.exports = connectToDb;
+connectToDb();
+// module.exports = connectToDb;
