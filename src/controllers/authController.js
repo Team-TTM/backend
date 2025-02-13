@@ -1,8 +1,7 @@
 const userService = require("../services/userService");
 const {checkAdherantLicence} = require("../services/adherantService");
-const path = require("path");
 const {createToken} = require("../services/tokenService");
-require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
+
 
 
 
