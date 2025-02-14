@@ -14,15 +14,16 @@ const handleAuthVerification = async (platform, profile, done) => {
 
         if (!user) {
             user = platform === 'google'
-                ? await userService.createUser({googleId: platformId})
-                : await userService.createUser({facebookId: platformId});
+                ? await userService.createUserGoogle(platformId)
+                : await userService.createUserFacebook(platformId);
         }
 
-        const licenceExiste = await userService.doesUserHaveLicence(user._id);
 
-        const token = createToken(user._id);
+        const isAdherant = user.id_adherant != null;
 
-        return done(null, {token, licenceExiste});
+        const token = createToken(user.id_user);
+
+        return done(null, {token, licenceExiste: isAdherant});
     } catch (error) {
         console.error(`Erreur dans ${platform} Auth:`, error);
         return done(error);
