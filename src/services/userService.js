@@ -1,106 +1,77 @@
-const User = require("../models/Users");
+const UsersModel = require("../models/usersModel");
 
+// 🔹 Trouver un utilisateur par son Google ID
 const findUserByGoogleId = async (googleId) => {
-    return User.findOne({ googleId });
+    return UsersModel.findUserByGoogleId(googleId);
 };
 
+// 🔹 Trouver un utilisateur par son Facebook ID
 const findUserByFacebookId = async (facebookId) => {
-    return User.findOne({ facebookId });
+    return UsersModel.findUserByFacebookId(facebookId);
 };
 
-const findUserByLicence = async (licence) => {
-    return User.findOne({ licence });
-};
-
+// 🔹 Trouver un utilisateur par son ID utilisateur
 const findUserByUserId = async (userId) => {
-    return User.findOne({ _id: userId });
+    return UsersModel.findUserById(userId);
 };
 
-const createUser = async (userData) => {
-    const user = new User(userData);
-    await user.save();
-    return user;
+// 🔹 Créer un utilisateur avec un Facebook ID
+const createUserFacebook = async (facebookID) => {
+    return UsersModel.createFacebookUser(facebookID);
 };
 
-const doesUserHaveLicence = async (userId) => {
-    return User.exists({ _id: userId, licence: { $exists: true } });
+// 🔹 Créer un utilisateur avec un Google ID
+const createUserGoogle = async (googleID) => {
+    return UsersModel.createGoogleUser(googleID);
 };
 
-const userExistsById = async (userId) => {
-    return User.exists({ _id: userId });
+// 🔹 Mettre à jour l'ID adhérant d’un utilisateur
+const updateUserLicence = async (userId, adherantID) => {
+    return UsersModel.updateAdherantId(userId, adherantID);
 };
 
-const updateUserLicence = async (userId, licence) => {
-    await User.updateOne(
-        { _id: userId },
-        { $set: { licence } }
-    );
-};
-
-const getFacebookId = async (userId) => {
-    const user = await User.findOne({ _id: userId }, 'facebookId');
-    return user ? user.facebookId : null;
-};
-
-const getGoogleId = async (userId) => {
-    const user = await User.findOne({ _id: userId }, 'googleId');
-    return user ? user.googleId : null;
-};
-
-const deleteUserById = async (userId) => {
-    try {
-        const user = await User.findByIdAndDelete(userId);
-        if (!user) {
-            throw new Error('Utilisateur non trouvé');
-        }
-        return user;
-    } catch (error) {
-        console.error('Erreur lors de la suppression :', error);
-        throw error;
-    }
-};
-
+// 🔹 Fusionner les comptes Facebook et Google
 const mergeUserFacebookAndGoogleIds = async (userId1, userId2) => {
-    const user1 = await User.findOne({ _id: userId1 });
-    const user2 = await User.findOne({ _id: userId2 });
+    try {
+        const user1 = await UsersModel.findUserById(userId1);
+        const user2 = await UsersModel.findUserById(userId2);
 
-    if (!user1 || !user2) {
-        throw new Error("Un ou les deux utilisateurs sont introuvables");
-    }
+        if (!user1 || !user2) {
+            throw new Error("❌ Un ou les deux utilisateurs sont introuvables");
+        }
 
-    // Si l'utilisateur 1 possède un ID Google et l'utilisateur 2 possède un ID Facebook
-    if (user1.googleId && user2.facebookId) {
-        await deleteUserById(userId2);
-        await User.updateOne(
-            { _id: userId1 },
-            { $set: { facebookId: user2.facebookId } }
-        );
-    }
-    // Si l'utilisateur 1 possède un ID Facebook et l'utilisateur 2 possède un ID Google
-    else if (user1.facebookId && user2.googleId) {
-        await deleteUserById(userId2);
-        await User.updateOne(
-            { _id: userId1 },
-            { $set: { googleId: user2.googleId } }
-        );
-    } else {
-        throw new Error("Fusion impossible, les utilisateurs ne possèdent pas des comptes différents (Google et Facebook)");
-    }
+        // 🔸 Si user1 a Google et user2 a Facebook → fusion
+        if (user1.google_id && user2.facebook_id) {
+            await UsersModel.updateFacebookId(userId1, user2.facebook_id);
+            await UsersModel.deleteUserById(userId2);
+            console.log(`✅ Fusion réussie : Google ID gardé, Facebook ID fusionné sous user ${userId1}`);
+        }
+        // 🔸 Si user1 a Facebook et user2 a Google → fusion
+        else if (user1.facebook_id && user2.google_id) {
+            await UsersModel.updateGoogleId(userId1, user2.google_id);
+            await UsersModel.deleteUserById(userId2);
+            console.log(`✅ Fusion réussie : Facebook ID gardé, Google ID fusionné sous user ${userId1}`);
+        }
+        else {
+            throw new Error("❌ Fusion impossible : les comptes ne sont pas distincts (Google & Facebook)");
+        }
 
-     // Suppression de l'utilisateur 2 après fusion
+        // Retourne l'utilisateur mis à jour après fusion
+        return await UsersModel.findUserById(userId1);
+
+    } catch (err) {
+        console.error("❌ Erreur lors de la fusion des comptes :", err);
+        throw err;
+    }
 };
 
+// ✅ Exportation des fonctions
 module.exports = {
     findUserByGoogleId,
     findUserByFacebookId,
-    findUserByLicence,
     findUserByUserId,
-    createUser,
-    doesUserHaveLicence,
-    userExistsById,
+    createUserFacebook,
+    createUserGoogle,
     updateUserLicence,
-    getFacebookId,
-    getGoogleId,
-    deleteUserById,
     mergeUserFacebookAndGoogleIds
 };
