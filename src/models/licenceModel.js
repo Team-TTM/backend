@@ -1,9 +1,9 @@
-const client = require('./db'); // Connexion à la base de données
+const client = require('../config/database'); // Connexion à la base de données
 
 const createLicenceTable = async () => {
     const query = `
         CREATE TABLE IF NOT EXISTS licences (
-            numero_licence SERIAL PRIMARY KEY,
+            numero_licence VARCHAR(255)  PRIMARY KEY,
             statut VARCHAR(255) NOT NULL,
             type VARCHAR(255) NOT NULL,
             longue BOOLEAN NOT NULL,
