@@ -1,12 +1,12 @@
-const client = require('./db'); // Connexion à la base de données
+const client = require('../config/database'); // Connexion à la base de données
 
 const createAdherantTable = async () => {
     const query = `
-        CREATE TABLE IF NOT EXISTS users (
+        CREATE TABLE IF NOT EXISTS adherants (
              id_adherant SERIAL PRIMARY KEY,
              numero_licence VARCHAR(255) UNIQUE NOT NULL,
-             id_adresse VARCHAR(255) UNIQUE NOT NULL,
-             id_contact VARCHAR(255) UNIQUE NOT NULL,
+             id_adresse INT UNIQUE NOT NULL,
+             id_contact INT UNIQUE NOT NULL,
              prenom VARCHAR(255) NOT NULL,
              nom VARCHAR(255) NOT NULL,
              nom_usage VARCHAR(255),
@@ -20,9 +20,9 @@ const createAdherantTable = async () => {
     `;
     try {
         await client.query(query);
-        console.log('✅ Table "users" créée ou déjà existante.');
+        console.log('✅ Table "adherant" créée ou déjà existante.');
     } catch (err) {
-        console.error('❌ Erreur lors de la création de la table "users":', err);
+        console.error('❌ Erreur lors de la création de la table "adherant":', err);
         throw err;
     }
 };
