@@ -1,6 +1,5 @@
 const client = require('../config/database'); // Connexion à la base de données
 
-// 🔹 Création de la table users
 const createUserTable = async () => {
     const query = `
         CREATE TABLE IF NOT EXISTS users (
@@ -145,7 +144,7 @@ const updateAdherantId = async (userId, adherantId) => {
         RETURNING *;
     `;
     try {
-        const res = await client.query(query, [userId, adherantId]); // Correction du mauvais paramètre
+        const res = await client.query(query, [userId, adherantId]);
         return res.rows[0] || null;
     } catch (err) {
         console.error('❌ Erreur lors de la mise à jour de l’ID adhérant:', err);
@@ -169,7 +168,7 @@ const deleteUserById = async (userId) => {
     }
 };
 
-// ✅ Exportation des fonctions
+
 module.exports = {
     createUserTable,
     createFacebookUser,
