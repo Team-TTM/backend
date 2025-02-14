@@ -1,4 +1,4 @@
-const client = require('./db'); // Connexion à la base de données
+const client = require('../config/database'); // Connexion à la base de données
 
 const createAnneLicenceTable = async () => {
     const query = `
