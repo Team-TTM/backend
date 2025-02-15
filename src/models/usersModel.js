@@ -102,7 +102,7 @@ const findUserByFacebookId = async (facebookId) => {
  */
 const findUserByGoogleId = async (googleId) => {
     const query = `
-        SELECT id_user FROM users
+        SELECT * FROM users
         WHERE google_id = $1;
     `;
     try {
@@ -123,7 +123,7 @@ const findUserByGoogleId = async (googleId) => {
  */
 const findUserByLicence = async (numeroLicence) => {
     const query = `
-        SELECT id_user FROM users
+        SELECT * FROM users
         WHERE numero_licence = $1;
     `;
     try {
