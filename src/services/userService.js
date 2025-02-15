@@ -1,75 +1,103 @@
 const UsersModel = require("../models/usersModel");
+const User = require("../models/User");
 
 
 /**
  * Trouver un utilisateur par son Google ID.
  * @async
  * @param {string} googleId - L'identifiant Google de l'utilisateur.
- * @returns {Promise<Object|null>} L'utilisateur trouvé ou null s'il n'existe pas.
+ * @returns {Promise<User|null>} L'utilisateur trouvé ou null s'il n'existe pas.
  */
 const findUserByGoogleId = async (googleId) => {
-    return UsersModel.findUserByGoogleId(googleId);
+    const user = await UsersModel.findUserByGoogleId(googleId);
+    if (!user) {
+        return null;
+    }
+    // Retourner un objet de type User
+    return new User(user.id_user, user.numero_licence, user.role, user.charte_signe, user.google_id, user.facebook_id, user.newsletter);
 };
 
 /**
  * Trouver un utilisateur par son Facebook ID.
  * @async
  * @param {string} facebookId - L'identifiant Facebook de l'utilisateur.
- * @returns {Promise<Object|null>} L'utilisateur trouvé ou null s'il n'existe pas.
+ * @returns {Promise<User|null>} L'utilisateur trouvé ou null s'il n'existe pas.
  */
 const findUserByFacebookId = async (facebookId) => {
-    return UsersModel.findUserByFacebookId(facebookId);
+    const user =  await UsersModel.findUserByFacebookId(facebookId);
+    if (!user) {
+        return null;
+    }
+    // Retourner un objet de type User
+    return new User(user.id_user, user.numero_licence, user.role, user.charte_signe, user.google_id, user.facebook_id, user.newsletter);
 };
 
 /**
  * Trouver un utilisateur par son ID utilisateur.
  * @async
  * @param {number} userId - L'identifiant de l'utilisateur.
- * @returns {Promise<Object|null>} L'utilisateur trouvé ou null s'il n'existe pas.
+ * @returns {Promise<User|null>} L'utilisateur trouvé ou null s'il n'existe pas.
  */
 const findUserByUserId = async (userId) => {
-    return UsersModel.findUserById(userId);
+    const user = await UsersModel.findUserById(userId);
+    if (!user) {
+        return null;
+    }
+    // Retourner un objet de type User
+    return new User(user.id_user, user.numero_licence, user.role, user.charte_signe, user.google_id, user.facebook_id, user.newsletter);
 };
 
 /**
  * Recherche un utilisateur par son numéro de licence.
  * @async
- * @param {string} numeroLicence - Le numéro de licence de l'utilisateur.
- * @returns {Promise<Object|null>} L'utilisateur trouvé (contenant `id_user`) ou `null` si aucun utilisateur n'est trouvé.
+ * @param {string} numberLicence - Le numéro de licence de l'utilisateur.
+ * @returns {Promise<User|null>} L'utilisateur trouvé (contenant `id_user`) ou `null` si aucun utilisateur n'est trouvé.
  * @throws {Error} En cas d'erreur lors de la requête à la base de données.
  */
-const findUserByLicence = async (numeroLicence) => {
-    return UsersModel.findUserByLicence(numeroLicence);
+const findUserByLicence = async (numberLicence) => {
+    const user = await  UsersModel.findUserByLicence(numberLicence);
+    if (!user) {
+        return null;
+    }
+    return new User(user.id_user, user.numero_licence, user.role, user.charte_signe, user.google_id, user.facebook_id, user.newsletter);
 };
 
 /**
  * Créer un utilisateur avec un Facebook ID.
  * @async
  * @param {string} facebookID - L'identifiant Facebook de l'utilisateur.
- * @returns {Promise<Object>} L'utilisateur créé.
+ * @returns {Promise<User>} L'utilisateur créé.
  */
 const createUserFacebook = async (facebookID) => {
-    return UsersModel.createFacebookUser(facebookID);
+    // Appel à la méthode du modèle pour insérer l'utilisateur dans la base de données
+    const createdUser = await UsersModel.createFacebookUser(facebookID);
+
+    return new User(createdUser.id_user, createdUser.numero_licence, createdUser.role, createdUser.charte_signe, createdUser.google_id, createdUser.facebook_id, createdUser.newsletter);
 };
 
 /**
  * Créer un utilisateur avec un Google ID.
  * @async
  * @param {string} googleID - L'identifiant Google de l'utilisateur.
- * @returns {Promise<Object>} L'utilisateur créé.
+ * @returns {Promise<User>} L'utilisateur créé.
  */
 const createUserGoogle = async (googleID) => {
-    return UsersModel.createGoogleUser(googleID);
+    const createdUser = await UsersModel.createGoogleUser(googleID);
+    return new User(createdUser.id_user, createdUser.numero_licence, createdUser.role, createdUser.charte_signe, createdUser.google_id, createdUser.facebook_id, createdUser.newsletter);
 };
 /**
  * Mettre à jour l'ID adhérent d’un utilisateur.
  * @async
  * @param {number} userId - L'identifiant de l'utilisateur.
- * @param {string} adherantID - Le nouvel identifiant d'adhérent.
- * @returns {Promise<Object>} L'utilisateur mis à jour.
+ * @param {string} adherentID - Le nouvel identifiant d'adhérent.
+ * @returns {Promise<User>} L'utilisateur mis à jour.
  */
-const updateUserLicence = async (userId, adherantID) => {
-    return UsersModel.updateAdherantId(userId, adherantID);
+const updateUserLicence = async (userId, adherentID) => {
+    const user = await  UsersModel.updateAdherantId(userId, adherentID);
+    if (!user) {
+        return null;
+    }
+    return new User(user.id_user, user.numero_licence, user.role, user.charte_signe, user.google_id, user.facebook_id, user.newsletter);
 };
 
 
@@ -79,13 +107,13 @@ const updateUserLicence = async (userId, adherantID) => {
  * @async
  * @param {number} userId1 - L'ID du premier utilisateur.
  * @param {number} userId2 - L'ID du second utilisateur.
- * @returns {Promise<Object>} L'utilisateur fusionné.
+ * @returns {Promise<User>} L'utilisateur fusionné.
  * @throws {Error} Si un des utilisateurs est introuvable ou si la fusion est impossible.
  */
 const mergeUserFacebookAndGoogleIds = async (userId1, userId2) => {
     try {
-        const user1 = await UsersModel.findUserById(userId1);
-        const user2 = await UsersModel.findUserById(userId2);
+        const user1 = await findUserByUserId(userId1);
+        const user2 = await findUserByUserId(userId2);
 
         if (!user1 || !user2) {
             throw new Error(`❌ Fusion impossible : L'un des utilisateurs (ID: ${userId1}, ID: ${userId2}) est introuvable.`);
@@ -120,14 +148,14 @@ const mergeUserFacebookAndGoogleIds = async (userId1, userId2) => {
             throw new Error(`❌ Fusion impossible : Les comptes (ID: ${userId1}, ID: ${userId2}) n'ont pas de services distincts (Google & Facebook).`);
         }
 
-        // Retourner l'utilisateur mis à jour après la fusion
-        return await UsersModel.findUserById(userId1);
-
+        // Retourner un objet de type User après la fusion
+        return findUserByUserId(userId1)
     } catch (err) {
         console.error("❌ Erreur lors de la fusion des comptes :", err);
         throw err;
     }
 };
+
 
 // ✅ Exportation des fonctions
 module.exports = {
