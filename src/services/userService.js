@@ -14,7 +14,7 @@ const findUserByGoogleId = async (googleId) => {
         return null;
     }
     // Retourner un objet de type User
-    return new User(user.id_user, user.numero_licence, user.role, user.charte_signe, user.google_id, user.facebook_id, user.newsletter);
+    return new User(...user);
 };
 
 /**
@@ -29,7 +29,8 @@ const findUserByFacebookId = async (facebookId) => {
         return null;
     }
     // Retourner un objet de type User
-    return new User(user.id_user, user.numero_licence, user.role, user.charte_signe, user.google_id, user.facebook_id, user.newsletter);
+    return new User(...user);
+
 };
 
 /**
@@ -44,7 +45,7 @@ const findUserByUserId = async (userId) => {
         return null;
     }
     // Retourner un objet de type User
-    return new User(user.id_user, user.numero_licence, user.role, user.charte_signe, user.google_id, user.facebook_id, user.newsletter);
+    return new User(...user);
 };
 
 /**
@@ -59,7 +60,7 @@ const findUserByLicence = async (numberLicence) => {
     if (!user) {
         return null;
     }
-    return new User(user.id_user, user.numero_licence, user.role, user.charte_signe, user.google_id, user.facebook_id, user.newsletter);
+    return new User(...user);
 };
 
 /**
@@ -72,7 +73,8 @@ const createUserFacebook = async (facebookID) => {
     // Appel à la méthode du modèle pour insérer l'utilisateur dans la base de données
     const createdUser = await UsersModel.createFacebookUser(facebookID);
 
-    return new User(createdUser.id_user, createdUser.numero_licence, createdUser.role, createdUser.charte_signe, createdUser.google_id, createdUser.facebook_id, createdUser.newsletter);
+    return new User(...createdUser);
+
 };
 
 /**
@@ -83,7 +85,7 @@ const createUserFacebook = async (facebookID) => {
  */
 const createUserGoogle = async (googleID) => {
     const createdUser = await UsersModel.createGoogleUser(googleID);
-    return new User(createdUser.id_user, createdUser.numero_licence, createdUser.role, createdUser.charte_signe, createdUser.google_id, createdUser.facebook_id, createdUser.newsletter);
+    return User(...createdUser);
 };
 /**
  * Mettre à jour l'ID adhérent d’un utilisateur.
@@ -97,7 +99,7 @@ const updateUserLicence = async (userId, adherentID) => {
     if (!user) {
         return null;
     }
-    return new User(user.id_user, user.numero_licence, user.role, user.charte_signe, user.google_id, user.facebook_id, user.newsletter);
+    return new User(...user);
 };
 
 
