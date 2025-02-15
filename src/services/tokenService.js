@@ -5,7 +5,7 @@ require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 
 const createToken = (userId) => {
     return jwt.sign(
-        { userId: userId.toString() },
+        { userId: userId},
         process.env.JWT_SECRET,
         { expiresIn: '12h' }
     );
