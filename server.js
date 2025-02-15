@@ -6,7 +6,7 @@ const app = express();
 const port = 3000;
 
 const indexRouter = require('./src/routes/index');
-const usersRouter = require('./src/routes/user');
+const usersRouter = require('./src/routes/userRoute');
 const assetsRouter = require('./src/routes/assets');
 const {initDatabase, dropAllTables} = require("./src/database/init-db");
 
@@ -51,5 +51,5 @@ app.use((error, req, res, next) => {
     });
 });
 
-// Connexion à  et démarrage du serveur
+// Connexion à et démarrage du serveur
 startServer()
