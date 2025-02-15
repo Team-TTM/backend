@@ -1,10 +1,13 @@
-const userService = require("../services/userService");
-const {checkAdherantLicence} = require("../services/adherantService");
-const {createToken} = require("../services/tokenService");
+const licenceService = require("../services/licenceService");
 
 
-
-
+/**
+ * Contrôleur pour la connexion via une licence d'adhérent.
+ * @async
+ * @param {Object} req - L'objet de requête Express.
+ * @param {Object} res - L'objet de réponse Express.
+ * @returns {Promise<Response>} Une réponse JSON avec un message de confirmation ou une erreur.
+ */
 const licenceSignInController = async (req, res) => {
     const { licence } = req.body;
     const { userId } = req.auth;
@@ -16,57 +19,24 @@ const licenceSignInController = async (req, res) => {
     }
 
     try {
-        const isLicenceValid = await checkAdherantLicence(licence);
-
-        if (!isLicenceValid) {
-            return res.status(404).json({
-                error: `Licence ${licence} introuvable.`
-            });
-        }
-
-        const user = await userService.findUserByUserId(userId);
-        if (!user) {
-            return res.status(403).json({ error: "Utilisateur non trouvé." });
-        }
-
-        const existingUser = await userService.findUserByLicence(licence);
-        if (existingUser) {
-            if ((user.googleId && existingUser.facebookId && !user.facebookId &&  !existingUser.googleId) ||
-                (user.facebookId && existingUser.googleId && !user.googleId &&  !existingUser.facebookId )){
-                // Fusionner les comptes si l'un est Google et l'autre est Facebook
-                await userService.mergeUserFacebookAndGoogleIds(existingUser, userId);
-                const token = createToken(existingUser._id);
-                const updatedUser = await userService.findUserByUserId(existingUser._id);
-
-                return res.status(201).json({
-                    token,
-                    user: updatedUser,
-                    message: `Fusion des comptes réussie (Facebook et Google).`
-                });
-            } else {
-                return res.status(402).json({
-                    error: "Fusion impossible : deux comptes du même type (Facebook ou Google) détectés."
-                });
-            }
-        } else {
-            // Si la licence n'est pas encore associée, l'associer à l'utilisateur
-            await userService.updateUserLicence(userId, licence);
-            const updatedUser = await userService.findUserByUserId(userId);
-
-            return res.status(200).json({
-                user: updatedUser,
-                message: `Licence ${licence} associée à l'utilisateur avec succès.`
-            });
-        }
-
+        const result = await licenceService.processLicenceSignIn(userId, licence);
+        return res.status(result.token ? 201 : 200).json(result);
     } catch (error) {
-        console.error("Erreur dans l'authentification de la licence pour l'utilisateur", userId, error);
-        res.status(500).json({
-            error: "Une erreur s'est produite lors de l'authentification de la licence."
+        console.error("❌ Erreur dans l'authentification de la licence :", error);
+        return res.status(500).json({
+            error: error.message || "Une erreur s'est produite lors de l'authentification de la licence."
         });
     }
 };
 
+/**
+ * Gère la redirection après authentification via une plateforme (Google ou Facebook).
+ * @async
+ * @param {Object} req - L'objet de requête Express.
+ * @param {Object} res - L'objet de réponse Express.
+ * @param {string} platform - La plateforme d'authentification ("Google" ou "Facebook").
+ * @returns {Promise<Response>} Une redirection vers l'URL appropriée ou une réponse JSON en cas d'erreur.
+ */
 const handleAuthRedirection = async (req, res, platform) => {
     try {
         if (!req.user) {
@@ -87,8 +57,19 @@ const handleAuthRedirection = async (req, res, platform) => {
 };
 
 
+/**
+ * Contrôleur pour l'authentification via Google.
+ * @param {Object} req - L'objet de requête Express.
+ * @param {Object} res - L'objet de réponse Express.
+ * @returns {Promise<Response>} Une redirection après authentification Google.
+ */
 const googleAuthController = (req, res) => handleAuthRedirection(req, res, "Google");
-
+/**
+ * Contrôleur pour l'authentification via Facebook.
+ * @param {Object} req - L'objet de requête Express.
+ * @param {Object} res - L'objet de réponse Express.
+ * @returns {Promise<Response>} Une redirection après authentification Facebook.
+ */
 const facebookAuthController = (req, res) => handleAuthRedirection(req, res, "Facebook");
 
 module.exports = { googleAuthController, facebookAuthController ,licenceSignInController};
