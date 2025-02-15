@@ -81,7 +81,7 @@ const createGoogleUser = async (googleId) => {
  */
 const findUserByFacebookId = async (facebookId) => {
     const query = `
-        SELECT id_user FROM users
+        SELECT * FROM users
         WHERE facebook_id = $1;
     `;
     try {
@@ -117,17 +117,17 @@ const findUserByGoogleId = async (googleId) => {
 /**
  * Recherche un utilisateur par son numéro de licence.
  * @async
- * @param {string} numeroLicence - Le numéro de licence de l'utilisateur.
+ * @param {string} numberLicence - Le numéro de licence de l'utilisateur.
  * @returns {Promise<Object|null>} L'utilisateur trouvé (contenant `id_user`) ou `null` si aucun utilisateur n'est trouvé.
  * @throws {Error} En cas d'erreur lors de la requête à la base de données.
  */
-const findUserByLicence = async (numeroLicence) => {
+const findUserByLicence = async (numberLicence) => {
     const query = `
         SELECT * FROM users
         WHERE numero_licence = $1;
     `;
     try {
-        const res = await client.query(query, [numeroLicence]);
+        const res = await client.query(query, [numberLicence]);
         return res.rows[0] || null;
     } catch (err) {
         console.error('❌ Erreur lors de la récupération de l’utilisateur:', err);
