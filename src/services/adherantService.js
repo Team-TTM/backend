@@ -1,5 +1,6 @@
 const xlsx = require('xlsx');
-const Adherant = require('../models/Adherant');
+const AdherantsModel = require('../models/adherantModel');
+
 
 function convertirDate(dateStr) {
     const [jour, mois, annee] = dateStr.split('/'); // Découpe la chaîne
@@ -13,14 +14,24 @@ function chargerDonneesExcel(fichierXlsx) {
     return xlsx.utils.sheet_to_json(sheet);
 }
 // Fonction pour insérer les adhérents dans MongoDB
+
+
+const createAdherant = async (adherantData) => {
+    return await AdherantsModel.createAdherant(adherantData)
+}
+
+
+// TODO
+const updateAdherant = async (adherantData) => {
+    return null;
+}
+
 async function transformerDonneesEnAdherants(donnees) {
     const adherants = [];
 
     for (const row of donnees) {
-        const existe = await checkAdherantLicence(row['Numéro de licence']);
-        if (!existe) {
             adherants.push({
-                statut: row['Statut'] || null,
+                statut: row['Statut'] === 'Validé' || null,
                 nom: {
                     prenom: row['Prénom'] || null,
                     nom: row['Nom'] || null,
@@ -50,60 +61,68 @@ async function transformerDonneesEnAdherants(donnees) {
                     fraisMutation: row['Accord frais de mutation'] === 'Oui',
                     fraisFormation: row['Accord frais de formation'] === 'Oui',
                     droitImage: row['Cession du droit à l\'image'] === 'Oui',
-                    newsletterFederale: row['Newsletter fédérale'] === 'Oui',
-                    newsletterCommerciale: row['Newsletter commerciale'] === 'Oui',
-                    autorisationParentale: row['Autorisation parentale pour les mineurs'] === 'Oui',
+                newsletterFederale: row['Newsletter fédérale'] === 'Oui',
+                newsletterCommerciale: row['Newsletter commerciale'] === 'Oui',
+                autorisationParentale: row['Autorisation parentale pour les mineurs'] === 'Oui',
+            },
+            licence: {
+                numero :  row['Numéro de licence'],
+                type: row['Type de licence'],
+                longue: row['Licence longue'] === 'Oui',
+                demiTarif: row['Licence demi-tarif'] === 'Oui',
+                horsClub: row['Licence hors club (licence individuelle)'] === 'Oui',
+                clubId: row['Club ID'] || null,
+                dateValidation: convertirDate(row['Date validation de la licence']) || null,
+                dateDemande: convertirDate(row['Date demande licence']) || null,
+                categorieAge: row['Catégorie d\'âge'] || null,
+                conditionsAssuranceValidees: row['A validé les conditions d\'assurance'] === 'Oui',
+                typeCertificatMedical: row['Type de certificat médical'] || null,
+                penaliteRetard: row['Pénalité de retard'] === 'Oui' ? 1 : 0,
+                infosCloture: null,
+                anneeBlanche: row['Année blanche'] === 'Oui',
+                premiereLicence: row['Première licence'] === 'Oui',
+            },
+            paiements: {
+                montantTotalPaye: row['Montant total payé en ligne'] === 'Oui' ? 1 : 0,
+                parts: {
+                    federation: Number(row['Montant part Fédérale']?.replace(',', '.')) || 0,
+                    ligue: Number(row['Montant part Ligue']?.replace(',', '.')) || 0,
+                    club: row['Montant part Club'] === '-' ? 0 : Number(row['Montant part Club']?.replace(',', '.')) || 0,
                 },
-                licence: {
-                    numero :  row['Numéro de licence'],
-                    type: row['Type de licence'],
-                    longue: row['Licence longue'] === 'Oui',
-                    demiTarif: row['Licence demi-tarif'] === 'Oui',
-                    horsClub: row['Licence hors club (licence individuelle)'] === 'Oui',
-                    clubId: row['Club ID'] || null,
-                    dateValidation: convertirDate(row['Date validation de la licence']) || null,
-                    dateDemande: convertirDate(row['Date demande licence']) || null,
-                    categorieAge: row['Catégorie d\'âge'] || null,
-                    conditionsAssuranceValidees: row['A validé les conditions d\'assurance'] === 'Oui',
-                    typeCertificatMedical: row['Type de certificat médical'] || null,
-                    penaliteRetard: row['Pénalité de retard'] === 'Oui' ? 1 : 0,
-                    infosCloture: null,
-                    anneeBlanche: row['Année blanche'] === 'Oui',
-                    premiereLicence: row['Première licence'] === 'Oui',
+                assurance: {
+                    montant: Number(row['Montant Assurance']?.replace(',', '.')) || 0,
+                    details: row['Assurance'] || null,
                 },
-                paiements: {
-                    montantTotalPaye: row['Montant total payé en ligne'] === 'Oui' ? 1 : 0,
-                    parts: {
-                        federation: Number(row['Montant part Fédérale']?.replace(',', '.')) || 0,
-                        ligue: Number(row['Montant part Ligue']?.replace(',', '.')) || 0,
-                        club: row['Montant part Club'] === '-' ? 0 : Number(row['Montant part Club']?.replace(',', '.')) || 0,
-                    },
-                    assurance: {
-                        montant: Number(row['Montant Assurance']?.replace(',', '.')) || 0,
-                        details: row['Assurance'] || null,
-                    },
-                },
-                activites: {
-                    triathlon: row['Triathlon'],
-                    duathlon: row['Duathlon'],
-                    aquathlon: row['Aquathlon'],
-                    bikeRun: row['Bike & Run'],
-                    crossTriathlon: row['Cross Triathlon'],
-                    crossDuathlon: row['Cross Duathlon'],
-                    swimrun: row['Swimrun'],
-                    raids: row['Raids'],
-                    swimbike: row['Swimbike'],
-                },
-                categorieEducateur: null,
-            });
-        }
+            },
+            activites: {
+                triathlon: row['Triathlon'],
+                duathlon: row['Duathlon'],
+                aquathlon: row['Aquathlon'],
+                bikeRun: row['Bike & Run'],
+                crossTriathlon: row['Cross Triathlon'],
+                crossDuathlon: row['Cross Duathlon'],
+                swimrun: row['Swimrun'],
+                raids: row['Raids'],
+                swimbike: row['Swimbike'],
+            },
+            categorieEducateur: null,
+        });
     }
-
     return adherants;
 }
-async function insererAdherantsDansMongoDB(adherants) {
+
+const createOrUpdateAdherant = async (adherant) => {
+    const exist = await checkAdherantLicence(adherant.licence.numero)
+    if (exist) {
+        await updateAdherant(adherant);
+    } else {
+        await createAdherant(adherant)
+    }
+}
+
+async function insererAdherants(adherants) {
     try {
-        await Adherant.insertMany(adherants);
+        await adherants.forEach((adherant) => createOrUpdateAdherant(adherant));
     } catch (err) {
         console.error('❌ Erreur lors de l\'importation :', err.message);
     }
@@ -115,8 +134,8 @@ async function importerXlsx(fichierXlsx) {
         const donnees = chargerDonneesExcel(fichierXlsx);
         console.log('🔄 Conversion des données..');
         const adherents = await transformerDonneesEnAdherants(donnees);
-        console.log('🛠️ Importation des données dans MongoDB...');
-        await insererAdherantsDansMongoDB(adherents);
+        console.log('🛠️ Importation des données dans la base de donner...');
+        await insererAdherants(adherents);
         console.log(`✅ Importation terminée avec succès. ${adherents.length} documents insérés.`);
     } catch (err) {
         console.error('❌ Erreur lors de l\'importation :', err.message);
@@ -124,11 +143,12 @@ async function importerXlsx(fichierXlsx) {
 }
 
 
-
+/**
+ * Vérifie si un adhérent existe en base de données.
+ * @param {string} num_licence - Le numéro de licence de l'adhérent.
+ * @returns {Promise<boolean>} - Retourne `true` si l'adhérent existe, sinon `false`.
+ */
 async function checkAdherantLicence(num_licence) {
-    if (await Adherant.exists({"licence.numero": num_licence})) {
-        return true;
-    }
-    return false;
+    return AdherantsModel.adherantExist(num_licence)
 }
 module.exports = {importerXlsx, checkAdherantLicence};
