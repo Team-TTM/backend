@@ -8,6 +8,20 @@ const port = 3000;
 const indexRouter = require('./src/routes/index');
 const usersRouter = require('./src/routes/user');
 const assetsRouter = require('./src/routes/assets');
+const {initDatabase, dropAllTables} = require("./src/database/init-db");
+
+const startServer = async () => {
+    try {
+        await dropAllTables();  // Supprime toutes les tables avant d'initialiser la DB
+        await initDatabase();  // Initialise la base de données
+        app.listen(port, () => {
+            console.log(`Serveur en écoute sur http://localhost:${port}`);
+        });
+    } catch (err) {
+        console.error('Erreur de connexion à MongoDB :', err);
+        process.exit(1);  // Arrêt du processus en cas d'erreur
+    }
+};
 
 app.use(logger('dev'));
 app.use(passport.initialize());
@@ -37,15 +51,5 @@ app.use((error, req, res, next) => {
     });
 });
 
-// Connexion à MongoDB et démarrage du serveur
-connectToDb()
-    .then((db) => {
-        app.locals.db = db;
-        app.listen(port, () => {
-            console.log(`Serveur en écoute sur http://localhost:${port}`);
-        });
-    })
-    .catch((err) => {
-        console.error('Erreur de connexion à MongoDB :', err);
-        process.exit(1);
-    });
+// Connexion à  et démarrage du serveur
+startServer()
