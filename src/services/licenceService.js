@@ -12,7 +12,8 @@ const {createToken} = require("./tokenService");
  */
 const processLicenceSignIn = async (userId, licence) => {
     const isLicenceValid = await checkAdherantLicence(licence);
-
+    let updatedUser;
+    let message;
     if (!isLicenceValid) {
         throw new Error(`Licence ${licence} introuvable.`);
     }
@@ -25,25 +26,18 @@ const processLicenceSignIn = async (userId, licence) => {
     const existingUser = await userService.findUserByLicence(licence);
     if (existingUser) {
         const newUserId = existingUser.id_user
-        await userService.mergeUserFacebookAndGoogleIds(newUserId, userId);
-        const token = createToken(newUserId);
-        const updatedUser = await userService.findUserByUserId(newUserId);
+        updatedUser = await userService.mergeUserFacebookAndGoogleIds(newUserId, userId);
+        message = `Fusion des comptes réussie (Facebook et Google).`;
 
-        return {
-            token,
-            user: updatedUser,
-            message: `Fusion des comptes réussie (Facebook et Google).`
-        };
     } else {
         // Si la licence n'est pas encore associée, l'associer à l'utilisateur
-        await userService.updateUserLicence(userId, licence);
-        const updatedUser = await userService.findUserByUserId(userId);
-
-        return {
-            user: updatedUser,
-            message: `Licence ${licence} associée à l'utilisateur avec succès.`
-        };
+        updatedUser = await   userService.updateUserLicence(userId, licence);
+        message = `Licence ${licence} associée à l'utilisateur avec succès.`;
     }
+    return {
+        user: updatedUser,
+        message: message,
+    };
 };
 
 module.exports = {

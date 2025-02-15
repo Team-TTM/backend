@@ -1,4 +1,5 @@
 const licenceService = require("../services/licenceService");
+const {createToken} = require("../services/tokenService");
 
 
 /**
@@ -19,8 +20,9 @@ const licenceSignInController = async (req, res) => {
     }
 
     try {
-        const result = await licenceService.processLicenceSignIn(userId, licence);
-        return res.status(result.token ? 201 : 200).json(result);
+        const {user,message} = await licenceService.processLicenceSignIn(userId, licence);
+        const token = createToken(user.id_user);
+        return res.status(200).json({token, message});
     } catch (error) {
         console.error("❌ Erreur dans l'authentification de la licence :", error);
         return res.status(500).json({
@@ -42,7 +44,6 @@ const handleAuthRedirection = async (req, res, platform) => {
         if (!req.user) {
             return res.status(401).json({ error: "Utilisateur non authentifié" });
         }
-
         const { token, licenceExiste } = req.user;
 
         const redirectUrl = licenceExiste
