@@ -1,6 +1,5 @@
 const userService = require("./userService");
 const {checkAdherentLicence} = require("./adherantService");
-const {createToken} = require("./tokenService");
 
 /**
  * Vérifie et associe une licence à un utilisateur.

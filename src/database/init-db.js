@@ -1,9 +1,9 @@
 const {importerXlsx} = require('../services/adherantService');
 
-const {createAnneLicenceTable} = require("../models/anneLicenceModel");
+const {createSaisonTable} = require("../models/saisonModel");
 const {createAdherantTable} = require("../models/adherantModel");
 const {createUserTable} = require("../models/usersModel");
-const {createLicenceAnneeAssociationTable} = require("../models/licenceAnneAssociationModel");
+const {createLicenceSaisonAssociationTable} = require("../models/licenceAnneAssociationModel");
 const client = require("../config/database");
 
 const path = require("path");
@@ -16,9 +16,9 @@ async function initDatabase() {
         // Connexion à la base de données
 
         await createAdherantTable()
-        await createAnneLicenceTable();
+        await createSaisonTable();
         await createUserTable();
-        await createLicenceAnneeAssociationTable();
+        await createLicenceSaisonAssociationTable();
 
         // Importation du fichier XLSX
         await importerXlsx(path.resolve(__dirname, '../../data', process.env.XLSX_FILE));

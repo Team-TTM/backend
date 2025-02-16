@@ -1,5 +1,5 @@
 const client = require('../config/database'); // Connexion à la base de données
-
+const Adherent = require('./Adherent');
 /**
  * Crée la table "adherants" dans la base de données si elle n'existe pas.
  * @async
@@ -26,19 +26,19 @@ const createAdherantTable = async () => {
             ville             VARCHAR(255),
             pays              VARCHAR(255),
 -- contact 
+            telephone         VARCHAR(20),
             mobile            VARCHAR(20),
             email             VARCHAR(255)                       NOT NULL,
             urgency_telephone VARCHAR(20),
 -- licence 
             statut            BOOLEAN                            NOT NULL,
             type              VARCHAR(255)                       NOT NULL,
-            longue            BOOLEAN                            NOT NULL,
             demi_tarif        BOOLEAN                            NOT NULL,
             hors_club         BOOLEAN                            NOT NULL,
             categorie         VARCHAR(255)                       NOT NULL,
-            annee_blanche     BOOLEAN                            NOT NULL
+            annee_blanche     BOOLEAN                            NOT NULL,
+            pratique          VARCHAR(255)                       NOT NULL
         );
-
 
     `;
     try {
@@ -50,52 +50,62 @@ const createAdherantTable = async () => {
     }
 };
 
-
-const createAdherant = async (adherantData) => {
+/**
+ * Crée un nouvel adhérent dans la base de données via le modèle AdherentsModel.
+ *
+ * @param {Adherent} adherent - L'objet Adherent à insérer dans la base de données.
+ * @returns {Promise} - Une promesse qui se résout lorsque l'adhérent est créé.
+ */
+const createAdherant = async (adherent) => {
     const query = `
         INSERT INTO adherants (
             numero_licence, prenom, nom, nom_usage, date_naissance, sexe, profession,
             principale, details, lieu_dit, code_postale, ville, pays,
-            mobile, email, urgency_telephone,
-            statut, type, longue, demi_tarif, hors_club, categorie, annee_blanche
+            telephone,mobile, email, urgency_telephone,
+            statut, type, demi_tarif, hors_club, categorie, annee_blanche,pratique
         ) VALUES (
             $1, $2, $3, $4, $5, $6, $7, 
-            $8, $9, $10, $11, $12, $13, 
-            $14, $15, $16, 
-            $17, $18, $19, $20, $21, $22, $23
+            $8, $9, $10, $11, $12, $13, $14, 
+            $15, $16, $17, $18, $19, $20, 
+            $21, $22,$23,$24
         )
         RETURNING *;
     `;
     try {
         const res = await client.query(query, [
-            adherantData.licence.numero,
-            adherantData.nom.prenom,
-            adherantData.nom.nom,
-            adherantData.nom.nomUsage,
-            adherantData.dateNaissance,
-            adherantData.sexe,
-            adherantData.profession,
-            adherantData.adresse.principale,
-            adherantData.adresse.details,
-            adherantData.adresse.lieuDit,
-            adherantData.adresse.codePostal,
-            adherantData.adresse.ville,
-            adherantData.adresse.pays,
-            adherantData.contacts.mobile,
-            adherantData.contacts.email,
-            adherantData.contacts.urgenceTelephone,
-            adherantData.statut,
-            adherantData.licence.type,
-            adherantData.licence.longue,
-            adherantData.licence.demiTarif,
-            adherantData.licence.horsClub,
-            adherantData.licence.categorieAge,
-            adherantData.licence.anneeBlanche
+            adherent.numeroLicence,
+            adherent.prenom,
+            adherent.nom,
+            adherent.nomUsage,
+            adherent.dateNaissance,
+            adherent.sexe,
+            adherent.profession,
+
+            adherent.principale,
+            adherent.details,
+            adherent.lieuDit,
+            adherent.codePostal,
+            adherent.ville,
+            adherent.pays,
+
+            adherent.telephone,
+            adherent.mobile,
+            adherent.email,
+            adherent.urgenceTelephone,
+
+            adherent.statut,
+            adherent.type,
+            adherent.demiTarif,
+            adherent.horsClub,
+            adherent.categorie,
+            adherent.anneeBlanche,
+            adherent.pratique,
+
         ]);
-        console.log("✅ Nouvel adhérant inséré :", res.rows[0]);
+        // console.log("✅ Nouvel adhérant inséré :", res.rows[0]);
         return res.rows[0];
     } catch (err) {
-        console.error("❌ Erreur lors de l'insertion de l'adhérant:", err);
+        console.error("❌ Erreur lors de l'insertion de l'adhérant:", err,adherent);
         throw err;
     }
 };
@@ -105,7 +115,7 @@ const createAdherant = async (adherantData) => {
  * @param {string} num_licence - Le numéro de licence de l'adhérent.
  * @returns {Promise<boolean>} - Retourne `true` si l'adhérent existe, sinon `false`.
  */
-const adherantExist = async (num_licence) => {
+const adherentExist = async (num_licence) => {
     const query = `
         SELECT 1
         FROM adherants
@@ -122,25 +132,39 @@ const adherantExist = async (num_licence) => {
     }
     ;
 }
-const findUserById = async (num_licence) => {
-    const query = `
-        SELECT *
-        FROM users
-        WHERE numero_licence = $1;
+
+/**
+ * Récupère toutes les informations d'un adhérent en fonction de son numéro de licence.
+ *
+ * @param {string} numeroLicence - Le numéro de licence de l'adhérent.
+ * @returns {Promise<Array<Object>>} - Une promesse qui se résout en un tableau d'objets contenant les informations de l'adhérent.
+ * @throws {Error} - Si une erreur survient lors de la requête.
+ */
+const getAdherentDetails = async (numeroLicence) => {
+        const query = `
+        SELECT adherants.*
+        FROM adherants
+        INNER JOIN licence_saison_association
+        ON adherants.numero_licence = licence_saison_association.numero_licence
+        WHERE adherants.numero_licence = $1
     `;
-    try {
-        const res = await client.query(query, [num_licence]);
-        return res.rows[0] || null;
-    } catch (err) {
-        console.error('❌ Erreur lors de la récupération de l’utilisateur:', err);
-        throw err;
-    }
-};
+        const values = [numeroLicence];
+
+        try {
+            const res = await client.query(query, values);
+            console.log('Informations de l\'adhérent:', res.rows[0]);
+            return res.rows[0];
+        } catch (err) {
+            console.error('Erreur lors de la récupération des informations de l\'adhérent:', err);
+            throw err;
+        }
+    };
+
 
 
 module.exports = {
     createAdherantTable,
     createAdherant,
-    adherantExist,
-    findUserById
+    adherantExist: adherentExist,
+    getAdherentDetails,
 };
