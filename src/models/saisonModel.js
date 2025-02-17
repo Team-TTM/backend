@@ -10,7 +10,7 @@ const client = require('../config/database'); // Connexion à la base de donnée
 const createSaisonTable = async () => {
     const query = `
         CREATE TABLE IF NOT EXISTS saison (
-            saison VARCHAR (9) PRIMARY KEY 
+            saison_id VARCHAR (9) PRIMARY KEY 
         );
     `;
     try {
@@ -32,13 +32,13 @@ const createSaisonTable = async () => {
  */
 const insertIfNotExists = async (saison) => {
     const query = `
-        INSERT INTO saison (saison)
+        INSERT INTO saison (saison_id)
         VALUES ($1)
-        ON CONFLICT (saison) DO NOTHING;
+        ON CONFLICT (saison_id) DO NOTHING;
     `;
     try {
         await client.query(query, [saison]);
-        console.log(`✅ Saison "${saison}" insérée ou déjà existante.`);
+        // console.log(`✅ Saison "${saison}" insérée ou déjà existante.`);
     } catch (err) {
         console.error(`❌ Erreur lors de l'insertion de la saison "${saison}":`, err);
         throw err;
