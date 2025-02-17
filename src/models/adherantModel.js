@@ -6,7 +6,7 @@ const Adherent = require('./Adherent');
  * @async
  * @returns {Promise<void>}
  */
-const createAdherantTable = async () => {
+const createAdherentTable = async () => {
     const query = `
         CREATE TABLE IF NOT EXISTS adherants
         (
@@ -57,7 +57,7 @@ const createAdherantTable = async () => {
  * @param {Adherent} adherent - L'objet Adherent à insérer dans la base de données.
  * @returns {Promise} - Une promesse qui se résout lorsque l'adhérent est créé.
  */
-const createAdherant = async (adherent) => {
+const createAdherent = async (adherent) => {
     const query = `
         INSERT INTO adherants (
             numero_licence, prenom, nom, nom_usage, date_naissance, sexe, profession,
@@ -227,9 +227,9 @@ const getAdherentDetails = async (numeroLicence) => {
 
 
 module.exports = {
-    createAdherantTable,
-    createAdherant,
-    adherantExist: adherentExist,
+    createAdherentTable,
+    createAdherent,
+    adherentExist,
     getAdherentDetails,
     updateAdherent,
 };

@@ -26,7 +26,7 @@ function chargerDonneesExcel(fichierXlsx) {
  */
 const createAdherent = async (adherent) => {
     await Promise.all([
-        AdherentsModel.createAdherant(adherent),
+        AdherentsModel.createAdherent(adherent),
         insertIfNotExists(adherent.getDerniereSaison())
     ]);
     await insertLicenceSaisonAssociation(adherent.getDerniereSaison(), adherent.numeroLicence)
@@ -39,16 +39,17 @@ const createAdherent = async (adherent) => {
  */
 const updateAdherent = async (adherent) => {
     const adherentData = await AdherentsModel.getAdherentDetails(adherent.numeroLicence);
-    const adherentbd = Adherent.fromDataBase(adherentData);
 
-    if (adherent.getDerniereSaison() > adherentbd.getDerniereSaison()) {
-        adherent.merge(adherentbd);
+    const adherentFromDb = Adherent.fromDataBase(adherentData);
+
+    if (adherent.getDerniereSaison() > adherentFromDb.getDerniereSaison()) {
+        adherent.merge(adherentFromDb);
+        await insertIfNotExists(adherent.getDerniereSaison())
         await Promise.all([
-            AdherentsModel.updateAdherent(adherent),
-            insertIfNotExists(adherent.getDerniereSaison())
+            insertLicenceSaisonAssociation(adherent.getDerniereSaison(), adherent.numeroLicence),
+            AdherentsModel.updateAdherent(adherent)
         ]);
 
-        await insertLicenceSaisonAssociation(adherent.getDerniereSaison(),adherent.numeroLicence)
 
         const data = await AdherentsModel.getAdherentDetails(adherent.numeroLicence)
         console.log(data)
@@ -85,16 +86,6 @@ const createOrUpdateAdherent = async (adherent) => {
 
 
 /**
- * Insère plusieurs adhérents dans la base de données, en vérifiant leur existence.
- * @param {Adherent[]} adherents - Un tableau d'objets Adherent à insérer dans la base de données.
- * @returns {Promise} - Une promesse qui se résout lorsque tous les adhérents sont insérés ou mis à jour.
- */
-const insertAdherents = async (adherents) => {
-    await Promise.all(adherents.map(async (adherent) => createOrUpdateAdherent(adherent)));
-}
-
-
-/**
  * Importe les données à partir d'un fichier Excel et les insère dans la base de données.
  * @param {string} fichierXlsx - Le chemin vers le fichier Excel à importer.
  * @returns {Promise} - Une promesse qui se résout après l'importation complète des données.
@@ -105,9 +96,23 @@ async function importerXlsx(fichierXlsx) {
         const donnees = chargerDonneesExcel(fichierXlsx);
         console.log('🔄 Conversion des données..');
         const adherents = await transformerDonneesEnAdherents(donnees);
-        console.log('🛠️ Importation des données dans la base de donner...');
-        await insertAdherents(adherents);
-        console.log(`✅ Importation terminée avec succès. ${adherents.length} documents insérés.`);
+        console.log('🛠️ Importation des données dans la base de données...');
+
+        let ajoutCount = 0;
+        let majCount = 0;
+
+        for (const adherent of adherents) {
+            const exist = await checkAdherentLicence(adherent.numeroLicence);
+            if (exist) {
+                await updateAdherent(adherent);
+                majCount++;
+            } else {
+                await createAdherent(adherent);
+                ajoutCount++;
+            }
+        }
+
+        console.log(`✅ Importation terminée avec succès. ${ajoutCount} documents ajoutés, ${majCount} documents mis à jour.`);
     } catch (err) {
         console.error('❌ Erreur lors de l\'importation :', err.message);
     }
@@ -120,6 +125,6 @@ async function importerXlsx(fichierXlsx) {
  * @returns {Promise<boolean>} - Retourne `true` si l'adhérent existe, sinon `false`.
  */
 async function checkAdherentLicence(num_licence) {
-    return AdherentsModel.adherantExist(num_licence)
+    return AdherentsModel.adherentExist(num_licence)
 }
 module.exports = {importerXlsx,checkAdherentLicence};
