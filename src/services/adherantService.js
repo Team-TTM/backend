@@ -1,9 +1,8 @@
 const xlsx = require('xlsx');
 const AdherentsModel = require('../models/adherantModel');
 const Adherent = require("../models/Adherent");
-const {insertLicenceSaisonAssociation} = require("../models/licenceAnneAssociationModel");
+const {insertLicenceSaisonAssociation} = require("../models/licenceSaisonAssociationModel");
 const {insertIfNotExists} = require("../models/saisonModel");
-const {getAdherentDetails} = require("../models/adherantModel");
 
 
 
@@ -26,9 +25,11 @@ function chargerDonneesExcel(fichierXlsx) {
  * @returns {Promise} - Une promesse qui se résout lorsque l'adhérent est créé.
  */
 const createAdherent = async (adherent) => {
-    await AdherentsModel.createAdherant(adherent)
-    await insertIfNotExists(adherent.saison[0])
-    await insertLicenceSaisonAssociation(adherent.saison[0], adherent.numeroLicence)
+    await Promise.all([
+        AdherentsModel.createAdherant(adherent),
+        insertIfNotExists(adherent.getDerniereSaison())
+    ]);
+    await insertLicenceSaisonAssociation(adherent.getDerniereSaison(), adherent.numeroLicence)
 }
 
 /**
@@ -37,8 +38,21 @@ const createAdherent = async (adherent) => {
  * @returns {Promise} - Une promesse indiquant le succès ou l'échec de la mise à jour.
  */
 const updateAdherent = async (adherent) => {
-    const adherentbd = getAdherentDetails(adherent.numeroLicence);
-    return null;
+    const adherentData = await AdherentsModel.getAdherentDetails(adherent.numeroLicence);
+    const adherentbd = Adherent.fromDataBase(adherentData);
+
+    if (adherent.getDerniereSaison() > adherentbd.getDerniereSaison()) {
+        adherent.merge(adherentbd);
+        await Promise.all([
+            AdherentsModel.updateAdherent(adherent),
+            insertIfNotExists(adherent.getDerniereSaison())
+        ]);
+
+        await insertLicenceSaisonAssociation(adherent.getDerniereSaison(),adherent.numeroLicence)
+
+        const data = await AdherentsModel.getAdherentDetails(adherent.numeroLicence)
+        console.log(data)
+    }
 }
 
 /**
@@ -76,11 +90,7 @@ const createOrUpdateAdherent = async (adherent) => {
  * @returns {Promise} - Une promesse qui se résout lorsque tous les adhérents sont insérés ou mis à jour.
  */
 const insertAdherents = async (adherents) => {
-    try {
-        await Promise.all(adherents.map((adherent) => createOrUpdateAdherent(adherent)));
-    } catch (err) {
-        console.error('❌ Erreur lors de l\'importation :', err.message);
-    }
+    await Promise.all(adherents.map(async (adherent) => createOrUpdateAdherent(adherent)));
 }
 
 
