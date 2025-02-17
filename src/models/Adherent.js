@@ -1,4 +1,3 @@
-
 /**
  * Calcule la saison à laquelle appartient une date donnée.
  * La saison commence en septembre et se termine en août de l'année suivante.
@@ -290,6 +289,42 @@ class Adherant {
             row['Email'],
             row['Téléphone contact d\'urgence'],
             [saison]  // Saison calculée et ajoutée
+        );
+    }
+
+    /**
+     * Crée un adhérent à partir des données fournies.
+     * @param {Object} adherentData - Données de l'adhérent sous forme d'objet.
+     * @returns {Adherant} - Instance de la classe Adherant.
+     */
+    static fromDataBase(adherentData) {
+        return new Adherant(
+            adherentData.numero_licence,
+            adherentData.statut || false,
+            adherentData.type || null,
+            false, // Pas de donnée pour 'longue', on met false par défaut
+            adherentData.demi_tarif || false,
+            adherentData.hors_club || false,
+            adherentData.categorie || null,
+            adherentData.annee_blanche || false,
+            adherentData.pratique || null,
+            adherentData.prenom || null,
+            adherentData.nom || null,
+            adherentData.nom_usage || null,
+            new Date(adherentData.date_naissance) || null, // Conversion en Date
+            adherentData.sexe || null,
+            adherentData.profession || null,
+            adherentData.principale || null,
+            adherentData.details || null,
+            adherentData.lieu_dit || null,
+            adherentData.code_postale || null,
+            adherentData.ville || null,
+            adherentData.pays || null,
+            adherentData.telephone || null,
+            adherentData.mobile || null,
+            adherentData.email || null,
+            adherentData.urgency_telephone || null,
+            adherentData.saisons || null,
         );
     }
 }
