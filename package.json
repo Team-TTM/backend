@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "nodemon src/database/test.js",
     "start": "npm run build && node server.js",
     "dev": "nodemon server.js",
     "import:db": "node src/database/test.js",
@@ -20,7 +20,8 @@
     "@eslint/js": "^9.19.0",
     "eslint": "^9.19.0",
     "eslint-plugin-vue": "^9.32.0",
-    "globals": "^15.14.0",
+    "globals": "^15.15.0",
+    "jest": "^29.7.0",
     "nodemon": "^3.1.9"
   },
   "dependencies": {
