@@ -1,142 +1,103 @@
 const xlsx = require('xlsx');
-const AdherantsModel = require('../models/adherantModel');
+const AdherentsModel = require('../models/adherantModel');
+const Adherent = require("../models/Adherent");
+const {insertLicenceSaisonAssociation} = require("../models/licenceSaisonAssociationModel");
+const {insertIfNotExists} = require("../models/saisonModel");
 
 
-function convertirDate(dateStr) {
-    const [jour, mois, annee] = dateStr.split('/'); // Découpe la chaîne
-    return new Date(`${annee}-${mois}-${jour}`); // Recompose dans le format YYYY-MM-DD
-}
 
+/**
+ * Charge les données à partir d'un fichier Excel (XLSX).
+ * @param {string} fichierXlsx - Le chemin vers le fichier Excel à charger.
+ * @returns {Object[]} - Retourne les données sous forme de tableau d'objets JSON représentant les lignes du fichier.
+ */
 function chargerDonneesExcel(fichierXlsx) {
     const workbook = xlsx.readFile(fichierXlsx);
     const sheetName = workbook.SheetNames[0];
     const sheet = workbook.Sheets[sheetName];
     return xlsx.utils.sheet_to_json(sheet);
 }
-// Fonction pour insérer les adhérents dans MongoDB
 
 
-const createAdherant = async (adherantData) => {
-    return await AdherantsModel.createAdherant(adherantData)
+/**
+ * Crée un nouvel adhérent dans la base de données via le modèle AdherentsModel.
+ * @param {Adherent} adherent - L'objet Adherent à insérer dans la base de données.
+ * @returns {Promise} - Une promesse qui se résout lorsque l'adhérent est créé.
+ */
+const createAdherent = async (adherent) => {
+    await Promise.all([
+        AdherentsModel.createAdherent(adherent),
+        insertIfNotExists(adherent.getDerniereSaison())
+    ]);
+    await insertLicenceSaisonAssociation(adherent.getDerniereSaison(), adherent.numeroLicence)
 }
 
+/**
+ * Met à jour un adhérent existant dans la base de données.
+ * @param {Adherent} adherent - Les nouvelles données de l'adhérent à mettre à jour.
+ * @returns {Promise} - Une promesse indiquant le succès ou l'échec de la mise à jour.
+ */
+const updateAdherent = async (adherent) => {
+    const adherentData = await AdherentsModel.getAdherentDetails(adherent.numeroLicence);
 
-// TODO
-const updateAdherant = async (adherantData) => {
-    return null;
+    const adherentFromDb = Adherent.fromDataBase(adherentData);
+
+    if (adherent.getDerniereSaison() > adherentFromDb.getDerniereSaison()) {
+        adherent.merge(adherentFromDb);
+        await insertIfNotExists(adherent.getDerniereSaison())
+        await Promise.all([
+            insertLicenceSaisonAssociation(adherent.getDerniereSaison(), adherent.numeroLicence),
+            AdherentsModel.updateAdherent(adherent)
+        ]);
+
+
+        const data = await AdherentsModel.getAdherentDetails(adherent.numeroLicence)
+        console.log(data)
+    }
 }
 
-async function transformerDonneesEnAdherants(donnees) {
-    const adherants = [];
+/**
+ * Transforme les données provenant d'un fichier Excel en une liste d'objets Adherent.
+ * @param {Object[]} donnees - Le tableau de données extrait du fichier Excel.
+ * @returns {Promise<Adherent[]>} - Une promesse qui se résout avec un tableau d'objets Adherent.
+ */
+async function transformerDonneesEnAdherents(donnees) {
+    const adherents = [];
 
     for (const row of donnees) {
-            adherants.push({
-                statut: row['Statut'] === 'Validé' || null,
-                nom: {
-                    prenom: row['Prénom'] || null,
-                    nom: row['Nom'] || null,
-                    nomUsage: null,
-                //     TODO
-                },
-                dateNaissance: convertirDate(row['Date de naissance']) || null,
-                sexe: row['Sexe'] ? row['Sexe'].toUpperCase() : null,
-                lieuNaissance: row['Lieu de naissance'] || null,
-                profession: row['Profession'] || null,
-                nationalite: row['Nationalité'] || null,
-                adresse: {
-                    principale: row['Adresse principale'] || null,
-                    details: row['Adresse Détails'] || null,
-                    lieuDit: null,
-                    codePostal: row['Code Postal'] || null,
-                    ville: row['Ville'] || null,
-                    pays: row['Pays'] || null,
-                },
-                contacts: {
-                    telephone: row['Téléphone'] || null,
-                    mobile: null,
-                    email: row['Email'] || null,
-                    urgenceTelephone: row['Téléphone contact d\'urgence'] || null,
-                },
-                accords: {
-                    fraisMutation: row['Accord frais de mutation'] === 'Oui',
-                    fraisFormation: row['Accord frais de formation'] === 'Oui',
-                    droitImage: row['Cession du droit à l\'image'] === 'Oui',
-                newsletterFederale: row['Newsletter fédérale'] === 'Oui',
-                newsletterCommerciale: row['Newsletter commerciale'] === 'Oui',
-                autorisationParentale: row['Autorisation parentale pour les mineurs'] === 'Oui',
-            },
-            licence: {
-                numero :  row['Numéro de licence'],
-                type: row['Type de licence'],
-                longue: row['Licence longue'] === 'Oui',
-                demiTarif: row['Licence demi-tarif'] === 'Oui',
-                horsClub: row['Licence hors club (licence individuelle)'] === 'Oui',
-                clubId: row['Club ID'] || null,
-                dateValidation: convertirDate(row['Date validation de la licence']) || null,
-                dateDemande: convertirDate(row['Date demande licence']) || null,
-                categorieAge: row['Catégorie d\'âge'] || null,
-                conditionsAssuranceValidees: row['A validé les conditions d\'assurance'] === 'Oui',
-                typeCertificatMedical: row['Type de certificat médical'] || null,
-                penaliteRetard: row['Pénalité de retard'] === 'Oui' ? 1 : 0,
-                infosCloture: null,
-                anneeBlanche: row['Année blanche'] === 'Oui',
-                premiereLicence: row['Première licence'] === 'Oui',
-            },
-            paiements: {
-                montantTotalPaye: row['Montant total payé en ligne'] === 'Oui' ? 1 : 0,
-                parts: {
-                    federation: Number(row['Montant part Fédérale']?.replace(',', '.')) || 0,
-                    ligue: Number(row['Montant part Ligue']?.replace(',', '.')) || 0,
-                    club: row['Montant part Club'] === '-' ? 0 : Number(row['Montant part Club']?.replace(',', '.')) || 0,
-                },
-                assurance: {
-                    montant: Number(row['Montant Assurance']?.replace(',', '.')) || 0,
-                    details: row['Assurance'] || null,
-                },
-            },
-            activites: {
-                triathlon: row['Triathlon'],
-                duathlon: row['Duathlon'],
-                aquathlon: row['Aquathlon'],
-                bikeRun: row['Bike & Run'],
-                crossTriathlon: row['Cross Triathlon'],
-                crossDuathlon: row['Cross Duathlon'],
-                swimrun: row['Swimrun'],
-                raids: row['Raids'],
-                swimbike: row['Swimbike'],
-            },
-            categorieEducateur: null,
-        });
+        adherents.push(Adherent.fromCSV(row));
     }
-    return adherants;
+    return adherents;
 }
 
-const createOrUpdateAdherant = async (adherant) => {
-    const exist = await checkAdherantLicence(adherant.licence.numero)
-    if (exist) {
-        await updateAdherant(adherant);
-    } else {
-        await createAdherant(adherant)
-    }
-}
-
-async function insererAdherants(adherants) {
-    try {
-        await adherants.forEach((adherant) => createOrUpdateAdherant(adherant));
-    } catch (err) {
-        console.error('❌ Erreur lors de l\'importation :', err.message);
-    }
-}
-
+/**
+ * Importe les données à partir d'un fichier Excel et les insère dans la base de données.
+ * @param {string} fichierXlsx - Le chemin vers le fichier Excel à importer.
+ * @returns {Promise} - Une promesse qui se résout après l'importation complète des données.
+ */
 async function importerXlsx(fichierXlsx) {
     try {
         console.log('📂 Chargement du fichier Excel...');
         const donnees = chargerDonneesExcel(fichierXlsx);
         console.log('🔄 Conversion des données..');
-        const adherents = await transformerDonneesEnAdherants(donnees);
-        console.log('🛠️ Importation des données dans la base de donner...');
-        await insererAdherants(adherents);
-        console.log(`✅ Importation terminée avec succès. ${adherents.length} documents insérés.`);
+        const adherents = await transformerDonneesEnAdherents(donnees);
+        console.log('🛠️ Importation des données dans la base de données...');
+
+        let ajoutCount = 0;
+        let majCount = 0;
+
+        for (const adherent of adherents) {
+            const exist = await checkAdherentLicence(adherent.numeroLicence);
+            if (exist) {
+                await updateAdherent(adherent);
+                majCount++;
+            } else {
+                await createAdherent(adherent);
+                ajoutCount++;
+            }
+        }
+
+        console.log(`✅ Importation terminée avec succès. ${ajoutCount} documents ajoutés, ${majCount} documents mis à jour.`);
     } catch (err) {
         console.error('❌ Erreur lors de l\'importation :', err.message);
     }
@@ -148,7 +109,7 @@ async function importerXlsx(fichierXlsx) {
  * @param {string} num_licence - Le numéro de licence de l'adhérent.
  * @returns {Promise<boolean>} - Retourne `true` si l'adhérent existe, sinon `false`.
  */
-async function checkAdherantLicence(num_licence) {
-    return AdherantsModel.adherantExist(num_licence)
+async function checkAdherentLicence(num_licence) {
+    return AdherentsModel.adherentExist(num_licence)
 }
-module.exports = {importerXlsx, checkAdherantLicence};
+module.exports = {importerXlsx,checkAdherentLicence};

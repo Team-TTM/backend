@@ -1,6 +1,5 @@
 const express = require('express');
 const logger = require('morgan');
-const connectToDb = require('./src/database/init-db'); // Connexion MongoDB
 const passport = require("./src/config/passport");
 const app = express();
 const port = 3000;

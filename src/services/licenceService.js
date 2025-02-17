@@ -1,6 +1,5 @@
 const userService = require("./userService");
-const {checkAdherantLicence} = require("./adherantService");
-const {createToken} = require("./tokenService");
+const {checkAdherentLicence} = require("./adherantService");
 
 /**
  * Vérifie et associe une licence à un utilisateur.
@@ -11,7 +10,7 @@ const {createToken} = require("./tokenService");
  * @throws {Error} Si la licence est invalide ou si une erreur survient.
  */
 const processLicenceSignIn = async (userId, licence) => {
-    const isLicenceValid = await checkAdherantLicence(licence);
+    const isLicenceValid = await checkAdherentLicence(licence);
     let updatedUser;
     let message;
     if (!isLicenceValid) {
