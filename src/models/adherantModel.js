@@ -1,6 +1,5 @@
 
 const client = require('../config/database'); // Connexion à la base de données
-const Adherent = require('./Adherent');
 /**
  * Crée la table "adherants" dans la base de données si elle n'existe pas.
  * @async
@@ -173,6 +172,8 @@ const updateAdherent = async (adherent) => {
         throw err;
     }
 };
+
+
 /**
  * Vérifie si un adhérent existe en base de données.
  * @param {string} num_licence - Le numéro de licence de l'adhérent.
@@ -193,8 +194,9 @@ const adherentExist = async (num_licence) => {
         console.error("❌ Erreur lors de la vérification de l'adhérent:", err);
         throw err; //
     }
-    ;
 }
+
+
 
 /**
  * Récupère toutes les informations d'un adhérent en fonction de son numéro de licence.

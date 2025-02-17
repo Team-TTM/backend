@@ -1,6 +1,6 @@
 const {getSaisonPlusRecente, calculerSaison, convertirDate} = require("../utils/saisonUtils");
 
-class Adherant {
+class Adherent {
     get numeroLicence() {
         return this._numeroLicence;
     }
@@ -98,7 +98,7 @@ class Adherant {
     }
 
     /**
-     * Constructeur de la classe Adherant.
+     * Constructeur de la classe Adherent.
      * @param {string} numeroLicence - Le numéro de licence de l'adhérent.
      * @param {boolean} statut - Le statut de l'adhérent (par exemple, validé).
      * @param {string} type - Le type de licence.
@@ -197,14 +197,14 @@ class Adherant {
     /**
      * Crée un objet Adherent à partir d'une ligne de fichier CSV ou d'une source brute.
      * @param {Object} row - Ligne de données source (ex: fichier CSV).
-     * @returns {Adherant} Une instance de Adherent.
+     * @returns {Adherent} Une instance de Adherent.
      */
     static fromCSV(row) {
 
         const saison = calculerSaison(convertirDate(row['Date validation de la licence']));
         const dateNaisance = convertirDate(row['Date de naissance'])
 
-        return new Adherant(
+        return new Adherent(
             row['Numéro de licence'],
             calculetStatut(saison),
             row['Type de licence'],
@@ -236,10 +236,10 @@ class Adherant {
     /**
      * Crée un adhérent à partir des données fournies.
      * @param {Object} adherentData - Données de l'adhérent sous forme d'objet.
-     * @returns {Adherant} - Instance de la classe Adherant.
+     * @returns {Adherent} - Instance de la classe Adherent.
      */
     static fromDataBase(adherentData) {
-        return new Adherant(
+        return new Adherent(
             adherentData.numero_licence,
             calculetStatut(getSaisonPlusRecente(adherentData.saisons)),
             adherentData.type || null,
@@ -279,7 +279,7 @@ class Adherant {
 
     /**
      * Fusionne les saisons de l'adhérent donné avec celles de l'instance actuelle.
-     * @param {Adherant} adherent - L'adhérent dont les saisons doivent être fusionnées.
+     * @param {Adherent} adherent - L'adhérent dont les saisons doivent être fusionnées.
      */
     merge(adherent) {
         if (adherent.saison) {
@@ -289,4 +289,4 @@ class Adherant {
 }
 
 
-module.exports = Adherant;
+module.exports = Adherent;

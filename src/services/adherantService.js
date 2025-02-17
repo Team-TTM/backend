@@ -71,21 +71,6 @@ async function transformerDonneesEnAdherents(donnees) {
 }
 
 /**
-* Crée ou met à jour un adhérent dans la base de données, selon qu'il existe déjà.
-* @param {Adherent} adherent - L'objet Adherent à créer ou mettre à jour.
-* @returns {Promise} - Une promesse indiquant le succès de l'opération.
-*/
-const createOrUpdateAdherent = async (adherent) => {
-    const exist = await checkAdherentLicence(adherent.numeroLicence)
-    if (exist) {
-        await updateAdherent(adherent);
-    } else {
-        await createAdherent(adherent)
-    }
-}
-
-
-/**
  * Importe les données à partir d'un fichier Excel et les insère dans la base de données.
  * @param {string} fichierXlsx - Le chemin vers le fichier Excel à importer.
  * @returns {Promise} - Une promesse qui se résout après l'importation complète des données.
