@@ -175,7 +175,18 @@ const updateFacebookId = async (userId, facebookId) => {
         WHERE id_user = ?
     `;
     try {
-        await pool.execute(query, [facebookId, userId]);
+        console.log("⌛️ Ajout de facebookId :", facebookId, "à l'utilisateur :", userId);
+
+        // Utilisation de pool.query() au lieu de pool.execute()
+        const [result] = await pool.query(query, [facebookId, userId]);
+
+
+        // Vérifie si une ligne a été mise à jour et récupère l'utilisateur mis à jour
+        if (result.affectedRows > 0) {
+            // Récupère les infos mises à jour
+            const [updatedUser] = await pool.query("SELECT * FROM users WHERE id_user = ?", [userId]);
+            return updatedUser[0] || null;
+        }
     } catch (err) {
         console.error('❌ Erreur lors de la mise à jour du Facebook ID:', err);
         throw err;
@@ -198,8 +209,17 @@ const updateGoogleId = async (userId, googleId) => {
         RETURNING *;
     `;
     try {
-        const [rows] = pool.execute(query, [userId, googleId]);
-        return rows[0];
+        console.log("⌛️ Ajout de googleId :", googleId, "à l'utilisateur :", userId);
+
+        const [result] = await pool.query(query, [googleId, userId]);
+
+
+        // Vérifie si une ligne a été mise à jour et récupère l'utilisateur mis à jour
+        if (result.affectedRows > 0) {
+            // Récupère les infos mises à jour
+            const [updatedUser] = await pool.query("SELECT * FROM users WHERE id_user = ?", [userId]);
+            return updatedUser[0] || null;
+        }
     } catch (err) {
         console.error('❌ Erreur lors de la mise à jour du Google ID:', err);
         throw err;
@@ -221,8 +241,18 @@ const updateAdherentId = async (userId, adherantId) => {
         WHERE id_user = ?;
     `;
     try {
-        const [rows] = pool.execute(query, [userId, adherantId]);
-        return rows[0];
+        console.log("⌛️ Ajout de la licence :", adherantId, "à l'utilisateur :", userId);
+
+        // Utilisation de pool.query() au lieu de pool.execute()
+        const [result] = await pool.query(query, [adherantId, userId]);
+
+
+        // Vérifie si une ligne a été mise à jour et récupère l'utilisateur mis à jour
+        if (result.affectedRows > 0) {
+            // Récupère les infos mises à jour
+            const [updatedUser] = await pool.query("SELECT * FROM users WHERE id_user = ?", [userId]);
+            return updatedUser[0] || null;
+        }
     } catch (err) {
         console.error('❌ Erreur lors de la mise à jour de l’ID adhérant:', err);
         throw err;

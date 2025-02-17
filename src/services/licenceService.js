@@ -13,6 +13,7 @@ const processLicenceSignIn = async (userId, licence) => {
     const isLicenceValid = await checkAdherentLicence(licence);
     let updatedUser;
     let message;
+
     if (!isLicenceValid) {
         throw new Error(`Licence ${licence} introuvable.`);
     }
@@ -24,15 +25,14 @@ const processLicenceSignIn = async (userId, licence) => {
 
     const existingUser = await userService.findUserByLicence(licence);
     if (existingUser) {
-        const newUserId = existingUser.id_user
-        updatedUser = await userService.mergeUserFacebookAndGoogleIds(newUserId, user);
+        updatedUser = await userService.mergeUserFacebookAndGoogleIds(existingUser, user);
         message = `Fusion des comptes réussie (Facebook et Google).`;
-
     } else {
         // Si la licence n'est pas encore associée, l'associer à l'utilisateur
         updatedUser = await userService.updateUserLicence(userId, licence);
         message = `Licence ${licence} associée à l'utilisateur avec succès.`;
     }
+
     return {
         user: updatedUser,
         message: message,

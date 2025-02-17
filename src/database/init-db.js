@@ -21,9 +21,9 @@ async function initDatabase() {
         await createLicenceSaisonAssociationTable();
 
         // Importation du fichier XLSX
-        await importerXlsx(path.resolve(__dirname, '../../data', process.env.XLSX_FILE2023));
+        // await importerXlsx(path.resolve(__dirname, '../../data', process.env.XLSX_FILE2023));
         await importerXlsx(path.resolve(__dirname, '../../data', process.env.XLSX_FILE2024));
-        await importerXlsx(path.resolve(__dirname, '../../data', process.env.XLSX_FILE2026));
+        // await importerXlsx(path.resolve(__dirname, '../../data', process.env.XLSX_FILE2026));
         } catch (err) {
         // Gestion des erreurs
         console.error('❌Erreur de connexion à MySQL', err);

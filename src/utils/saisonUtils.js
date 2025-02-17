@@ -24,12 +24,18 @@ const calculerSaison = (date) =>{
 }
 
 /**
- * Récupère la saison la plus récente à partir d'un tableau de saisons.
- * @param {string[]} saisons - Tableau des saisons sous le format "YYYY/YYYY+1".
- * @returns {string|null} - La saison la plus récente ou `null` si la liste est vide.
+ * Détermine la saison la plus récente à partir d'une liste de saisons.
+ *
+ * @param {string[] | string} saisons - Un tableau de saisons sous le format "YYYY/YYYY+1"
+ *                                      ou une seule saison sous forme de chaîne de caractères.
+ * @returns {string|null} - La saison la plus récente, ou la valeur d'entrée si ce n'est pas un tableau,
+ *                          ou `null` si la liste est vide ou invalide.
  */
-const getSaisonPlusRecente = (saisons) =>{
+const getSaisonPlusRecente = (saisons) => {
     if (!saisons || saisons.length === 0) return null;
+    if (!Array.isArray(saisons)) {
+        return saisons;
+    }
 
     saisons.sort((a, b) => {
         const anneeA = parseInt(a.split('/')[0], 10);
@@ -38,7 +44,7 @@ const getSaisonPlusRecente = (saisons) =>{
     });
 
     return saisons[0]; // Retourne la première (plus récente)
-}
+};
 
 /**
  * Calcule le statut de la saison donnée.
@@ -63,4 +69,4 @@ function convertirDate(dateStr) {
     return new Date(`${annee}-${mois}-${jour}`); // Recompose dans le format YYYY-MM-DD
 }
 
-module.exports = {convertirDate,calculetStatut,getSaisonPlusRecente,calculerSaison}
+module.exports = {convertirDate,calculetStatut,getSaisonPlusRecente,calculerSaison,}

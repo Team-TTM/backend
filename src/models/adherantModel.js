@@ -96,6 +96,7 @@ const createAdherent = async (adherent) => {
             adherent.anneeBlanche,
             adherent.pratique,
         ]);
+        console.log("⌛ creation Adherant : ",adherent.numeroLicence)
         return rows;
     } catch (err) {
         console.error("❌ Erreur lors de l'insertion de l'adhérant:", err, adherent);
