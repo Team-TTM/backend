@@ -9,7 +9,6 @@ class User {
         this._newsletter = newsletter;
     }
 
-
     set id_user(value) {
         this._id_user = value;
     }

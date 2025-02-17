@@ -13,7 +13,6 @@ const findUserByGoogleId = async (googleId) => {
     if (!user) {
         return null;
     }
-    // Retourner un objet de type User
     return new User(user.id_user, user.numero_licence, user.role, user.charte_signe, user.google_id, user.facebook_id, user.newsletter);
 };
 
@@ -28,7 +27,6 @@ const findUserByFacebookId = async (facebookId) => {
     if (!user) {
         return null;
     }
-    // Retourner un objet de type User
     return new User(user.id_user, user.numero_licence, user.role, user.charte_signe, user.google_id, user.facebook_id, user.newsletter);
 };
 
@@ -93,7 +91,7 @@ const createUserGoogle = async (googleID) => {
  * @returns {Promise<User>} L'utilisateur mis à jour.
  */
 const updateUserLicence = async (userId, adherentID) => {
-    const user = await  UsersModel.updateAdherantId(userId, adherentID);
+    const user = await  UsersModel.updateAdherentId(userId, adherentID);
     if (!user) {
         return null;
     }
@@ -105,18 +103,16 @@ const updateUserLicence = async (userId, adherentID) => {
 /**
  * Fusionner les comptes Facebook et Google d'un utilisateur.
  * @async
- * @param {number} userId1 - L'ID du premier utilisateur.
- * @param {number} userId2 - L'ID du second utilisateur.
+ * @param {User} user1 - L'ID du premier utilisateur.
+ * @param {User} user2 - L'ID du second utilisateur.
  * @returns {Promise<User>} L'utilisateur fusionné.
  * @throws {Error} Si un des utilisateurs est introuvable ou si la fusion est impossible.
  */
-const mergeUserFacebookAndGoogleIds = async (userId1, userId2) => {
+const mergeUserFacebookAndGoogleIds = async (user1, user2) => {
     try {
-        const user1 = await findUserByUserId(userId1);
-        const user2 = await findUserByUserId(userId2);
 
         if (!user1 || !user2) {
-            throw new Error(`❌ Fusion impossible : L'un des utilisateurs (ID: ${userId1}, ID: ${userId2}) est introuvable.`);
+            throw new Error(`❌ Fusion impossible : L'un des utilisateurs (ID: ${user1.id_user}, ID: ${user2.id_user}) est introuvable.`);
         }
 
         const user1HasGoogle = !!user1.google_id;
@@ -125,26 +121,25 @@ const mergeUserFacebookAndGoogleIds = async (userId1, userId2) => {
         const user2HasFacebook = !!user2.facebook_id;
 
         if (user1HasGoogle && user2HasGoogle) {
-            throw new Error(`❌ Fusion impossible : Les deux comptes (ID: ${userId1}, ID: ${userId2}) sont déjà liés à Google.`);
+            throw new Error(`❌ Fusion impossible : Les deux comptes (ID: ${user1.id_user}, ID: ${user2.id_user}) sont déjà liés à Google.`);
         }
         else if (user1HasFacebook && user2HasFacebook) {
-            throw new Error(`❌ Fusion impossible : Les deux comptes (ID: ${userId1}, ID: ${userId2}) sont déjà liés à Facebook.`);
+            throw new Error(`❌ Fusion impossible : Les deux comptes (ID: ${user1.id_user}, ID: ${user2.id_user}) sont déjà liés à Facebook.`);
         }
         else if (!user1HasGoogle && !user1HasFacebook && !user2HasGoogle && !user2HasFacebook) {
-            throw new Error(`❌ Fusion impossible : Aucun des comptes (ID: ${userId1}, ID: ${userId2}) n'est lié à Google ou Facebook.`);
+            throw new Error(`❌ Fusion impossible : Aucun des comptes (ID: ${user1.id_user}, ID: ${user2.id_user}) n'est lié à Google ou Facebook.`);
         }
         else if (user1HasGoogle && user2HasFacebook) {
-            await UsersModel.deleteUserById(userId2);
-            await UsersModel.updateFacebookId(userId1, user2.facebook_id);
-            console.log(`✅ Fusion réussie : Google ID conservé, Facebook ID fusionné sous user ${userId1}`);
+            await UsersModel.deleteUserById(user2);
+            await UsersModel.updateFacebookId(user1.id_user, user2.facebook_id);
+            console.log(`✅ Fusion réussie : Google ID conservé, Facebook ID fusionné sous user ${user1.id_user}`);
         }
         else if (user1HasFacebook && user2HasGoogle) {
-            await UsersModel.deleteUserById(userId2);
-            await UsersModel.updateGoogleId(userId1, user2.google_id);
-            console.log(`✅ Fusion réussie : Facebook ID conservé, Google ID fusionné sous user ${userId1}`);
+            await UsersModel.deleteUserById(user2);
+            await UsersModel.updateGoogleId(user1.id_user, user2.google_id);
+            console.log(`✅ Fusion réussie : Facebook ID conservé, Google ID fusionné sous user ${user1.id_user}`);
         }
-        // Retourner un objet de type User après la fusion
-        return findUserByUserId(userId1)
+        return user1;
     } catch (err) {
         console.error("❌ Erreur lors de la fusion des comptes :", err);
         throw err;

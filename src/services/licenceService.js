@@ -25,12 +25,12 @@ const processLicenceSignIn = async (userId, licence) => {
     const existingUser = await userService.findUserByLicence(licence);
     if (existingUser) {
         const newUserId = existingUser.id_user
-        updatedUser = await userService.mergeUserFacebookAndGoogleIds(newUserId, userId);
+        updatedUser = await userService.mergeUserFacebookAndGoogleIds(newUserId, user);
         message = `Fusion des comptes réussie (Facebook et Google).`;
 
     } else {
         // Si la licence n'est pas encore associée, l'associer à l'utilisateur
-        updatedUser = await   userService.updateUserLicence(userId, licence);
+        updatedUser = await userService.updateUserLicence(userId, licence);
         message = `Licence ${licence} associée à l'utilisateur avec succès.`;
     }
     return {
