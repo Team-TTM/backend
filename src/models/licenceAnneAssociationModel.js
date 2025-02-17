@@ -5,10 +5,10 @@ const  createLicenceSaisonAssociationTable = async () => {
     const query = `
         CREATE TABLE IF NOT EXISTS licence_saison_association
         (
-            id_anne        VARCHAR(9) NOT NULL, -- Référence à l'année dans la table \`anne_licence\`
+            saison        VARCHAR(9) NOT NULL, -- Référence à l'année dans la table \`anne_licence\`
             numero_licence VARCHAR(255) NOT NULL, -- Référence à \`numero_licence\` dans \`licences\`
-            PRIMARY KEY (id_anne, numero_licence),
-            FOREIGN KEY (id_anne) REFERENCES saison (saison) ON DELETE CASCADE,
+            PRIMARY KEY (saison, numero_licence),
+            FOREIGN KEY (saison) REFERENCES saison (saison_id) ON DELETE CASCADE,
             FOREIGN KEY (numero_licence) REFERENCES adherants (numero_licence) ON DELETE CASCADE
         );
 
@@ -32,7 +32,7 @@ const  createLicenceSaisonAssociationTable = async () => {
  */
 const insertLicenceSaisonAssociation = async (idAnne, numeroLicence) => {
     const query = `
-        INSERT INTO licence_saison_association (id_anne, numero_licence)
+        INSERT INTO licence_saison_association (saison, numero_licence)
         VALUES ($1, $2)
     `;
     const values = [idAnne, numeroLicence];
@@ -46,9 +46,9 @@ const insertLicenceSaisonAssociation = async (idAnne, numeroLicence) => {
     }
 };
 
-const saisonbyLicence = async ( numeroLicence) => {
+const saisonbyLicence = async (numeroLicence) => {
     const query = `
-        SELECT id_anne
+        SELECT saison
         FROM licence_saison_association
         WHERE numero_licence = $1;
     `;
