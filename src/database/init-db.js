@@ -1,9 +1,9 @@
 const {importerXlsx} = require('../services/adherantService');
 
 const {createSaisonTable} = require("../models/saisonModel");
-const {createAdherantTable} = require("../models/adherantModel");
+const {createAdherentTable} = require("../models/adherantModel");
 const {createUserTable} = require("../models/usersModel");
-const {createLicenceSaisonAssociationTable} = require("../models/licenceAnneAssociationModel");
+const {createLicenceSaisonAssociationTable} = require("../models/licenceSaisonAssociationModel");
 const client = require("../config/database");
 
 const path = require("path");
@@ -14,14 +14,15 @@ const path = require("path");
 async function initDatabase() {
     try {
         // Connexion à la base de données
-        await createAdherantTable()
+        await createAdherentTable()
         await createSaisonTable();
         await createUserTable();
         await createLicenceSaisonAssociationTable();
 
         // Importation du fichier XLSX
         await importerXlsx(path.resolve(__dirname, '../../data', process.env.XLSX_FILE2023));
-        // await importerXlsx(path.resolve(__dirname, '../../data', process.env.XLSX_FILE2026));
+        await importerXlsx(path.resolve(__dirname, '../../data', process.env.XLSX_FILE2024));
+        await importerXlsx(path.resolve(__dirname, '../../data', process.env.XLSX_FILE2026));
         } catch (err) {
         // Gestion des erreurs
         console.error('❌Erreur de connexion à PostgreSQL', err);
