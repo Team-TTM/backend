@@ -1,3 +1,4 @@
+
 const client = require('../config/database'); // Connexion à la base de données
 const Adherent = require('./Adherent');
 /**
@@ -102,7 +103,6 @@ const createAdherant = async (adherent) => {
             adherent.pratique,
 
         ]);
-        // console.log("✅ Nouvel adhérant inséré :", res.rows[0]);
         return res.rows[0];
     } catch (err) {
         console.error("❌ Erreur lors de l'insertion de l'adhérant:", err,adherent);
@@ -110,6 +110,69 @@ const createAdherant = async (adherent) => {
     }
 };
 
+
+const updateAdherent = async (adherent) => {
+    const query = `
+        UPDATE adherants SET
+            prenom = $1,
+            nom = $2,
+            nom_usage = $3,
+            date_naissance = $4,
+            sexe = $5,
+            profession = $6,
+            principale = $7,
+            details = $8,
+            lieu_dit = $9,
+            code_postale = $10,
+            ville = $11,
+            pays = $12,
+            telephone = $13,
+            mobile = $14,
+            email = $15,
+            urgency_telephone = $16,
+            statut = $17,
+            type = $18,
+            demi_tarif = $19,
+            hors_club = $20,
+            categorie = $21,
+            annee_blanche = $22,
+            pratique = $23
+        WHERE numero_licence = $24
+        RETURNING *;
+    `;
+    try {
+        const res = await client.query(query, [
+            adherent.prenom,
+            adherent.nom,
+            adherent.nomUsage,
+            adherent.dateNaissance,
+            adherent.sexe,
+            adherent.profession,
+            adherent.principale,
+            adherent.details,
+            adherent.lieuDit,
+            adherent.codePostal,
+            adherent.ville,
+            adherent.pays,
+            adherent.telephone,
+            adherent.mobile,
+            adherent.email,
+            adherent.urgenceTelephone,
+            adherent.statut,
+            adherent.type,
+            adherent.demiTarif,
+            adherent.horsClub,
+            adherent.categorie,
+            adherent.anneeBlanche,
+            adherent.pratique,
+            adherent.numeroLicence
+        ]);
+        return res.rows[0];
+    } catch (err) {
+        console.error("❌ Erreur lors de la mise à jour de l'adhérant:", err, adherent);
+        throw err;
+    }
+};
 /**
  * Vérifie si un adhérent existe en base de données.
  * @param {string} num_licence - Le numéro de licence de l'adhérent.
@@ -141,24 +204,25 @@ const adherentExist = async (num_licence) => {
  * @throws {Error} - Si une erreur survient lors de la requête.
  */
 const getAdherentDetails = async (numeroLicence) => {
-        const query = `
-        SELECT adherants.*
-        FROM adherants
-        INNER JOIN licence_saison_association
-        ON adherants.numero_licence = licence_saison_association.numero_licence
-        WHERE adherants.numero_licence = $1
-    `;
-        const values = [numeroLicence];
+    const query = `
+    SELECT adherants.*, array_agg(licence_saison_association.saison) AS saisons
+    FROM adherants
+    LEFT JOIN licence_saison_association
+    ON adherants.numero_licence = licence_saison_association.numero_licence
+    WHERE adherants.numero_licence = $1
+    GROUP BY adherants.numero_licence
+`;
+    const values = [numeroLicence];
 
-        try {
-            const res = await client.query(query, values);
-            console.log('Informations de l\'adhérent:', res.rows[0]);
-            return res.rows[0];
-        } catch (err) {
-            console.error('Erreur lors de la récupération des informations de l\'adhérent:', err);
-            throw err;
-        }
-    };
+    try {
+        const res = await client.query(query, values);
+        // console.log('Informations de l\'adhérent:', res.rows);
+        return res.rows[0];
+    } catch (err) {
+        console.error('Erreur lors de la récupération des informations de l\'adhérent:', err);
+        throw err;
+    }
+};
 
 
 
@@ -167,4 +231,5 @@ module.exports = {
     createAdherant,
     adherantExist: adherentExist,
     getAdherentDetails,
+    updateAdherent,
 };
