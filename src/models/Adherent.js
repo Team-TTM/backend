@@ -1,56 +1,3 @@
-/**
- * Calcule la saison à laquelle appartient une date donnée.
- * La saison commence en septembre et se termine en août de l'année suivante.
- * Par exemple, pour une date comprise entre septembre 2024 et août 2025, la saison sera "2024/2025".
- *
- * @param {Date} date - La date à partir de laquelle la saison doit être calculée. Cela peut être une chaîne de caractères au format "YYYY-MM-DD" ou un objet `Date'.
- * @returns {string} La saison au format "YYYY/YYYY", où la première année est l'année de début de la saison et la deuxième année est l'année de fin.
- * @throws {Error} Si la date fournie est invalide, une erreur est lancée.
- *
- * @example
- * console.log(calculerSaison('2024-09-01'));  // Saison 2024/2025
- * console.log(calculerSaison('2025-03-01'));  // Saison 2024/2025
- * console.log(calculerSaison('2025-07-15'));  // Saison 2024/2025
- * console.log(calculerSaison('2025-08-30'));  // Saison 2024/2025
- * console.log(calculerSaison('2025-09-01'));  // Saison 2025/2026
- */
-function calculerSaison(date) {
-
-    // Récupère l'année et le mois
-    const annee = date.getFullYear();
-    const mois = date.getMonth(); // 0 = janvier, 1 = Février, ..., 8 = Septembre, ...
-
-    // Si le mois est avant septembre (c'est-à-dire Janvier - Août), la saison est l'année précédente
-    const saisonAnnee = mois >= 8 ? annee : annee - 1;
-
-    // Retourne la saison sous le format "2024/2025"
-    return `${saisonAnnee}/${saisonAnnee + 1}`;
-}
-
-
-/**
- * Calcule le statut de la saison donnée.
- * @param {string} saison - La saison à vérifier sous le format "YYYY/YYYY+1".
- * @returns {boolean} - Vrai si la saison est la saison actuelle, faux sinon.
- */
-function calculetStatut(saison) {
-    return saison === calculerSaison(new Date())
-
-}
-
-/**
- * Convertit une date au format `DD/MM/YYYY` en objet Date JavaScript.
- * @param {string} dateStr - La date à convertir, au format `DD/MM/YYYY`.
- * @returns {Date} - La date convertie en format `YYYY-MM-DD`.
- * @example
- * convertirDate('01/09/2024'); // Retourne un objet Date pour le 1er septembre 2024
- */
-function convertirDate(dateStr) {
-    const [jour, mois, annee] = dateStr.split('/'); // Découpe la chaîne
-    return new Date(`${annee}-${mois}-${jour}`); // Recompose dans le format YYYY-MM-DD
-}
-
-
 class Adherant {
     get numeroLicence() {
         return this._numeroLicence;
@@ -62,10 +9,6 @@ class Adherant {
 
     get type() {
         return this._type;
-    }
-
-    get longue() {
-        return this._longue;
     }
 
     get demiTarif() {
@@ -151,12 +94,12 @@ class Adherant {
     get urgenceTelephone() {
         return this._urgenceTelephone;
     }
+
     /**
      * Constructeur de la classe Adherant.
      * @param {string} numeroLicence - Le numéro de licence de l'adhérent.
      * @param {boolean} statut - Le statut de l'adhérent (par exemple, validé).
      * @param {string} type - Le type de licence.
-     * @param {boolean} longue - Si la licence est longue.
      * @param {boolean} demiTarif - Si l'adhérent bénéficie d'un tarif réduit.
      * @param {boolean} horsClub - Si l'adhérent est hors club.
      * @param {string} categorie - La catégorie de l'adhérent.
@@ -183,28 +126,27 @@ class Adherant {
     constructor(
         numeroLicence,
         statut,
-        type ,
-        longue ,
-        demiTarif ,
-        horsClub ,
-        categorie ,
-        anneeBlanche ,
-        pratique ,
-        prenom ,
-        nom ,
-        nomUsage ,
-        dateNaissance ,
-        sexe ,
-        profession ,
-        principale ,
-        details ,
-        lieuDit ,
+        type,
+        demiTarif,
+        horsClub,
+        categorie,
+        anneeBlanche,
+        pratique,
+        prenom,
+        nom,
+        nomUsage,
+        dateNaissance,
+        sexe,
+        profession,
+        principale,
+        details,
+        lieuDit,
         codePostal,
-        ville ,
-        pays ,
+        ville,
+        pays,
         telephone,
-        mobile ,
-        email ,
+        mobile,
+        email,
         urgenceTelephone,
         saison = []
     ) {
@@ -212,7 +154,6 @@ class Adherant {
         this._numeroLicence = numeroLicence;
         this._statut = statut;
         this._type = type;
-        this._longue = longue;
         this._demiTarif = demiTarif;
         this._horsClub = horsClub;
         this._categorie = categorie;
@@ -244,29 +185,27 @@ class Adherant {
 
     /**
      * Getter pour obtenir la saison.
-     * @returns {string} La saison au format "YYYY/YYYY".
+     * @returns {Array|null} La saison au format "YYYY/YYYY".
      */
     get saison() {
         return this._saison || null;
     }
 
 
-
     /**
-     * Crée un objet Adherant à partir d'une ligne de fichier CSV ou d'une source brute.
+     * Crée un objet Adherent à partir d'une ligne de fichier CSV ou d'une source brute.
      * @param {Object} row - Ligne de données source (ex: fichier CSV).
-     * @returns {Adherant} Une instance de Adherant.
+     * @returns {Adherant} Une instance de Adherent.
      */
     static fromCSV(row) {
-        // Utilisation de la fonction calculerSaison pour obtenir la saison
+
         const saison = calculerSaison(convertirDate(row['Date validation de la licence']));
-        const dateNaisance =  convertirDate(row['Date de naissance'])
+        const dateNaisance = convertirDate(row['Date de naissance'])
 
         return new Adherant(
             row['Numéro de licence'],
             calculetStatut(saison),
             row['Type de licence'],
-            row['Licence longue'] === 'Oui',
             row['Licence demi-tarif'] === 'Oui',
             row['Licence hors club (licence individuelle)'] === 'Oui',
             row['Catégorie d\'âge'],
@@ -300,9 +239,8 @@ class Adherant {
     static fromDataBase(adherentData) {
         return new Adherant(
             adherentData.numero_licence,
-            adherentData.statut || false,
+            calculetStatut(getSaisonPlusRecente(adherentData.saisons)),
             adherentData.type || null,
-            false, // Pas de donnée pour 'longue', on met false par défaut
             adherentData.demi_tarif || false,
             adherentData.hors_club || false,
             adherentData.categorie || null,
@@ -311,7 +249,7 @@ class Adherant {
             adherentData.prenom || null,
             adherentData.nom || null,
             adherentData.nom_usage || null,
-            new Date(adherentData.date_naissance) || null, // Conversion en Date
+            adherentData.date_naissance || null, // Conversion en Date
             adherentData.sexe || null,
             adherentData.profession || null,
             adherentData.principale || null,
@@ -327,6 +265,92 @@ class Adherant {
             adherentData.saisons || null,
         );
     }
+
+
+    /**
+     * Récupère la saison la plus récente de l'adhérent.
+     * @returns {string|null} - La saison la plus récente au format "YYYY/YYYY+1" ou `null` si aucune saison n'est trouvée.
+     */
+    getDerniereSaison() {
+        return getSaisonPlusRecente(this._saison);
+    }
+
+    /**
+     * Fusionne les saisons de l'adhérent donné avec celles de l'instance actuelle.
+     * @param {Adherant} adherent - L'adhérent dont les saisons doivent être fusionnées.
+     */
+    merge(adherent) {
+        if (adherent.saison) {
+            this._saison = this._saison.concat(adherent.saison);
+        }
+    }
 }
+
+
+/**
+ * Calcule la saison à laquelle appartient une date donnée.
+ * La saison commence en septembre et se termine en août de l'année suivante.
+ * Par exemple, pour une date comprise entre septembre 2024 et août 2025, la saison sera "2024/2025".
+ *
+ * @param {Date} date - La date à partir de laquelle la saison doit être calculée. Cela peut être une chaîne de caractères au format "YYYY-MM-DD" ou un objet `Date'.
+ * @returns {string} La saison au format "YYYY/YYYY", où la première année est l'année de début de la saison et la deuxième année est l'année de fin.
+ * @throws {Error} Si la date fournie est invalide, une erreur est lancée.
+ *
+ * @example
+ * console.log(calculerSaison('2024-09-01'));  // Saison 2024/2025
+ * console.log(calculerSaison('2025-03-01'));  // Saison 2024/2025
+ * console.log(calculerSaison('2025-07-15'));  // Saison 2024/2025
+ * console.log(calculerSaison('2025-08-30'));  // Saison 2024/2025
+ * console.log(calculerSaison('2025-09-01'));  // Saison 2025/2026
+ */
+const calculerSaison = (date) =>{
+
+    const annee = date.getFullYear();
+    const mois = date.getMonth();
+
+    const saisonAnnee = mois >= 8 ? annee : annee - 1;
+    return `${saisonAnnee}/${saisonAnnee + 1}`;
+}
+
+/**
+ * Récupère la saison la plus récente à partir d'un tableau de saisons.
+ * @param {string[]} saisons - Tableau des saisons sous le format "YYYY/YYYY+1".
+ * @returns {string|null} - La saison la plus récente ou `null` si la liste est vide.
+ */
+const getSaisonPlusRecente = (saisons) =>{
+    if (!saisons || saisons.length === 0) return null;
+
+    saisons.sort((a, b) => {
+        const anneeA = parseInt(a.split('/')[0], 10);
+        const anneeB = parseInt(b.split('/')[0], 10);
+        return anneeB - anneeA; // Tri décroissant
+    });
+
+    return saisons[0]; // Retourne la première (plus récente)
+}
+
+/**
+ * Calcule le statut de la saison donnée.
+ * @param {string} saison - La saison a vérifié sous le format "YYYY/YYYY+1".
+ * @returns {boolean} - Vrai si la saison est la saison actuelle, faux sinon.
+ */
+const calculetStatut =(saison) => {
+    return saison === calculerSaison(new Date())
+    // return saison === calculerSaison(convertirDate("22/11/2026"))
+
+}
+
+/**
+ * Convertit une date au format `DD/MM/YYYY` en objet Date JavaScript.
+ * @param {string} dateStr - La date à convertir, au format `DD/MM/YYYY`.
+ * @returns {Date} - La date convertie en format `YYYY-MM-DD'.
+ * @example
+ * convertirDate('01/09/2024'); // Retourne un objet Date pour le 1er septembre 2024
+ */
+function convertirDate(dateStr) {
+    const [jour, mois, annee] = dateStr.split('/'); // Découpe la chaîne
+    return new Date(`${annee}-${mois}-${jour}`); // Recompose dans le format YYYY-MM-DD
+}
+
 
 module.exports = Adherant;
