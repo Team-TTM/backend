@@ -39,7 +39,7 @@ const insertLicenceSaisonAssociation = async (idAnne, numeroLicence) => {
 
     try {
         await client.query(query, values);
-        console.log('✅ Données insérées dans la table "licence_annee_association".');
+        // console.log('✅ Données insérées dans la table "licence_annee_association".');
     } catch (err) {
         console.error('❌ Erreur lors de l\'insertion des données dans la table "licence_annee_association":', err);
         throw err;
@@ -54,7 +54,7 @@ const saisonbyLicence = async (numeroLicence) => {
     `;
     try {
         await client.query(query, numeroLicence);
-        console.log('✅ Données insérées dans la table "licence_annee_association".');
+        // console.log('✅ Données insérées dans la table "licence_annee_association".');
     } catch (err) {
         console.error('❌ Erreur lors de l\'insertion des données dans la table "licence_annee_association":', err);
         throw err;
