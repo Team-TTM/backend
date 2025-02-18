@@ -14,29 +14,33 @@ const processLicenceSignIn = async (userId, licence) => {
     let updatedUser;
     let message;
 
-    if (!isLicenceValid) {
-        throw new Error(`Licence ${licence} introuvable.`);
-    }
+    try {
+        if (!isLicenceValid) {
+            throw new Error(`Licence ${licence} introuvable.`);
+        }
 
-    const user = await userService.findUserByUserId(userId);
-    if (!user) {
-        throw new Error("Utilisateur non trouvé.");
-    }
+        const user = await userService.findUserByUserId(userId);
+        if (!user) {
+            throw new Error("Utilisateur non trouvé.");
+        }
+        const existingUser = await userService.findUserByLicence(licence);
+        if (existingUser) {
 
-    const existingUser = await userService.findUserByLicence(licence);
-    if (existingUser) {
-        updatedUser = await userService.mergeUserFacebookAndGoogleIds(existingUser, user);
-        message = `Fusion des comptes réussie (Facebook et Google).`;
-    } else {
-        // Si la licence n'est pas encore associée, l'associer à l'utilisateur
-        updatedUser = await userService.updateUserLicence(userId, licence);
-        message = `Licence ${licence} associée à l'utilisateur avec succès.`;
-    }
+            updatedUser = await userService.mergeUserFacebookAndGoogleIds(existingUser, user);
+            message = `Fusion des comptes réussie (Facebook et Google).`;
+        } else {
+            // Si la licence n'est pas encore associée, l'associer à l'utilisateur
+            updatedUser = await userService.updateUserLicence(user, licence);
+            message = `Licence ${licence} associée à l'utilisateur avec succès.`;
+        }
 
-    return {
-        user: updatedUser,
-        message: message,
-    };
+        return {
+            user: updatedUser,
+            message: message,
+        };
+    } catch (err){
+        throw err
+    }
 };
 
 module.exports = {

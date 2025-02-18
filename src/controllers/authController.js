@@ -13,20 +13,17 @@ const licenceSignInController = async (req, res) => {
     const { licence } = req.body;
     const { userId } = req.auth;
 
-    if (!licence) {
-        return res.status(400).json({
-            error: "Le paramètre 'licence' est requis."
-        });
-    }
-
     try {
+        if (!licence) {
+            throw new Error("Le paramètre 'licence' est requis.");
+        }
         const {user,message} = await licenceService.processLicenceSignIn(userId, licence);
         const token = createToken(user.id_user);
         return res.status(200).json({token, message});
     } catch (error) {
         console.error("❌ Erreur dans l'authentification de la licence :", error);
-        return res.status(500).json({
-            error: error.message || "Une erreur s'est produite lors de l'authentification de la licence."
+        return res.status(400).json({
+            error: error.message
         });
     }
 };

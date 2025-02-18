@@ -32,20 +32,20 @@ const createUserTable = async () => {
 /**
  * Insère un utilisateur avec un Facebook ID.
  * @async
- * @param {string} facebookId - L'ID Facebook de l'utilisateur.
- * @returns {Promise<Object>} L'utilisateur inséré.
+ * @param {User} user - L'utilisateur a inséré avec un ID Facebook.
+ * @returns {Promise<number>} L'ID de l'utilisateur inséré.
  * @throws {Error} En cas d'erreur lors de l'insertion.
  */
-const createFacebookUser = async (facebookId) => {
+const createFacebookUser = async (user) => {
     const query = `
         INSERT INTO users (facebook_id)
         VALUES (?)
         RETURNING *
     `;
     try {
-        const [rows] = await pool.execute(query, [facebookId]);
+        const [rows] = await pool.execute(query, [user.facebook_id]);
         console.log('✅ Utilisateur Facebook inséré :', rows[0]);
-        return rows[0];
+        return rows[0].id_user;
     } catch (err) {
         console.error('❌ Erreur lors de l’insertion de l’utilisateur Facebook:', err);
         throw err;
@@ -56,20 +56,20 @@ const createFacebookUser = async (facebookId) => {
 /**
  * Insère un utilisateur avec un Google ID.
  * @async
- * @param {string} googleId - L'ID Google de l'utilisateur.
- * @returns {Promise<Object>} L'utilisateur inséré.
+ * @param {User} user - L'utilisateur à insérer avec un ID Google.
+ * @returns {Promise<number>} L'ID de l'utilisateur inséré.
  * @throws {Error} En cas d'erreur lors de l'insertion.
  */
-const createGoogleUser = async (googleId) => {
+const createGoogleUser = async (user) => {
     const query = `
         INSERT INTO users (google_id)
         VALUES (?)
         RETURNING *
     `;
     try {
-        const [rows] = await pool.execute(query, [googleId]);
+        const [rows] = await pool.execute(query, [user.google_id]);
         console.log('✅ Utilisateur Google inséré :', rows[0]);
-        return rows[0];
+        return rows[0].id_user;
     } catch (err) {
         console.error('❌ Erreur lors de l’insertion de l’utilisateur Google:', err);
         throw err;
@@ -90,6 +90,7 @@ const findUserByFacebookId = async (facebookId) => {
     `;
     try {
         const [rows] = await pool.execute(query, [facebookId]);
+        console.log(`🔍 Utilisateur trouvé avec Facebook ID ${facebookId}:`, rows[0]);
         return rows[0] || null;
     } catch (err) {
         console.error('❌ Erreur lors de la recherche de l’utilisateur Facebook:', err);
@@ -111,6 +112,7 @@ const findUserByGoogleId = async (googleId) => {
     `;
     try {
         const [rows] = await pool.execute(query, [googleId]);
+        console.log(`🔍 Utilisateur trouvé avec Google ID ${googleId}:`, rows[0]);
         return rows[0] || null;
     } catch (err) {
         console.error('❌ Erreur lors de la recherche de l’utilisateur Google:', err);
@@ -132,6 +134,7 @@ const findUserByLicence = async (numberLicence) => {
     `;
     try {
         const [rows] = await pool.execute(query, [numberLicence]);
+        console.log(`🔍 Utilisateur trouvé avec le numéro de licence ${numberLicence}:`, rows[0]);
         return rows[0] || null;
     } catch (err) {
         console.error('❌ Erreur lors de la récupération de l’utilisateur:', err);
@@ -153,6 +156,7 @@ const findUserById = async (userId) => {
     `;
     try {
         const [rows] = await pool.execute(query, [userId]);
+        console.log(`🔍 Utilisateur trouvé avec l'user ID ${userId}:`, rows[0]);
         return rows[0] || null;
     } catch (err) {
         console.error('❌ Erreur lors de la récupération de l’utilisateur:', err);
@@ -161,31 +165,24 @@ const findUserById = async (userId) => {
 };
 
 /**
+/**
  * Met à jour le Facebook ID d’un utilisateur.
  * @async
- * @param {number} userId - L'ID de l'utilisateur.
- * @param {string} facebookId - Le nouvel ID Facebook.
- * @returns {Promise<Object|null>} L'utilisateur mis à jour ou `null` si non trouvé.
+ * @param {User} user - L'utilisateur à mettre à jour.
+ * @returns {Promise<void>} Une promesse qui se résout lorsque l'utilisateur est mis à jour.
  * @throws {Error} En cas d'erreur de mise à jour.
  */
-const updateFacebookId = async (userId, facebookId) => {
+const updateFacebookId = async (user) => {
     const query = `
         UPDATE users
         SET facebook_id = ?
         WHERE id_user = ?
     `;
     try {
-        console.log("⌛️ Ajout de facebookId :", facebookId, "à l'utilisateur :", userId);
-
-        // Utilisation de pool.query() au lieu de pool.execute()
-        const [result] = await pool.query(query, [facebookId, userId]);
-
-
-        // Vérifie si une ligne a été mise à jour et récupère l'utilisateur mis à jour
+        console.log(`⌛️ Ajout de Facebook ID: ${user.facebook_id} à l'utilisateur ID: ${user.id_user}`);
+        const [result] = await pool.query(query, [user.facebook_id, user.id_user]);
         if (result.affectedRows > 0) {
-            // Récupère les infos mises à jour
-            const [updatedUser] = await pool.query("SELECT * FROM users WHERE id_user = ?", [userId]);
-            return updatedUser[0] || null;
+            console.log(`✅ Facebook ID mis à jour pour l'utilisateur ID: ${user.id_user}`);
         }
     } catch (err) {
         console.error('❌ Erreur lors de la mise à jour du Facebook ID:', err);
@@ -196,12 +193,11 @@ const updateFacebookId = async (userId, facebookId) => {
 /**
  * Met à jour le Google ID d’un utilisateur.
  * @async
- * @param {number} userId - L'ID de l'utilisateur.
- * @param {string} googleId - Le nouvel ID Google.
- * @returns {Promise<User|null>} L'utilisateur mis à jour ou `null` si non trouvé.
+ * @param {User} user - L'utilisateur à mettre à jour.
+ * @returns {Promise<void>} L'utilisateur mis à jour ou `null` si non trouvé.
  * @throws {Error} En cas d'erreur de mise à jour.
  */
-const updateGoogleId = async (userId, googleId) => {
+const updateGoogleId = async (user) => {
     const query = `
         UPDATE users
         SET google_id = ?
@@ -209,16 +205,10 @@ const updateGoogleId = async (userId, googleId) => {
         RETURNING *;
     `;
     try {
-        console.log("⌛️ Ajout de googleId :", googleId, "à l'utilisateur :", userId);
-
-        const [result] = await pool.query(query, [googleId, userId]);
-
-
-        // Vérifie si une ligne a été mise à jour et récupère l'utilisateur mis à jour
+        console.log("⌛️ Ajout de googleId :", user.google_id, "à l'utilisateur :", user.id_user);
+        const [result] = await pool.query(query, [user.google_id, user.id_user]);
         if (result.affectedRows > 0) {
-            // Récupère les infos mises à jour
-            const [updatedUser] = await pool.query("SELECT * FROM users WHERE id_user = ?", [userId]);
-            return updatedUser[0] || null;
+            console.log(`✅Google ID mis à jour pour l'utilisateur ID: ${user.id_user}`);
         }
     } catch (err) {
         console.error('❌ Erreur lors de la mise à jour du Google ID:', err);
@@ -229,29 +219,21 @@ const updateGoogleId = async (userId, googleId) => {
 /**
  * Met à jour l’ID adhérant d’un utilisateur.
  * @async
- * @param {number} userId - L'ID de l'utilisateur.
- * @param {string} adherantId - Le nouvel ID adhérant (numéro de licence).
- * @returns {Promise<Object|null>} L'utilisateur mis à jour ou `null` si non trouvé.
+ * @param {User} user - L'utilisateur à mettre à jour.
+ * @returns {Promise<void>} L'utilisateur mis à jour ou `null` si non trouvé.
  * @throws {Error} En cas d'erreur de mise à jour.
  */
-const updateAdherentId = async (userId, adherantId) => {
+const updateAdherentId = async (user) => {
     const query = `
         UPDATE users
         SET numero_licence = ?
         WHERE id_user = ?;
     `;
     try {
-        console.log("⌛️ Ajout de la licence :", adherantId, "à l'utilisateur :", userId);
-
-        // Utilisation de pool.query() au lieu de pool.execute()
-        const [result] = await pool.query(query, [adherantId, userId]);
-
-
-        // Vérifie si une ligne a été mise à jour et récupère l'utilisateur mis à jour
+        console.log("⌛️ Ajout de la licence :", user.numero_licence, "à l'utilisateur :", user.id_user);
+        const [result] = await pool.query(query, [user.numero_licence, user.id_user]);
         if (result.affectedRows > 0) {
-            // Récupère les infos mises à jour
-            const [updatedUser] = await pool.query("SELECT * FROM users WHERE id_user = ?", [userId]);
-            return updatedUser[0] || null;
+            console.log(`✅ Numéro de licence mis à jour pour l'utilisateur ID: ${user.id_user}`);
         }
     } catch (err) {
         console.error('❌ Erreur lors de la mise à jour de l’ID adhérant:', err);
@@ -272,7 +254,9 @@ const deleteUserById = async (user) => {
         WHERE id_user = ?
     `;
     try {
+        console.log(`⌛️ Suppression de l'utilisateur avec ID: ${user.id_user}`);
         await pool.execute(query, [user.id_user]);
+        console.log(`✅ Utilisateur avec ID: ${user.id_user} supprimé`);
     } catch (err) {
         console.error('❌ Erreur lors de la suppression de l’utilisateur:', err);
         throw err;
