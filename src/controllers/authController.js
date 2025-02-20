@@ -1,3 +1,8 @@
+/**
+ * @module authController
+ */
+
+
 const licenceService = require("../services/licenceService");
 const {createToken} = require("../services/tokenService");
 
@@ -5,7 +10,12 @@ const {createToken} = require("../services/tokenService");
 /**
  * Contrôleur pour la connexion via une licence d'adhérent.
  * @async
+ * @function licenceSignInController
  * @param {Object} req - L'objet de requête Express.
+ * @param {Object} req.body - Le corps de la requête.
+ * @param {string} req.body.licence - La licence de l'utilisateur.
+ * @param {Object} req.auth - L'objet d'authentification.
+ * @param {number} req.auth.userId - L'ID de l'utilisateur authentifié.
  * @param {Object} res - L'objet de réponse Express.
  * @returns {Promise<Response>} Une réponse JSON avec un message de confirmation ou une erreur.
  */
@@ -31,6 +41,7 @@ const licenceSignInController = async (req, res) => {
 /**
  * Gère la redirection après authentification via une plateforme (Google ou Facebook).
  * @async
+ * @function handleAuthRedirection
  * @param {Object} req - L'objet de requête Express.
  * @param {Object} res - L'objet de réponse Express.
  * @param {string} platform - La plateforme d'authentification ("Google" ou "Facebook").
