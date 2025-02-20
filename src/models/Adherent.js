@@ -1,4 +1,4 @@
-const {getSaisonPlusRecente, calculerSaison, convertirDate} = require("../utils/saisonUtils");
+const {getSaisonPlusRecente, calculerSaison, convertirDate, calculetStatut} = require("../utils/saisonUtils");
 
 class Adherent {
     get numeroLicence() {
@@ -205,30 +205,30 @@ class Adherent {
         const dateNaisance = convertirDate(row['Date de naissance'])
 
         return new Adherent(
-            row['Numéro de licence'],
-            calculetStatut(saison),
-            row['Type de licence'],
+            row['Numéro de licence'] || null,
+            calculetStatut(saison) ,
+            row['Type de licence' ] || null,
             row['Licence demi-tarif'] === 'Oui',
             row['Licence hors club (licence individuelle)'] === 'Oui',
-            row['Catégorie d\'âge'],
+            row['Catégorie d\'âge' ] || null,
             row['Année blanche'] === 'Oui',
-            row['Triathlon'],
-            row['Prénom'],
-            row['Nom'],
-            row['Nom Usage'],
-            dateNaisance,
+            row['Triathlon' ] || null,
+            row['Prénom' ] || null,
+            row['Nom' ] || null,
+            row['Nom Usage' ] || null,
+            dateNaisance || null,
             row['Sexe'] ? row['Sexe'].toUpperCase() : null,
-            row['Profession'],
-            row['Adresse principale'],
-            row['Adresse Détails'],
-            row['Lieu dit'],
-            row['Code Postal'],
-            row['Ville'],
-            row['Pays'],
-            row['Téléphone'],
-            row['Mobile'],
-            row['Email'],
-            row['Téléphone contact d\'urgence'],
+            row['Profession' ] || null,
+            row['Adresse principale' ] || null,
+            row['Adresse Détails' ] || null,
+            row['Lieu dit' ] || null,
+            row['Code Postal'] || null,
+            row['Ville'] || null,
+            row['Pays'] || null,
+            row['Téléphone'] || null,
+            row['Mobile'] | null,
+            row['Email'] || null,
+            row['Téléphone contact d\'urgence'] || null,
             [saison]  // Saison calculée et ajoutée
         );
     }
@@ -264,7 +264,7 @@ class Adherent {
             adherentData.mobile || null,
             adherentData.email || null,
             adherentData.urgency_telephone || null,
-            adherentData.saisons || null,
+            adherentData.saisons.split(',') || null,
         );
     }
 

@@ -44,13 +44,14 @@ const updateAdherent = async (adherent) => {
 
     if (adherent.getDerniereSaison() > adherentFromDb.getDerniereSaison()) {
         adherent.merge(adherentFromDb);
+        console.log(adherent)
         await insertIfNotExists(adherent.getDerniereSaison())
         await Promise.all([
             insertLicenceSaisonAssociation(adherent.getDerniereSaison(), adherent.numeroLicence),
             AdherentsModel.updateAdherent(adherent)
         ]);
 
-
+        console.log("in b")
         const data = await AdherentsModel.getAdherentDetails(adherent.numeroLicence)
         console.log(data)
     }

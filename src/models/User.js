@@ -9,7 +9,34 @@ class User {
         this._newsletter = newsletter;
     }
 
+    static createFacebookUser(facebookId) {
+        return new User(null,
+            null,
+            "user",
+            false,
+            null,
+            facebookId,false)
+    }
 
+    static createGoogleUser(googleId) {
+        return new User(null,
+            null,
+            "user",
+            false,
+            googleId,
+            null,
+            false)
+    }
+
+    static createUserFromDataBase(userData) {
+        return new User(userData.id_user,
+            userData.numero_licence,
+            userData.role,
+            userData.charte_signe,
+            userData.google_id,
+            userData.facebook_id,
+            userData.newsletter)
+    }
     set id_user(value) {
         this._id_user = value;
     }

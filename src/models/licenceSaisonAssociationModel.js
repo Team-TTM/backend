@@ -1,4 +1,4 @@
-const client = require('../config/database'); // Connexion à la base de données
+const pool = require('../config/database'); // Connexion à la base de données
 
 
 const  createLicenceSaisonAssociationTable = async () => {
@@ -14,7 +14,7 @@ const  createLicenceSaisonAssociationTable = async () => {
 
     `;
     try {
-        await client.query(query);
+        await pool.execute(query);
         console.log('✅ Table "licence_saison_association" créée ou déjà existante.');
     } catch (err) {
         console.error('❌ Erreur lors de la création de la table "licence_saison_association":', err);
@@ -33,13 +33,14 @@ const  createLicenceSaisonAssociationTable = async () => {
 const insertLicenceSaisonAssociation = async (idAnne, numeroLicence) => {
     const query = `
         INSERT INTO licence_saison_association (saison, numero_licence)
-        VALUES ($1, $2)
+        VALUES (?, ?)
     `;
     const values = [idAnne, numeroLicence];
 
     try {
-        await client.query(query, values);
-        // console.log('✅ Données insérées dans la table "licence_annee_association".');
+        console.log("⌛️ Requête association saison :", idAnne, "Licence :", numeroLicence);
+        await pool.execute(query, values);
+        console.log('✅ Données insérées dans la table "licence_annee_association".');
     } catch (err) {
         console.error('❌ Erreur lors de l\'insertion des données dans la table "licence_annee_association":', err);
         throw err;
@@ -50,10 +51,10 @@ const saisonbyLicence = async (numeroLicence) => {
     const query = `
         SELECT saison
         FROM licence_saison_association
-        WHERE numero_licence = $1;
+        WHERE numero_licence = ?;
     `;
     try {
-        await client.query(query, numeroLicence);
+        await pool.execute(query, numeroLicence);
         // console.log('✅ Données insérées dans la table "licence_annee_association".');
     } catch (err) {
         console.error('❌ Erreur lors de l\'insertion des données dans la table "licence_annee_association":', err);

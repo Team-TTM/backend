@@ -11,8 +11,8 @@ const {initDatabase, dropAllTables} = require("./src/database/init-db");
 
 const startServer = async () => {
     try {
-        await dropAllTables();  // Supprime toutes les tables avant d'initialiser la DB
-        await initDatabase();  // Initialise la base de données
+        // await dropAllTables();  // Supprime toutes les tables avant d'initialiser la DB
+        // await initDatabase();  // Initialise la base de données
         app.listen(port, () => {
             console.log(`Serveur en écoute sur http://localhost:${port}`);
         });
