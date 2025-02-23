@@ -3,6 +3,7 @@ const path = require("path");
 require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 
 
+
 /**
  * Middleware d'authentification utilisant JWT.
  * Vérifie la validité du token et ajoute l'ID utilisateur à `req.auth`.

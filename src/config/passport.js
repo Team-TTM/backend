@@ -5,13 +5,13 @@ const FacebookStrategy = require('passport-facebook').Strategy;
 
 const path = require("path");
 const {facebookAuthVerify, googleAuthVerify} = require("../services/authVerifyService");
-require('dotenv').config({ path: path.resolve(__dirname, '../../../.env') });
+require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 
 
 passport.use(new FacebookStrategy({
     clientID: process.env.FACEBOOK_CLIENT_ID,
     clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
-    callbackURL: process.env.URL + process.env.FACEBOOK_CALLBACK_URL,
+    callbackURL: process.env.FACEBOOK_CALLBACK_URL,
 
 }, async (accessToken, refreshToken, profile, done) => {
     try {
@@ -25,7 +25,7 @@ passport.use(new FacebookStrategy({
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: process.env.URL + process.env.GOOGLE_CALLBACK_URL,
+    callbackURL: process.env.GOOGLE_CALLBACK_URL,
     scope: ["email", "profile", "openid"],
 }, async (accessToken, refreshToken, profile, done) => {
     try {
