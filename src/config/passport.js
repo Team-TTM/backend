@@ -33,6 +33,7 @@ passport.use(new GoogleStrategy({
     scope: ["email", "profile", "openid"],
 }, async (accessToken, refreshToken, profile, done) => {
     try {
+
         await googleAuthVerify(accessToken, profile, done);
     } catch (error) {
         done(error);
