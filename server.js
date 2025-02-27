@@ -6,10 +6,10 @@ const port = process.env.PORT || 3000; // Le port HTTPS standard est 443 (ne ser
 const startServer = () => {
     try {
         app.listen(port, () => {
-            console.log(`Serveur Express en écoute sur le port ${port}`, 'INFO');
+            console.log(`Serveur Express en écoute sur le port ${port}`);
         });
     } catch (err) {
-        console.error(`Erreur lors du démarrage du serveur : ${err.message}`, 'ERROR');
+        console.error(`Erreur lors du démarrage du serveur : ${err.message}`);
         process.exit(1);  // Arrêt du processus en cas d'erreur
     }
 };
