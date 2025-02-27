@@ -1,3 +1,8 @@
+/**
+ * @module authVerifyService
+ */
+
+
 const userService = require("./userService");
 const {createToken} = require("./tokenService");
 

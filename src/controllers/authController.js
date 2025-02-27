@@ -3,8 +3,13 @@
  */
 
 
+
 const licenceService = require("../services/licenceService");
 const {createToken} = require("../services/tokenService");
+const path = require("path");
+require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
+
+const URL = process.env.URL
 
 
 /**
@@ -17,7 +22,7 @@ const {createToken} = require("../services/tokenService");
  * @param {Object} req.auth - L'objet d'authentification.
  * @param {number} req.auth.userId - L'ID de l'utilisateur authentifié.
  * @param {Object} res - L'objet de réponse Express.
- * @returns {Promise<Response>} Une réponse JSON avec un message de confirmation ou une erreur.
+ * @returns {Promise<Object>} Une réponse JSON avec un message de confirmation ou une erreur.
  */
 const licenceSignInController = async (req, res) => {
     const { licence } = req.body;
@@ -55,8 +60,8 @@ const handleAuthRedirection = async (req, res, platform) => {
         const { token, licenceExiste } = req.user;
 
         const redirectUrl = licenceExiste
-            ? `http://localhost:3000/users/connected?token=${token}`
-            : `http://localhost:3000/users/verify-licence?token=${token}`;
+            ? `${URL}/users/connected?token=${token}`
+            : `${URL}/users/verify-licence?token=${token}`;
 
         return res.redirect(redirectUrl);
     } catch (error) {
