@@ -1,32 +1,35 @@
 const express = require('express');
+const app = express();
+
 const logger = require('morgan');
 const passport = require("./src/config/passport");
-const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000; // Le port HTTPS standard est 443 (ne sera pas utilisé directement si Passenger gère SSL)
 
+// Routes
 const indexRouter = require('./src/routes/index');
 const usersRouter = require('./src/routes/userRoute');
 const assetsRouter = require('./src/routes/assets');
-const {initDatabase, dropAllTables} = require("./src/database/init-db");
+const { initDatabase, dropAllTables } = require("./src/database/init-db");
 
-const startServer = async () => {
+// Démarrer le serveur HTTPS (géré par Passenger si SSL est configuré)
+const startServer =  () => {
     try {
         // await dropAllTables();  // Supprime toutes les tables avant d'initialiser la DB
         // await initDatabase();  // Initialise la base de données
+
+        // Démarrer le serveur via Passenger
         app.listen(port, () => {
-            console.log(`Serveur en écoute sur http://localhost:${port}`);
+            console.log(`Serveur Express en écoute sur le port ${port}`);
         });
     } catch (err) {
-        console.error('Erreur de connexion à MongoDB :', err);
+        console.error('Erreur lors du démarrage du serveur :', err);
         process.exit(1);  // Arrêt du processus en cas d'erreur
     }
 };
 
 app.use(logger('dev'));
 app.use(passport.initialize());
-
 app.use(express.json());
-
 
 // Ordre logique des routes
 app.use(indexRouter);
@@ -51,4 +54,4 @@ app.use((error, req, res, next) => {
 });
 
 // Connexion à et démarrage du serveur
-startServer()
+startServer();
