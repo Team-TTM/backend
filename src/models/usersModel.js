@@ -90,8 +90,15 @@ const findUserByFacebookId = async (facebookId) => {
     `;
     try {
         const [rows] = await pool.execute(query, [facebookId]);
-        console.log(`🔍 Utilisateur trouvé avec Facebook ID ${facebookId}:`, rows[0]);
-        return rows[0] || null;
+        if (rows[0]){
+            console.log(`🔍 Utilisateur trouvé avec Facebook ID ${facebookId}:`, rows[0]);
+            return rows[0];
+
+        }
+        else {
+            console.log(`🔍 Utilisateur non trouvé avec Facebook ID ${facebookId}:`);
+            return null
+        }
     } catch (err) {
         console.error('❌ Erreur lors de la recherche de l’utilisateur Facebook:', err);
         throw err;
@@ -112,8 +119,14 @@ const findUserByGoogleId = async (googleId) => {
     `;
     try {
         const [rows] = await pool.execute(query, [googleId]);
-        console.log(`🔍 Utilisateur trouvé avec Google ID ${googleId}:`, rows[0]);
-        return rows[0] || null;
+        if (rows[0]){
+            console.log(`🔍 Utilisateur trouvé avec Google ID ${googleId}:`, rows[0]);
+            return rows[0]
+        }
+        else {
+            console.log(`🔍 Utilisateur non trouvé avec Google ID ${googleId}:`);
+            return null
+        }
     } catch (err) {
         console.error('❌ Erreur lors de la recherche de l’utilisateur Google:', err);
         throw err;

@@ -13,8 +13,6 @@ const findUserByGoogleId = async (googleId) => {
     if (!userData) {
         return null;
     }
-    return User.createUserFromDataBase(userData);
-
 };
 
 /**
@@ -28,7 +26,6 @@ const findUserByFacebookId = async (facebookId) => {
     if (!userData) {
         return null;
     }
-    return User.createUserFromDataBase(userData);
 };
 
 /**
@@ -82,7 +79,7 @@ const createUserFacebook = async (facebookID) => {
  */
 const createUserGoogle = async (googleID) => {
     const user = User.createGoogleUser(googleID);
-    user.id_user  = await UsersModel.createFacebookUser(user);
+    user.id_user  = await UsersModel.createGoogleUser(user);
     return user;
 };
 /**
