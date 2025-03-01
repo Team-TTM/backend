@@ -13,6 +13,7 @@ const findUserByGoogleId = async (googleId) => {
     if (!userData) {
         return null;
     }
+    return userData
 };
 
 /**
@@ -26,6 +27,7 @@ const findUserByFacebookId = async (facebookId) => {
     if (!userData) {
         return null;
     }
+    return userData
 };
 
 /**

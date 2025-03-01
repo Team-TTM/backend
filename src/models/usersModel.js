@@ -44,7 +44,7 @@ const createFacebookUser = async (user) => {
     `;
     try {
         const [rows] = await pool.execute(query, [user.facebook_id]);
-        console.log('✅ Utilisateur Facebook inséré :', rows[0]);
+        console.log('✅ Utilisateur Facebook inséré :', rows[0].id_user);
         return rows[0].id_user;
     } catch (err) {
         console.error('❌ Erreur lors de l’insertion de l’utilisateur Facebook:', err);
@@ -68,7 +68,7 @@ const createGoogleUser = async (user) => {
     `;
     try {
         const [rows] = await pool.execute(query, [user.google_id]);
-        console.log('✅ Utilisateur Google inséré :', rows[0]);
+        console.log('✅ Utilisateur Google inséré :', rows[0].id_user);
         return rows[0].id_user;
     } catch (err) {
         console.error('❌ Erreur lors de l’insertion de l’utilisateur Google:', err);
@@ -91,12 +91,12 @@ const findUserByFacebookId = async (facebookId) => {
     try {
         const [rows] = await pool.execute(query, [facebookId]);
         if (rows[0]){
-            console.log(`🔍 Utilisateur trouvé avec Facebook ID ${facebookId}:`, rows[0]);
+            console.log(`🔍 Utilisateur trouvé avec Facebook ID ${facebookId}:`, rows[0].id_user);
             return rows[0];
 
         }
         else {
-            console.log(`🔍 Utilisateur non trouvé avec Facebook ID ${facebookId}:`);
+            console.log(`🔍 Utilisateur non trouvé avec Facebook ID ${facebookId}`);
             return null
         }
     } catch (err) {
@@ -120,11 +120,11 @@ const findUserByGoogleId = async (googleId) => {
     try {
         const [rows] = await pool.execute(query, [googleId]);
         if (rows[0]){
-            console.log(`🔍 Utilisateur trouvé avec Google ID ${googleId}:`, rows[0]);
+            console.log(`🔍 Utilisateur trouvé avec Google ID ${googleId}:`, rows[0].id_user);
             return rows[0]
         }
         else {
-            console.log(`🔍 Utilisateur non trouvé avec Google ID ${googleId}:`);
+            console.log(`🔍 Utilisateur non trouvé avec Google ID ${googleId}`);
             return null
         }
     } catch (err) {
