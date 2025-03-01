@@ -100,13 +100,13 @@ class Adherent {
     /**
      * Constructeur de la classe Adherent.
      * @param {string} numeroLicence - Le numéro de licence de l'adhérent.
-     * @param {boolean} statut - Le statut de l'adhérent (par exemple, validé).
+     * @param {boolean} statut - Le statut de l'adhérent si la licence est valide pour la saison en cour
      * @param {string} type - Le type de licence.
      * @param {boolean} demiTarif - Si l'adhérent bénéficie d'un tarif réduit.
      * @param {boolean} horsClub - Si l'adhérent est hors club.
      * @param {string} categorie - La catégorie de l'adhérent.
      * @param {boolean} anneeBlanche - Si l'adhérent a une année blanche.
-     * @param {string} pratique - La pratique de l'adhérent (par exemple, triathlon).
+     * @param {string} pratique - La frequence de pratique ex : competion, occasionnel etc
      * @param {string} prenom - Le prénom de l'adhérent.
      * @param {string} nom - Le nom de l'adhérent.
      * @param {string} nomUsage - Le nom d'usage de l'adhérent.
@@ -123,7 +123,7 @@ class Adherent {
      * @param {string} mobile - Le numéro de téléphone mobile de l'adhérent.
      * @param {string} email - L'email de l'adhérent.
      * @param {string} urgenceTelephone - Le numéro de téléphone d'urgence de l'adhérent.
-     * @param {array} saison - La saison à laquelle l'adhérent appartient (ex: ["2024/2025"]).
+     * @param {array} saison - Les saison à laquelle l'adhérent a pris une licence (ex: ["2024/2025"]).
      */
     constructor(
         numeroLicence,
