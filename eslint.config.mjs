@@ -10,7 +10,7 @@ export default [
     },
     rules: {
       "no-var": "error", // Interdit l'utilisation de var
-      "quotes": ["error", "double"], // Force l'utilisation des guillemets doubles
+      "quotes": ["error", "single"], // Force l'utilisation des guillemets doubles
       "semi": ["error", "always"], // Force l'utilisation de points-virgules
     },
   },
