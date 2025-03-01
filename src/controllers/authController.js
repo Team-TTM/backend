@@ -4,12 +4,12 @@
 
 
 
-const licenceService = require("../services/licenceService");
-const {createToken} = require("../services/tokenService");
-const path = require("path");
-require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
+const licenceService = require('../services/licenceService');
+const {createToken} = require('../services/tokenService');
+const path = require('path');
+require('dotenv').config({path: path.resolve(__dirname, '../../.env')});
 
-const URL = process.env.URL
+const URL = process.env.URL;
 
 
 /**
@@ -25,18 +25,18 @@ const URL = process.env.URL
  * @returns {Promise<Object>} Une réponse JSON avec un message de confirmation ou une erreur.
  */
 const licenceSignInController = async (req, res) => {
-    const { licence } = req.body;
-    const { userId } = req.auth;
+    const {licence} = req.body;
+    const {userId} = req.auth;
 
     try {
         if (!licence) {
-            throw new Error("Le paramètre 'licence' est requis.");
+            throw new Error('Le paramètre \'licence\' est requis.');
         }
-        const {user,message} = await licenceService.processLicenceSignIn(userId, licence);
+        const {user, message} = await licenceService.processLicenceSignIn(userId, licence);
         const token = createToken(user.id_user);
         return res.status(200).json({token, message});
     } catch (error) {
-        console.error("❌ Erreur dans l'authentification de la licence :", error);
+        console.error('❌ Erreur dans l\'authentification de la licence :', error);
         return res.status(400).json({
             error: error.message
         });
@@ -49,15 +49,15 @@ const licenceSignInController = async (req, res) => {
  * @function handleAuthRedirection
  * @param {Object} req - L'objet de requête Express.
  * @param {Object} res - L'objet de réponse Express.
- * @param {string} platform - La plateforme d'authentification ("Google" ou "Facebook").
+ * @param {string} platform - La plateforme d'authentification ('Google' ou 'Facebook').
  * @returns {Promise<Response>} Une redirection vers l'URL appropriée ou une réponse JSON en cas d'erreur.
  */
 const handleAuthRedirection = async (req, res, platform) => {
     try {
         if (!req.user) {
-            return res.status(401).json({ error: "Utilisateur non authentifié" });
+            return res.status(401).json({error: 'Utilisateur non authentifié'});
         }
-        const { token, licenceExiste } = req.user;
+        const {token, licenceExiste} = req.user;
 
         const redirectUrl = licenceExiste
             ? `${URL}/users/connected?token=${token}`
@@ -66,7 +66,7 @@ const handleAuthRedirection = async (req, res, platform) => {
         return res.redirect(redirectUrl);
     } catch (error) {
         console.error(`Erreur dans ${platform}AuthController:`, error);
-        return res.status(501).json({ error: "Erreur lors de la redirection après authentification" });
+        return res.status(501).json({error: 'Erreur lors de la redirection après authentification'});
     }
 };
 
@@ -77,13 +77,13 @@ const handleAuthRedirection = async (req, res, platform) => {
  * @param {Object} res - L'objet de réponse Express.
  * @returns {Promise<Response>} Une redirection après authentification Google.
  */
-const googleAuthController = (req, res) => handleAuthRedirection(req, res, "Google");
+const googleAuthController = (req, res) => handleAuthRedirection(req, res, 'Google');
 /**
  * Contrôleur pour l'authentification via Facebook.
  * @param {Object} req - L'objet de requête Express.
  * @param {Object} res - L'objet de réponse Express.
  * @returns {Promise<Response>} Une redirection après authentification Facebook.
  */
-const facebookAuthController = (req, res) => handleAuthRedirection(req, res, "Facebook");
+const facebookAuthController = (req, res) => handleAuthRedirection(req, res, 'Facebook');
 
-module.exports = { googleAuthController, facebookAuthController ,licenceSignInController};
+module.exports = {googleAuthController, facebookAuthController, licenceSignInController};

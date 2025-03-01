@@ -7,26 +7,26 @@ const pool = require('../config/database'); // Connexion à la base de données
  */
 const createUserTable = async () => {
     const query = `
-        CREATE TABLE IF NOT EXISTS users (
-            id_user INT AUTO_INCREMENT PRIMARY KEY,
+        CREATE TABLE IF NOT EXISTS users
+        (
+            id_user        INT AUTO_INCREMENT PRIMARY KEY,
             numero_licence VARCHAR(255) UNIQUE,
-            role ENUM('user', 'dirigent') NOT NULL DEFAULT 'user',
-            charte_signe BOOLEAN NOT NULL DEFAULT FALSE,
-            google_id VARCHAR(255) UNIQUE,
-            facebook_id VARCHAR(255) UNIQUE,
-            newsletter BOOLEAN NOT NULL DEFAULT FALSE,
-            FOREIGN KEY (numero_licence) REFERENCES adherants(numero_licence) ON DELETE CASCADE
+            role           ENUM ('user', 'dirigent') NOT NULL DEFAULT 'user',
+            charte_signe   BOOLEAN                   NOT NULL DEFAULT FALSE,
+            google_id      VARCHAR(255) UNIQUE,
+            facebook_id    VARCHAR(255) UNIQUE,
+            newsletter     BOOLEAN                   NOT NULL DEFAULT FALSE,
+            FOREIGN KEY (numero_licence) REFERENCES adherants (numero_licence) ON DELETE CASCADE
         );
     `;
     try {
         await pool.execute(query);
-        // console.log('✅ Table "users" créée ou déjà existante.');
+        // console.log('✅ Table 'users' créée ou déjà existante.');
     } catch (err) {
-        console.error('❌ Erreur lors de la création de la table "users":', err);
+        console.error('❌ Erreur lors de la création de la table \'users\':', err);
         throw err;
     }
 };
-
 
 
 /**
@@ -39,8 +39,8 @@ const createUserTable = async () => {
 const createFacebookUser = async (user) => {
     const query = `
         INSERT INTO users (facebook_id)
-        VALUES (?)
-        RETURNING *
+            VALUES (?)
+                RETURNING *
     `;
     try {
         const [rows] = await pool.execute(query, [user.facebook_id]);
@@ -63,8 +63,8 @@ const createFacebookUser = async (user) => {
 const createGoogleUser = async (user) => {
     const query = `
         INSERT INTO users (google_id)
-        VALUES (?)
-        RETURNING *
+            VALUES (?)
+                RETURNING *
     `;
     try {
         const [rows] = await pool.execute(query, [user.google_id]);
@@ -85,19 +85,19 @@ const createGoogleUser = async (user) => {
  */
 const findUserByFacebookId = async (facebookId) => {
     const query = `
-        SELECT * FROM users
+        SELECT *
+        FROM users
         WHERE facebook_id = ?;
     `;
     try {
         const [rows] = await pool.execute(query, [facebookId]);
-        if (rows[0]){
+        if (rows[0]) {
             console.log(`🔍 Utilisateur trouvé avec Facebook ID ${facebookId}:`, rows[0].id_user);
             return rows[0];
 
-        }
-        else {
+        } else {
             console.log(`🔍 Utilisateur non trouvé avec Facebook ID ${facebookId}`);
-            return null
+            return null;
         }
     } catch (err) {
         console.error('❌ Erreur lors de la recherche de l’utilisateur Facebook:', err);
@@ -114,18 +114,18 @@ const findUserByFacebookId = async (facebookId) => {
  */
 const findUserByGoogleId = async (googleId) => {
     const query = `
-        SELECT * FROM users
+        SELECT *
+        FROM users
         WHERE google_id = ?;
     `;
     try {
         const [rows] = await pool.execute(query, [googleId]);
-        if (rows[0]){
+        if (rows[0]) {
             console.log(`🔍 Utilisateur trouvé avec Google ID ${googleId}:`, rows[0].id_user);
-            return rows[0]
-        }
-        else {
+            return rows[0];
+        } else {
             console.log(`🔍 Utilisateur non trouvé avec Google ID ${googleId}`);
-            return null
+            return null;
         }
     } catch (err) {
         console.error('❌ Erreur lors de la recherche de l’utilisateur Google:', err);
@@ -142,7 +142,8 @@ const findUserByGoogleId = async (googleId) => {
  */
 const findUserByLicence = async (numberLicence) => {
     const query = `
-        SELECT * FROM users
+        SELECT *
+        FROM users
         WHERE numero_licence = ?;
     `;
     try {
@@ -164,7 +165,8 @@ const findUserByLicence = async (numberLicence) => {
  */
 const findUserById = async (userId) => {
     const query = `
-        SELECT * FROM users
+        SELECT *
+        FROM users
         WHERE id_user = ?;
     `;
     try {
@@ -178,7 +180,7 @@ const findUserById = async (userId) => {
 };
 
 /**
-/**
+ /**
  * Met à jour le Facebook ID d’un utilisateur.
  * @async
  * @param {User} user - L'utilisateur à mettre à jour.
@@ -214,11 +216,10 @@ const updateGoogleId = async (user) => {
     const query = `
         UPDATE users
         SET google_id = ?
-        WHERE id_user = ?
-        RETURNING *;
+        WHERE id_user = ? RETURNING *;
     `;
     try {
-        console.log("⌛️ Ajout de googleId :", user.google_id, "à l'utilisateur :", user.id_user);
+        console.log('⌛️ Ajout de googleId :', user.google_id, 'à l\'utilisateur :', user.id_user);
         const [result] = await pool.query(query, [user.google_id, user.id_user]);
         if (result.affectedRows > 0) {
             console.log(`✅Google ID mis à jour pour l'utilisateur ID: ${user.id_user}`);
@@ -243,7 +244,7 @@ const updateAdherentId = async (user) => {
         WHERE id_user = ?;
     `;
     try {
-        console.log("⌛️ Ajout de la licence :", user.numero_licence, "à l'utilisateur :", user.id_user);
+        console.log('⌛️ Ajout de la licence :', user.numero_licence, 'à l\'utilisateur :', user.id_user);
         const [result] = await pool.query(query, [user.numero_licence, user.id_user]);
         if (result.affectedRows > 0) {
             console.log(`✅ Numéro de licence mis à jour pour l'utilisateur ID: ${user.id_user}`);
@@ -263,7 +264,8 @@ const updateAdherentId = async (user) => {
  */
 const deleteUserById = async (user) => {
     const query = `
-        DELETE FROM users
+        DELETE
+        FROM users
         WHERE id_user = ?
     `;
     try {

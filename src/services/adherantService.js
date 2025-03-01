@@ -1,9 +1,8 @@
 const xlsx = require('xlsx');
 const AdherentsModel = require('../models/adherantModel');
-const Adherent = require("../models/Adherent");
-const {insertLicenceSaisonAssociation} = require("../models/licenceSaisonAssociationModel");
-const {insertIfNotExists} = require("../models/saisonModel");
-
+const Adherent = require('../models/Adherent');
+const {insertLicenceSaisonAssociation} = require('../models/licenceSaisonAssociationModel');
+const {insertIfNotExists} = require('../models/saisonModel');
 
 
 /**
@@ -29,8 +28,8 @@ const createAdherent = async (adherent) => {
         AdherentsModel.createAdherent(adherent),
         insertIfNotExists(adherent.getDerniereSaison())
     ]);
-    await insertLicenceSaisonAssociation(adherent.getDerniereSaison(), adherent.numeroLicence)
-}
+    await insertLicenceSaisonAssociation(adherent.getDerniereSaison(), adherent.numeroLicence);
+};
 
 /**
  * Met à jour un adhérent existant dans la base de données.
@@ -44,18 +43,18 @@ const updateAdherent = async (adherent) => {
 
     if (adherent.getDerniereSaison() > adherentFromDb.getDerniereSaison()) {
         adherent.merge(adherentFromDb);
-        console.log(adherent)
-        await insertIfNotExists(adherent.getDerniereSaison())
+        console.log(adherent);
+        await insertIfNotExists(adherent.getDerniereSaison());
         await Promise.all([
             insertLicenceSaisonAssociation(adherent.getDerniereSaison(), adherent.numeroLicence),
             AdherentsModel.updateAdherent(adherent)
         ]);
 
-        console.log("in b")
-        const data = await AdherentsModel.getAdherentDetails(adherent.numeroLicence)
-        console.log(data)
+        console.log('in b');
+        const data = await AdherentsModel.getAdherentDetails(adherent.numeroLicence);
+        console.log(data);
     }
-}
+};
 
 /**
  * Transforme les données provenant d'un fichier Excel en une liste d'objets Adherent.
@@ -111,6 +110,7 @@ async function importerXlsx(fichierXlsx) {
  * @returns {Promise<boolean>} - Retourne `true` si l'adhérent existe, sinon `false`.
  */
 async function checkAdherentLicence(num_licence) {
-    return AdherentsModel.adherentExist(num_licence)
+    return AdherentsModel.adherentExist(num_licence);
 }
-module.exports = {importerXlsx,checkAdherentLicence};
+
+module.exports = {importerXlsx, checkAdherentLicence};

@@ -3,9 +3,9 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
 
 
-const path = require("path");
-const {facebookAuthVerify, googleAuthVerify} = require("../services/authVerifyService");
-require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
+const path = require('path');
+const {facebookAuthVerify, googleAuthVerify} = require('../services/authVerifyService');
+require('dotenv').config({path: path.resolve(__dirname, '../../.env')});
 
 
 passport.use(new FacebookStrategy({
@@ -25,8 +25,8 @@ passport.use(new FacebookStrategy({
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL:  `${process.env.URL}${process.env.GOOGLE_CALLBACK_URL}`,
-    scope: ["email", "profile", "openid"],
+    callbackURL: `${process.env.URL}${process.env.GOOGLE_CALLBACK_URL}`,
+    scope: ['email', 'profile', 'openid'],
 }, async (accessToken, refreshToken, profile, done) => {
     try {
         await googleAuthVerify(accessToken, profile, done);

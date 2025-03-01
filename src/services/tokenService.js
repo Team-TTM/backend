@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
-const path = require("path");
-require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
+const path = require('path');
+require('dotenv').config({path: path.resolve(__dirname, '../../.env')});
 
 /**
  * Crée un JSON Web Token (JWT) pour un identifiant utilisateur donné.
@@ -10,9 +10,9 @@ require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
  */
 const createToken = (userId) => {
     return jwt.sign(
-        { userId: userId},
+        {userId: userId},
         process.env.JWT_SECRET,
-        { expiresIn: '12h' }
+        {expiresIn: '12h'}
     );
 };
 

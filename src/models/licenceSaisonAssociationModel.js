@@ -1,11 +1,11 @@
 const pool = require('../config/database'); // Connexion à la base de données
 
 
-const  createLicenceSaisonAssociationTable = async () => {
+const createLicenceSaisonAssociationTable = async () => {
     const query = `
         CREATE TABLE IF NOT EXISTS licence_saison_association
         (
-            saison        VARCHAR(9) NOT NULL, -- Référence à l'année dans la table \`anne_licence\`
+            saison         VARCHAR(9)   NOT NULL, -- Référence à l'année dans la table \`anne_licence\`
             numero_licence VARCHAR(255) NOT NULL, -- Référence à \`numero_licence\` dans \`licences\`
             PRIMARY KEY (saison, numero_licence),
             FOREIGN KEY (saison) REFERENCES saison (saison_id) ON DELETE CASCADE,
@@ -15,9 +15,9 @@ const  createLicenceSaisonAssociationTable = async () => {
     `;
     try {
         await pool.execute(query);
-        console.log('✅ Table "licence_saison_association" créée ou déjà existante.');
+        console.log('✅ Table \'licence_saison_association\' créée ou déjà existante.');
     } catch (err) {
-        console.error('❌ Erreur lors de la création de la table "licence_saison_association":', err);
+        console.error('❌ Erreur lors de la création de la table \'licence_saison_association\':', err);
         throw err;
     }
 };
@@ -38,11 +38,11 @@ const insertLicenceSaisonAssociation = async (idAnne, numeroLicence) => {
     const values = [idAnne, numeroLicence];
 
     try {
-        console.log("⌛️ Requête association saison :", idAnne, "Licence :", numeroLicence);
+        console.log('⌛️ Requête association saison :', idAnne, 'Licence :', numeroLicence);
         await pool.execute(query, values);
-        console.log('✅ Données insérées dans la table "licence_annee_association".');
+        console.log('✅ Données insérées dans la table \'licence_annee_association\'.');
     } catch (err) {
-        console.error('❌ Erreur lors de l\'insertion des données dans la table "licence_annee_association":', err);
+        console.error('❌ Erreur lors de l\'insertion des données dans la table \'licence_annee_association\':', err);
         throw err;
     }
 };
@@ -55,9 +55,9 @@ const saisonbyLicence = async (numeroLicence) => {
     `;
     try {
         await pool.execute(query, numeroLicence);
-        // console.log('✅ Données insérées dans la table "licence_annee_association".');
+        // console.log('✅ Données insérées dans la table 'licence_annee_association'.');
     } catch (err) {
-        console.error('❌ Erreur lors de l\'insertion des données dans la table "licence_annee_association":', err);
+        console.error('❌ Erreur lors de l\'insertion des données dans la table \'licence_annee_association\':', err);
         throw err;
     }
 };

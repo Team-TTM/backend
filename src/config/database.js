@@ -3,8 +3,8 @@
  * Utilise les variables d'environnement pour les paramètres de connexion.
  */
 
-const path = require("path");
-require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
+const path = require('path');
+require('dotenv').config({path: path.resolve(__dirname, '../../.env')});
 
 const mysql = require('mysql2/promise');
 

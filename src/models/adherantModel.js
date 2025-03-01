@@ -2,7 +2,7 @@ const pool = require('../config/database'); // Connexion à la base de données
 
 
 /**
- * Crée la table "adherants" dans la base de données si elle n'existe pas.
+ * Crée la table 'adherants' dans la base de données si elle n'existe pas.
  * @async
  * @returns {Promise<void>}
  */
@@ -40,7 +40,7 @@ const createAdherentTable = async () => {
     try {
         await pool.execute(query);
     } catch (err) {
-        console.error('❌ Erreur lors de la création de la table "adherant":', err);
+        console.error('❌ Erreur lors de la création de la table \'adherant\':', err);
         throw err;
     }
 };
@@ -53,21 +53,23 @@ const createAdherentTable = async () => {
  */
 const createAdherent = async (adherent) => {
     const query = `
-        INSERT INTO adherants (
-            numero_licence, prenom, nom, nom_usage, date_naissance, sexe, profession,
-            principale, details, lieu_dit, code_postale, ville, pays,
-            telephone, mobile, email, urgency_telephone,
-            statut, type, demi_tarif, hors_club, categorie, annee_blanche, pratique
-        ) VALUES (
-            ?, ?, ?, ?, ?, ?, ?, 
-            ?, ?, ?, ?, ?, ?, ?, 
-            ?, ?, ?, ?, ?, ?, 
-            ?, ?, ?, ?
-        )
-        RETURNING *;
+        INSERT INTO adherants (numero_licence, prenom, nom, nom_usage, date_naissance, sexe, profession,
+                               principale, details, lieu_dit, code_postale, ville, pays,
+                               telephone, mobile, email, urgency_telephone,
+                               statut, type, demi_tarif, hors_club, categorie, annee_blanche, pratique) VALUES (?, ?, ?,
+                                                                                                                ?, ?, ?,
+                                                                                                                ?,
+                                                                                                                ?, ?, ?,
+                                                                                                                ?, ?, ?,
+                                                                                                                ?,
+                                                                                                                ?, ?, ?,
+                                                                                                                ?, ?, ?,
+                                                                                                                ?, ?, ?,
+                                                                                                                ?)
+            RETURNING *;
     `;
     try {
-        const[rows] = await pool.execute(query, [
+        const [rows] = await pool.execute(query, [
             adherent.numeroLicence,
             adherent.prenom,
             adherent.nom,
@@ -96,10 +98,10 @@ const createAdherent = async (adherent) => {
             adherent.anneeBlanche,
             adherent.pratique,
         ]);
-        console.log("⌛ creation Adherant : ",adherent.numeroLicence)
+        console.log('⌛ creation Adherant : ', adherent.numeroLicence);
         return rows;
     } catch (err) {
-        console.error("❌ Erreur lors de l'insertion de l'adhérant:", err, adherent);
+        console.error('❌ Erreur lors de l\'insertion de l\'adhérant:', err, adherent);
         throw err;
     }
 };
@@ -113,30 +115,30 @@ const createAdherent = async (adherent) => {
  */
 const updateAdherent = async (adherent) => {
     const query = `
-        UPDATE adherants SET
-            prenom = ?,
-            nom = ?,
-            nom_usage = ?,
-            date_naissance = ?,
-            sexe = ?,
-            profession = ?,
-            principale = ?,
-            details = ?,
-            lieu_dit = ?,
-            code_postale = ?,
-            ville = ?,
-            pays = ?,
-            telephone = ?,
-            mobile = ?,
-            email = ?,
+        UPDATE adherants
+        SET prenom            = ?,
+            nom               = ?,
+            nom_usage         = ?,
+            date_naissance    = ?,
+            sexe              = ?,
+            profession        = ?,
+            principale        = ?,
+            details           = ?,
+            lieu_dit          = ?,
+            code_postale      = ?,
+            ville             = ?,
+            pays              = ?,
+            telephone         = ?,
+            mobile            = ?,
+            email             = ?,
             urgency_telephone = ?,
-            statut = ?,
-            type = ?,
-            demi_tarif = ?,
-            hors_club = ?,
-            categorie = ?,
-            annee_blanche = ?,
-            pratique = ?
+            statut            = ?,
+            type              = ?,
+            demi_tarif        = ?,
+            hors_club         = ?,
+            categorie         = ?,
+            annee_blanche     = ?,
+            pratique          = ?
         WHERE numero_licence = ?
     `;
     try {
@@ -167,7 +169,7 @@ const updateAdherent = async (adherent) => {
             adherent.numeroLicence
         ]);
     } catch (err) {
-        console.error("❌ Erreur lors de la mise à jour de l'adhérant:", err, adherent);
+        console.error('❌ Erreur lors de la mise à jour de l\'adhérant:', err, adherent);
         throw err;
     }
 };
@@ -187,14 +189,13 @@ const adherentExist = async (num_licence) => {
     `;
 
     try {
-        const[rows] = await pool.execute(query, [num_licence]);
+        const [rows] = await pool.execute(query, [num_licence]);
         return rows.length > 0;
     } catch (err) {
-        console.error("❌ Erreur lors de la vérification de l'adhérent:", err);
+        console.error('❌ Erreur lors de la vérification de l\'adhérent:', err);
         throw err; //
     }
-}
-
+};
 
 
 /**
@@ -216,14 +217,13 @@ const getAdherentDetails = async (numeroLicence) => {
     const values = [numeroLicence];
     try {
         const [rows] = await pool.execute(query, values);
-        console.log(rows)
+        console.log(rows);
         return rows[0];
     } catch (err) {
         console.error('Erreur lors de la récupération des informations de l\'adhérent:', err);
         throw err;
     }
 };
-
 
 
 module.exports = {

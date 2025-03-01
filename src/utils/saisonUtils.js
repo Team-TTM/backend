@@ -1,10 +1,10 @@
 /**
  * Calcule la saison à laquelle appartient une date donnée.
  * La saison commence en septembre et se termine en août de l'année suivante.
- * Par exemple, pour une date comprise entre septembre 2024 et août 2025, la saison sera "2024/2025".
+ * Par exemple, pour une date comprise entre septembre 2024 et août 2025, la saison sera '2024/2025'.
  *
- * @param {Date} date - La date à partir de laquelle la saison doit être calculée. Cela peut être une chaîne de caractères au format "YYYY-MM-DD" ou un objet `Date'.
- * @returns {string} La saison au format "YYYY/YYYY", où la première année est l'année de début de la saison et la deuxième année est l'année de fin.
+ * @param {Date} date - La date à partir de laquelle la saison doit être calculée. Cela peut être une chaîne de caractères au format 'YYYY-MM-DD' ou un objet `Date'.
+ * @returns {string} La saison au format 'YYYY/YYYY', où la première année est l'année de début de la saison et la deuxième année est l'année de fin.
  * @throws {Error} Si la date fournie est invalide, une erreur est lancée.
  *
  * @example
@@ -14,19 +14,19 @@
  * console.log(calculerSaison('2025-08-30'));  // Saison 2024/2025
  * console.log(calculerSaison('2025-09-01'));  // Saison 2025/2026
  */
-const calculerSaison = (date) =>{
+const calculerSaison = (date) => {
 
     const annee = date.getFullYear();
     const mois = date.getMonth();
 
     const saisonAnnee = mois >= 8 ? annee : annee - 1;
     return `${saisonAnnee}/${saisonAnnee + 1}`;
-}
+};
 
 /**
  * Détermine la saison la plus récente à partir d'une liste de saisons.
  *
- * @param {string[] | string} saisons - Un tableau de saisons sous le format "YYYY/YYYY+1"
+ * @param {string[] | string} saisons - Un tableau de saisons sous le format 'YYYY/YYYY+1'
  *                                      ou une seule saison sous forme de chaîne de caractères.
  * @returns {string|null} - La saison la plus récente, ou la valeur d'entrée si ce n'est pas un tableau,
  *                          ou `null` si la liste est vide ou invalide.
@@ -48,14 +48,14 @@ const getSaisonPlusRecente = (saisons) => {
 
 /**
  * Calcule le statut de la saison donnée.
- * @param {string} saison - La saison a vérifié sous le format "YYYY/YYYY+1".
+ * @param {string} saison - La saison a vérifié sous le format 'YYYY/YYYY+1'.
  * @returns {boolean} - Vrai si la saison est la saison actuelle, faux sinon.
  */
-const calculetStatut =(saison) => {
-    return saison === calculerSaison(new Date())
-    // return saison === calculerSaison(convertirDate("22/11/2026"))
+const calculetStatut = (saison) => {
+    return saison === calculerSaison(new Date());
+    // return saison === calculerSaison(convertirDate('22/11/2026'))
 
-}
+};
 
 /**
  * Convertit une date au format `DD/MM/YYYY` en objet Date JavaScript.
@@ -69,4 +69,4 @@ function convertirDate(dateStr) {
     return new Date(`${annee}-${mois}-${jour}`); // Recompose dans le format YYYY-MM-DD
 }
 
-module.exports = {convertirDate,calculetStatut,getSaisonPlusRecente,calculerSaison,}
+module.exports = {convertirDate, calculetStatut, getSaisonPlusRecente, calculerSaison,};

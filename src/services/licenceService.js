@@ -1,5 +1,5 @@
-const userService = require("./userService");
-const {checkAdherentLicence} = require("./adherantService");
+const userService = require('./userService');
+const {checkAdherentLicence} = require('./adherantService');
 
 /**
  * Vérifie et associe une licence à un utilisateur.
@@ -21,13 +21,13 @@ const processLicenceSignIn = async (userId, licence) => {
 
         const user = await userService.findUserByUserId(userId);
         if (!user) {
-            throw new Error("Utilisateur non trouvé.");
+            throw new Error('Utilisateur non trouvé.');
         }
         const existingUser = await userService.findUserByLicence(licence);
         if (existingUser) {
 
             updatedUser = await userService.mergeUserFacebookAndGoogleIds(existingUser, user);
-            message = `Fusion des comptes réussie (Facebook et Google).`;
+            message = 'Fusion des comptes réussie (Facebook et Google).';
         } else {
             // Si la licence n'est pas encore associée, l'associer à l'utilisateur
             updatedUser = await userService.updateUserLicence(user, licence);
@@ -38,8 +38,8 @@ const processLicenceSignIn = async (userId, licence) => {
             user: updatedUser,
             message: message,
         };
-    } catch (err){
-        throw err
+    } catch (err) {
+        throw err;
     }
 };
 

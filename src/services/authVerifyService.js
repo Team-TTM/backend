@@ -3,15 +3,15 @@
  */
 
 
-const userService = require("./userService");
-const {createToken} = require("./tokenService");
+const userService = require('./userService');
+const {createToken} = require('./tokenService');
 
 
 /**
  * Gère la vérification et l'authentification des utilisateurs via Google ou Facebook.
  *
  * @async
- * @param {"google"|"facebook"} platform - La plateforme d'authentification (Google ou Facebook).
+ * @param {'google'|'facebook'} platform - La plateforme d'authentification (Google ou Facebook).
  * @param {Object} profile - Le profil utilisateur retourné par la plateforme OAuth.
  * @param {Function} done - Callback de fin d'authentification.
  * @returns {Promise<void>} - Retourne un objet contenant le token et l'état de l'adhésion.
@@ -64,4 +64,4 @@ const facebookAuthVerify = (accessToken, profile, done) => handleAuthVerificatio
 module.exports = {
     googleAuthVerify,
     facebookAuthVerify
-}
+};

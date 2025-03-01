@@ -9,23 +9,79 @@ class User {
         this._newsletter = newsletter;
     }
 
+    get id_user() {
+        return this._id_user;
+    }
+
+    set id_user(value) {
+        this._id_user = value;
+    }
+
+    get numero_licence() {
+        return this._numero_licence;
+    }
+
+    set numero_licence(value) {
+        this._numero_licence = value;
+    }
+
+    get role() {
+        return this._role;
+    }
+
+    set role(value) {
+        this._role = value;
+    }
+
+    get charte_signe() {
+        return this._charte_signe;
+    }
+
+    set charte_signe(value) {
+        this._charte_signe = value;
+    }
+
+    get google_id() {
+        return this._google_id;
+    }
+
+    set google_id(value) {
+        this._google_id = value;
+    }
+
+    get facebook_id() {
+        return this._facebook_id;
+    }
+
+    set facebook_id(value) {
+        this._facebook_id = value;
+    }
+
+    get newsletter() {
+        return this._newsletter;
+    }
+
+    set newsletter(value) {
+        this._newsletter = value;
+    }
+
     static createFacebookUser(facebookId) {
         return new User(null,
             null,
-            "user",
+            'user',
             false,
             null,
-            facebookId,false)
+            facebookId, false);
     }
 
     static createGoogleUser(googleId) {
         return new User(null,
             null,
-            "user",
+            'user',
             false,
             googleId,
             null,
-            false)
+            false);
     }
 
     static createUserFromDataBase(userData) {
@@ -35,62 +91,7 @@ class User {
             userData.charte_signe,
             userData.google_id,
             userData.facebook_id,
-            userData.newsletter)
-    }
-    set id_user(value) {
-        this._id_user = value;
-    }
-
-    set numero_licence(value) {
-        this._numero_licence = value;
-    }
-
-    set role(value) {
-        this._role = value;
-    }
-
-    set charte_signe(value) {
-        this._charte_signe = value;
-    }
-
-    set google_id(value) {
-        this._google_id = value;
-    }
-
-    set facebook_id(value) {
-        this._facebook_id = value;
-    }
-
-    set newsletter(value) {
-        this._newsletter = value;
-    }
-
-    get id_user() {
-        return this._id_user;
-    }
-
-    get numero_licence() {
-        return this._numero_licence;
-    }
-
-    get role() {
-        return this._role;
-    }
-
-    get charte_signe() {
-        return this._charte_signe;
-    }
-
-    get google_id() {
-        return this._google_id;
-    }
-
-    get facebook_id() {
-        return this._facebook_id;
-    }
-
-    get newsletter() {
-        return this._newsletter;
+            userData.newsletter);
     }
 }
 
