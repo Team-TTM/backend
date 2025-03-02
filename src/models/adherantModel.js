@@ -204,26 +204,52 @@ const adherentExist = async (num_licence) => {
  * @returns {Promise<Array<Object>>} - Une promesse qui se résout en un tableau d'objets contenant les informations de l'adhérent.
  * @throws {Error} - Si une erreur survient lors de la requête.
  */
-const getAdherentDetails = async (numeroLicence) => {
+const getAllAdherents = async () => {
     const query = `
-        SELECT adherants.*, GROUP_CONCAT(licence_saison_association.saison) AS saisons
-        FROM adherants
+        SELECT adherents.*,
+               COALESCE(GROUP_CONCAT(licence_saison_association.saison), '') AS saisons
+        FROM adherents
                  LEFT JOIN licence_saison_association
-                           ON adherants.numero_licence = licence_saison_association.numero_licence
-        WHERE adherants.numero_licence = ?
-        GROUP BY adherants.numero_licence
+                           ON adherents.numero_licence = licence_saison_association.numero_licence
+        GROUP BY adherents.numero_licence;
     `;
-    const values = [numeroLicence];
     try {
-        const [rows] = await pool.execute(query, values);
-        console.log(rows)
-        return rows[0];
+        const [rows] = await pool.execute(query);
+        return rows.map(row => ({
+            ...row,
+            saisons: row.saisons ? row.saisons.split(',') : []
+        }));
     } catch (err) {
-        console.error('Erreur lors de la récupération des informations de l\'adhérent:', err);
+        console.error('❌ Erreur lors de la récupération des adhérents:', err);
         throw err;
     }
 };
 
+module.exports = { getAllAdherents };
+
+
+/**
+ * Renvoie tous les adhérents de la base de données
+ *
+ * @async
+ * @return les infos des adhérents
+ * **/
+const getAllAdherents = async () => {
+    const query = `
+        SELECT adherants.*, GROUP_CONCAT(licence_saison_association.saison) AS saisons
+        FROM adherants
+        LEFT JOIN licence_saison_association
+        ON adherants.numero_licence = licence_saison_association.numero_licence
+        GROUP BY adherants.numero_licence;
+    `;
+    try {
+        const [rows] = await pool.execute(query);
+        return rows;
+    } catch (err) {
+        console.error('❌ Erreur lors de la récupération des adhérents:', err);
+        throw err;
+    }
+};
 
 
 module.exports = {
@@ -231,5 +257,6 @@ module.exports = {
     createAdherent,
     adherentExist,
     getAdherentDetails,
+    getAllAdherents,
     updateAdherent,
 };
