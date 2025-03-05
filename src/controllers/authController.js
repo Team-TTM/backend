@@ -22,7 +22,7 @@ const URL = process.env.URL;
  * @param {Object} req.auth - L'objet d'authentification.
  * @param {number} req.auth.userId - L'ID de l'utilisateur authentifié.
  * @param {Object} res - L'objet de réponse Express.
- * @returns {Promise<Object>} Une réponse JSON avec un message de confirmation ou une erreur.
+ * @returns {Promise<Response>} Une réponse JSON avec un message de confirmation ou une erreur.
  */
 const licenceSignInController = async (req, res) => {
     const {licence} = req.body;

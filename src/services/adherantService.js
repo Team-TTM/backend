@@ -20,7 +20,7 @@ function chargerDonneesExcel(fichierXlsx) {
 
 /**
  * Récupère tous les adhérents de la base de données.
- * @returns {Promise<Object[]>} - Liste des adhérents.
+ * @returns {Promise<Object[Adherent]>} - Liste des adhérents.
  */
 const getAllAdherents = async () => {
     try {
@@ -32,7 +32,7 @@ const getAllAdherents = async () => {
         })
 
         console.log(`✅ ${adherents.length} adhérents récupérés.`);
-        return adherents;
+        return adherentList;
     } catch (error) {
         console.error('❌ [SERVICE] Erreur lors de la récupération des adhérents:', error);
         throw error;

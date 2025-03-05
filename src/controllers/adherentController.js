@@ -1,6 +1,6 @@
 const adherantService = require('../services/adherantService');
 
-const getAllAdherents = async (req, res, next) => {
+const getAllAdherents = async (req, res) => {
     try {
         console.log('📌 [CONTROLLER] Récupération des adhérents...');
 
@@ -12,7 +12,6 @@ const getAllAdherents = async (req, res, next) => {
         }
 
         console.log(`✅ ${adherents.length} adhérents récupérés avec succès.`);
-        console.log(adherents)
         res.status(200).json(adherents);
     } catch (error) {
         console.error('❌ [CONTROLLER] Erreur lors de la récupération des adhérents:', error);
