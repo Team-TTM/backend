@@ -19,7 +19,7 @@ router.post('/licence-check',authenticateJWT,authController.licenceSignInControl
 
 // TODO changer la route de mise en prod
 // router.post('/getAllAdherent',authenticateJWT,adherentController.getAllAdherents);
-router.get('/getAllAdherent',adherentController.getAllAdherents);
+router.get('/getAllAdherents',adherentController.getAllAdherents);
 
 
 router.get('*', (req, res) => {
