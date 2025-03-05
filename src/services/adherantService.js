@@ -18,6 +18,26 @@ function chargerDonneesExcel(fichierXlsx) {
     return xlsx.utils.sheet_to_json(sheet);
 }
 
+/**
+ * Récupère tous les adhérents de la base de données.
+ * @returns {Promise<Object[]>} - Liste des adhérents.
+ */
+const getAllAdherents = async () => {
+    try {
+        console.log('📌 [SERVICE] Récupération de tous les adhérents...');
+        const adherents = await AdherentsModel.getAllAdherents();
+        const adherentList = [];
+        adherents.map(adherent => {
+            adherentList.push(Adherent.fromDataBase(adherent))
+        })
+
+        console.log(`✅ ${adherents.length} adhérents récupérés.`);
+        return adherents;
+    } catch (error) {
+        console.error('❌ [SERVICE] Erreur lors de la récupération des adhérents:', error);
+        throw error;
+    }
+};
 
 /**
  * Crée un nouvel adhérent dans la base de données via le modèle AdherentsModel.
@@ -113,4 +133,4 @@ async function importerXlsx(fichierXlsx) {
 async function checkAdherentLicence(num_licence) {
     return AdherentsModel.adherentExist(num_licence)
 }
-module.exports = {importerXlsx,checkAdherentLicence};
+module.exports = { importerXlsx, checkAdherentLicence, getAllAdherents };
