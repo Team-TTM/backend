@@ -7,9 +7,9 @@ Il intègre des fonctionnalités d'authentification via Google et Facebook en ut
 
 ## Prérequis
 
-- Node.js (version 18.20.4 ou ultérieure)
-- npm (version 10.7.0 ou ultérieure)
-- Une base de données (MongoDB)
+- Node.js (version v22.14.0 ou ultérieure)
+- npm (version 10.9.2 ou ultérieure)
+- Une base de données (MariaDB)
 
 ## Installation
 
@@ -22,7 +22,7 @@ cd votre-repo
 
 npm install
 
-3. Configurez les variables d'environnement en créant un fichier `.env` à la racine du projet et en y ajoutant les informations nécessaires (ex: identifiants OAuth, informations de connexion à la base de données).
+3. Configurez les variables d'environnement en créant un fichier `.env` à la racine du repertoire backend et en y ajoutant les informations nécessaires (ex: identifiants OAuth, informations de connexion à la base de données).
 
 ## Scripts npm
 
