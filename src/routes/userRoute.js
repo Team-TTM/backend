@@ -18,11 +18,11 @@ router.get('/auth/facebook/callback', passport.authenticate('facebook', {session
 router.post('/licence-check',authenticateJWT,authController.licenceSignInController);
 
 // TODO changer la route de mise en prod
-// router.post('/getAllAdherent',authenticateJWT,adherentController.getAllAdherents);
+router.post('/getAllAdherent',authenticateJWT,adherentController.getAllAdherents);
 router.get('/getAllAdherents',adherentController.getAllAdherents);
 
 
-router.get('*', (req, res) => {
+router.get('/{*splat}', (req, res) => {
     res.sendFile(path.join(__dirname, '..','..','dist', 'index.html'));
 });
 module.exports = router;
