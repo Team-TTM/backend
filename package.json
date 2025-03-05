@@ -3,14 +3,13 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "nodemon src/database/test.js",
+    "test": "nodemon src/database/reset.js",
     "start-build": "npm run build && node server.js",
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "import:db": "node src/database/test.js",
     "build": "cd ../frontend && npm run build && rm -rf ../backend/dist && cp -r ../frontend/dist ../backend/ && cd ../backend ",
     "clean": "rm -rf ../backend/dist",
-    "clean-bd": "node src/database/reset-db.js",
+    "clean-bd": "node src/database/reset.js",
     "lint": "eslint ."
   },
   "keywords": [],
