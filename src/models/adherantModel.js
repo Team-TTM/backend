@@ -225,6 +225,30 @@ const getAdherentDetails = async (numeroLicence) => {
     }
 };
 
+/**
+ * Renvoie tous les adhérents de la base de données
+ *
+ * @async
+ * @return les infos des adhérents
+ * **/
+const getAllAdherents = async () => {
+    const query = `
+        SELECT adherants.*, GROUP_CONCAT(licence_saison_association.saison) AS saisons
+        FROM adherants
+                 LEFT JOIN licence_saison_association
+                           ON adherants.numero_licence = licence_saison_association.numero_licence
+        GROUP BY adherants.numero_licence
+    `;
+    try {
+        const [rows] = await pool.execute(query);
+        return rows;
+    } catch (err) {
+        console.error('❌ Erreur lors de la récupération des adhérents:', err);
+        throw err;
+    }
+};
+
+
 
 module.exports = {
     createAdherentTable,
@@ -232,4 +256,5 @@ module.exports = {
     adherentExist,
     getAdherentDetails,
     updateAdherent,
+    getAllAdherents,
 };

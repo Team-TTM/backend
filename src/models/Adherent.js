@@ -56,141 +56,34 @@ class Adherent {
         urgenceTelephone,
         saison = []
     ) {
-        this._saison = saison;
-        this._numeroLicence = numeroLicence;
-        this._statut = statut;
-        this._type = type;
-        this._demiTarif = demiTarif;
-        this._horsClub = horsClub;
-        this._categorie = categorie;
-        this._anneeBlanche = anneeBlanche;
-        this._pratique = pratique;
-        this._prenom = prenom;
-        this._nom = nom;
-        this._nomUsage = nomUsage;
-        this._dateNaissance = dateNaissance;
-        this._sexe = sexe;
-        this._profession = profession;
-        this._principale = principale;
-        this._details = details;
-        this._lieuDit = lieuDit;
-        this._codePostal = codePostal;
-        this._ville = ville;
-        this._pays = pays;
-        this._telephone = telephone;
-        this._mobile = mobile;
-        this._email = email;
-        this._urgenceTelephone = urgenceTelephone;
+        this.saison = saison;
+        this.numeroLicence = numeroLicence;
+        this.statut = statut;
+        this.type = type;
+        this.demiTarif = demiTarif;
+        this.horsClub = horsClub;
+        this.categorie = categorie;
+        this.anneeBlanche = anneeBlanche;
+        this.pratique = pratique;
+        this.prenom = prenom;
+        this.nom = nom;
+        this.nomUsage = nomUsage;
+        this.dateNaissance = dateNaissance;
+        this.sexe = sexe;
+        this.profession = profession;
+        this.principale = principale;
+        this.details = details;
+        this.lieuDit = lieuDit;
+        this.codePostal = codePostal;
+        this.ville = ville;
+        this.pays = pays;
+        this.telephone = telephone;
+        this.mobile = mobile;
+        this.email = email;
+        this.urgenceTelephone = urgenceTelephone;
 
     }
 
-    get numeroLicence() {
-        return this._numeroLicence;
-    }
-
-    get statut() {
-        return this._statut;
-    }
-
-    get type() {
-        return this._type;
-    }
-
-    get demiTarif() {
-        return this._demiTarif;
-    }
-
-    get horsClub() {
-        return this._horsClub;
-    }
-
-    get categorie() {
-        return this._categorie;
-    }
-
-    get anneeBlanche() {
-        return this._anneeBlanche;
-    }
-
-    get pratique() {
-        return this._pratique;
-    }
-
-    get prenom() {
-        return this._prenom;
-    }
-
-    get nom() {
-        return this._nom;
-    }
-
-    get nomUsage() {
-        return this._nomUsage;
-    }
-
-    get dateNaissance() {
-        return this._dateNaissance;
-    }
-
-    get sexe() {
-        return this._sexe;
-    }
-
-    get profession() {
-        return this._profession;
-    }
-
-    get principale() {
-        return this._principale;
-    }
-
-    get details() {
-        return this._details;
-    }
-
-    get lieuDit() {
-        return this._lieuDit;
-    }
-
-    get codePostal() {
-        return this._codePostal;
-    }
-
-    get ville() {
-        return this._ville;
-    }
-
-    get pays() {
-        return this._pays;
-    }
-
-    get telephone() {
-        return this._telephone;
-    }
-
-    get mobile() {
-        return this._mobile;
-    }
-
-    get email() {
-        return this._email;
-    }
-
-    get urgenceTelephone() {
-        return this._urgenceTelephone;
-    }
-
-    /**
-     * Getter pour obtenir la saison.
-     * @returns {Array|null} La saison au format 'YYYY/YYYY'.
-     */
-    get saison() {
-        return this._saison || null;
-    }
-
-    set saison(value) {
-        this._saison = value;
-    }
 
     /**
      * Crée un objet Adherent à partir d'une ligne de fichier CSV ou d'une source brute.
