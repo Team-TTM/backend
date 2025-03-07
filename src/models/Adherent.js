@@ -10,7 +10,7 @@ class Adherent {
      * @param {boolean} horsClub - Si l'adhérent est hors club.
      * @param {string} categorie - La catégorie de l'adhérent.
      * @param {boolean} anneeBlanche - Si l'adhérent a une année blanche.
-     * @param {string} pratique - La frequence de pratique ex : competion, occasionnel etc
+     * @param {string} pratique - La frequence de pratique ex : compétition, occasionnel etc
      * @param {string} prenom - Le prénom de l'adhérent.
      * @param {string} nom - Le nom de l'adhérent.
      * @param {string} nomUsage - Le nom d'usage de l'adhérent.
