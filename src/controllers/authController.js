@@ -60,7 +60,7 @@ const handleAuthRedirection = async (req, res, platform) => {
         const {token, licenceExiste} = req.user;
 
         const redirectUrl = licenceExiste
-            ? `${URL}/users/csvListeAdherent?token=${token}`
+            ? `${URL}/users/HomePage?token=${token}`
             : `${URL}/users/verify-licence?token=${token}`;
 
         return res.redirect(redirectUrl);
