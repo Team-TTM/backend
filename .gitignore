@@ -24,4 +24,7 @@ Thumbs.db
 # Environnement
 ../.env
 
+#Logs
+logs/
+
 package-lock.json
