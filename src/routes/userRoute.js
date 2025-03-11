@@ -2,14 +2,14 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 authenticateJWT = require('../middleware/auth');
-const authController = require("../controllers/authController");
-const adherentController = require("../controllers/adherentController");
-const path = require("path");
+const authController = require('../controllers/authController');
+const adherentController = require('../controllers/adherentController');
+const path = require('path');
 
 
 router.get('/auth/google', passport.authenticate('google'));
 
-router.get("/auth/google/callback", passport.authenticate("google", {session: false}), authController.googleAuthController);
+router.get('/auth/google/callback', passport.authenticate('google', {session: false}), authController.googleAuthController);
 
 router.get('/auth/facebook', passport.authenticate('facebook'));
 
@@ -23,6 +23,6 @@ router.get('/getAllAdherents',adherentController.getAllAdherents);
 
 
 router.get('/{*splat}', (req, res) => {
-    res.sendFile(path.join(__dirname, '..','..','dist', 'index.html'));
+    res.sendFile(path.join(__dirname, '..','..','..','frontend','dist', 'index.html'));
 });
 module.exports = router;

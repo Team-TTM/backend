@@ -1,8 +1,8 @@
 const xlsx = require('xlsx');
 const AdherentsModel = require('../models/adherantModel');
-const Adherent = require("../models/Adherent");
-const {insertLicenceSaisonAssociation} = require("../models/licenceSaisonAssociationModel");
-const {insertIfNotExists} = require("../models/saisonModel");
+const Adherent = require('../models/Adherent');
+const {insertLicenceSaisonAssociation} = require('../models/licenceSaisonAssociationModel');
+const {insertIfNotExists} = require('../models/saisonModel');
 
 
 
@@ -64,16 +64,11 @@ const updateAdherent = async (adherent) => {
 
     if (adherent.getDerniereSaison() > adherentFromDb.getDerniereSaison()) {
         adherent.merge(adherentFromDb);
-        console.log(adherent);
         await insertIfNotExists(adherent.getDerniereSaison());
         await Promise.all([
             insertLicenceSaisonAssociation(adherent.getDerniereSaison(), adherent.numeroLicence),
             AdherentsModel.updateAdherent(adherent)
         ]);
-
-        console.log("in b");
-        const data = await AdherentsModel.getAdherentDetails(adherent.numeroLicence);
-        console.log(data);
     }
 };
 

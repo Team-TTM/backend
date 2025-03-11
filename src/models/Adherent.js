@@ -120,7 +120,7 @@ class Adherent {
             row['Mobile'] | null,
             row['Email'] || null,
             row['Téléphone contact d\'urgence'] || null,
-            [saison]  // Saison calculée et ajoutée
+            [saison] // Saison calculée et ajoutée
         );
     }
 
