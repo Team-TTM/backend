@@ -18,7 +18,7 @@ router.get('/auth/facebook/callback', passport.authenticate('facebook', {session
 router.post('/licence-check',authenticateJWT,authController.licenceSignInController);
 
 // TODO changer la route de mise en prod
-router.post('/getAllAdherent',authenticateJWT,adherentController.getAllAdherents);
+// router.post('/getAllAdherent',authenticateJWT,adherentController.getAllAdherents);
 router.get('/getAllAdherents',adherentController.getAllAdherents);
 
 

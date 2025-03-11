@@ -27,5 +27,4 @@ Thumbs.db
 #Logs
 logs/
 
-package-lock.json
 /.env
