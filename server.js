@@ -10,7 +10,7 @@ const startServer = () => {
         });
     } catch (err) {
         console.error(`Erreur lors du démarrage du serveur : ${err.message}`);
-        process.exit(1);  // Arrêt du processus en cas d'erreur
+        process.exit(1);// Arrêt du processus en cas d'erreur
     }
 };
 

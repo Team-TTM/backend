@@ -1,5 +1,4 @@
 const path = require('path');
-const fs = require('fs');
 const rfs = require('rotating-file-stream');
 const morgan = require('morgan');
 
@@ -9,7 +8,7 @@ const logDirectory = path.join(__dirname, 'logs');
 
 // Créer un flux d'écriture vers un fichier de log avec une rotation quotidienne
 const logStream = rfs.createStream('server.log', {
-    interval: '1d',   // La log est coupée tous les jours
+    interval: '1d', // La log est coupée tous les jours
     path: logDirectory
 });
 

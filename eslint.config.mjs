@@ -3,6 +3,7 @@ import globals from 'globals';
 /** @type {import('eslint').Linter.Config[]} */
 export default [
     {
+
         ignores: [
             'node_modules',
             'dist',],
@@ -24,11 +25,6 @@ export default [
             'no-console': ['warn'],
             'curly': ['error', 'all'],
             'prefer-const': 'error',
-            "unused-imports/no-unused-vars": [
-                "warn",
-                { "vars": "all", "varsIgnorePattern": "^_", "args": "after-used", "argsIgnorePattern": "^_" }
-            ]
-
         },
     },
 ];

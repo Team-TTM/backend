@@ -12,7 +12,7 @@ const getAllAdherents = async (req, res) => {
         }
 
         console.log(`✅ ${adherents.length} adhérents récupérés avec succès.`);
-        res.status(200).json(adherents);
+        return res.status(200).json(adherents);
     } catch (error) {
         console.error('❌ [CONTROLLER] Erreur lors de la récupération des adhérents:', error);
         return res.status(404).json({

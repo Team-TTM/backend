@@ -32,7 +32,7 @@ const calculerSaison = (date) => {
  *                          ou `null` si la liste est vide ou invalide.
  */
 const getSaisonPlusRecente = (saisons) => {
-    if (!saisons || saisons.length === 0) return null;
+    if (!saisons || saisons.length === 0) {return null;}
     if (!Array.isArray(saisons)) {
         return saisons;
     }

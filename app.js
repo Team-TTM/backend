@@ -1,5 +1,5 @@
 const express = require('express');
-const passport = require("./src/config/passport");
+const passport = require('./src/config/passport');
 const { morganLogger, logConsole } = require('./logger'); // Importer le logger
 
 const app = express();
@@ -27,7 +27,7 @@ app.use((req, res, next) => {
 });
 
 // Middleware de gestion des erreurs globales
-app.use((error, req, res, next) => {
+app.use((error, req, res) => {
     res.status(error.status && Number.isInteger(error.status) ? error.status : 500);
     res.json({
         error: {

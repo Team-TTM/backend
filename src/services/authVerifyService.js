@@ -33,7 +33,7 @@ const handleAuthVerification = async (platform, profile, done) => {
                 ? await userService.createUserGoogle(platformId)
                 : await userService.createUserFacebook(platformId);
         }
-        const isAdherent = user.numero_licence != null;
+        const isAdherent = user.numero_licence !== null;
 
         const token = createToken(user.id_user);
 

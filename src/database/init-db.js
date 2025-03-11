@@ -4,7 +4,6 @@ const {createSaisonTable} = require('../models/saisonModel');
 const {createAdherentTable} = require('../models/adherantModel');
 const {createUserTable} = require('../models/usersModel');
 const {createLicenceSaisonAssociationTable} = require('../models/licenceSaisonAssociationModel');
-const client = require('../config/database');
 
 const path = require('path');
 const pool = require('../config/database');
