@@ -19,7 +19,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-        node-version: 'lts/*'  # Utilise la dernière version stable (LTS)
+          node-version: '22'  # Utilise la dernière version stable (LTS)
 
       # 3️⃣ Installation des dépendances du backend
       - name: Install backend dependencies
@@ -32,11 +32,6 @@ jobs:
         working-directory: .  # Assure que le lint s'exécute dans le répertoire backend
         run: npm run lint
         continue-on-error: false  # Arrête si le lint échoue
-
-      - name: Build Backend
-        working-directory: .  # Assure que le build s'exécute dans le répertoire backend
-        run: npm run build
-        continue-on-error: false  # Arrête si le build échoue
 
   deploy:
     needs: lint_and_build  # Le déploiement ne s'exécute que si le job lint_and_build réussit
@@ -52,5 +47,5 @@ jobs:
           password: ${{ secrets.FTP_PASS }}    # Mot de passe FTP
           protocol: ftps                       # Utilisation de FTPS pour la sécurité
           port: 21                              # Port FTP par défaut
-          local-dir: ./backend/dist/            # Dossier local à déployer (dossier dist du backend après build)
+          local-dir: ./ # Dossier local à déployer (dossier dist du backend après build)
           server-dir: www/backend/             # Dossier distant où déployer le contenu
