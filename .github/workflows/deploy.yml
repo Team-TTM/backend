@@ -52,5 +52,5 @@ jobs:
           password: ${{ secrets.FTP_PASS }}    # Mot de passe FTP
           protocol: ftps                       # Utilisation de FTPS pour la sécurité
           port: 21                              # Port FTP par défaut
-          local-dir: ./backend/dist/            # Dossier local à déployer (dossier dist du backend après build)
+          local-dir: .           # Dossier local à déployer (dossier dist du backend après build)
           server-dir: www/backend/             # Dossier distant où déployer le contenu
