@@ -3,49 +3,74 @@ name: Build and Deploy Backend via FTP
 on:
   push:
     branches:
-      - test  # Déclenche le workflow lors d'un push sur la branche 'test'
-      - main  # Déclenche le workflow lors d'un push sur la branche 'main'
+      - test  # Déclenche le workflow sur la branche 'test'
+      - main  # Déclenche le workflow sur la branche 'main'
 
 jobs:
-  lint_and_build:
-    runs-on: ubuntu-latest  # Utilisation de l'image Ubuntu pour exécuter les actions
-
-    steps:
-      # 1️⃣ Vérification du code source
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      # 2️⃣ Installation de Node.js (backend)
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '22'  # Utilise la dernière version stable (LTS)
-
-      # 3️⃣ Installation des dépendances du backend
-      - name: Install backend dependencies
-        working-directory: .  # Spécifie le répertoire du backend
-        run: |
-          npm install
-
-      # 4️⃣ Exécution du linting et du build en parallèle
-      - name: Run Lint
-        working-directory: .  # Assure que le lint s'exécute dans le répertoire backend
-        run: npm run lint
-        continue-on-error: false  # Arrête si le lint échoue
-
-  deploy:
-    needs: lint_and_build  # Le déploiement ne s'exécute que si le job lint_and_build réussit
+  lint:
     runs-on: ubuntu-latest
 
     steps:
-      # 5️⃣ Déploiement sur le serveur FTP
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install backend dependencies
+        working-directory: .  # Assure l'installation au bon endroit
+        run: npm install
+
+      - name: Run Lint
+        working-directory: .  # Vérifie le code
+        run: npm run lint
+        continue-on-error: false  # Stoppe si erreur
+
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install backend dependencies
+        working-directory: .  # Assure l'installation au bon endroit
+        run: npm install
+
+      - name: Run Test
+        working-directory: .  # Vérifie le code
+        run: npm run test
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: lint  # Attend que `build` soit terminé avant de commencer
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install backend dependencies
+        working-directory: .  # Assure l'installation au bon endroit
+        run: npm install
+
       - name: Deploy to FTP server
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          server: ${{ secrets.FTP_HOST }}      # Adresse du serveur FTP
-          username: ${{ secrets.FTP_USER }}    # Nom d'utilisateur FTP
-          password: ${{ secrets.FTP_PASS }}    # Mot de passe FTP
-          protocol: ftps                       # Utilisation de FTPS pour la sécurité
+          server: ${{ secrets.FTP_HOST }}       # Adresse du serveur FTP
+          username: ${{ secrets.FTP_USER }}     # Nom d'utilisateur FTP
+          password: ${{ secrets.FTP_PASS }}     # Mot de passe FTP
+          protocol: ftps                        # Utilisation de FTPS pour plus de sécurité
           port: 21                              # Port FTP par défaut
-          local-dir: ./ # Dossier local à déployer (dossier dist du backend après build)
-          server-dir: www/backend/             # Dossier distant où déployer le contenu
+          server-dir: www/backend/              # Dossier distant où déployer le contenu
