@@ -23,7 +23,11 @@ export default [
             'consistent-return': 'error',
             'no-console': ['warn'],
             'curly': ['error', 'all'],
-            'prefer-const': 'error'
+            'prefer-const': 'error',
+            "unused-imports/no-unused-vars": [
+                "warn",
+                { "vars": "all", "varsIgnorePattern": "^_", "args": "after-used", "argsIgnorePattern": "^_" }
+            ]
 
         },
     },

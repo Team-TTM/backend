@@ -23,6 +23,31 @@ cd votre-repo
 npm install
 
 3. Configurez les variables d'environnement en créant un fichier `.env` à la racine du repertoire backend et en y ajoutant les informations nécessaires (ex: identifiants OAuth, informations de connexion à la base de données).
+   Créez un fichier .env à la racine du répertoire backend avec les variables suivantes :
+```
+# Configuration du serveur
+PORT=3000
+NODE_ENV=development
+
+# Configuration de la base de données
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=votre_utilisateur
+DB_PASSWORD=votre_mot_de_passe
+DB_NAME=triathlon_db
+
+# Clés d'API pour l'authentification
+GOOGLE_CLIENT_ID=votre_client_id_google
+GOOGLE_CLIENT_SECRET=votre_client_secret_google
+FACEBOOK_APP_ID=votre_app_id_facebook
+FACEBOOK_APP_SECRET=votre_app_secret_facebook
+
+# JWT Secret pour l'authentification
+JWT_SECRET=votre_secret_jwt
+
+# URL du site
+URL=http://localhost:3000
+```
 
 ## Scripts npm
 
@@ -33,6 +58,20 @@ npm install
 - **`clean`** : Supprime le dossier `dist` du backend.
 - **`clean-bd`** : Réinitialise la base de données.
 - **`lint`** : Analyse le code avec ESLint.
+
+## Base de données
+Le projet utilise MariaDB comme système de gestion de base de données. Les scripts de migration et de seeding sont disponibles dans le dossier scripts/.
+
+Pour initialiser ou réinitialiser la base de données :
+```ssh
+npm run clean-bd
+```
+Pour importer des données de test :
+```ssh
+npm run import:db
+```
+
+
 
 ## Routes d'authentification
 
@@ -48,6 +87,22 @@ Le projet utilise Passport.js pour gérer l'authentification via Google et Faceb
 
 ### **Licence Check**
 - `POST /licence-check` : Vérifie la licence de l'utilisateur. Cette route nécessite un token d'identification dans l'en-tête de la requête.
+
+## Déploiement
+Le déploiement est automatisé via GitHub Actions. Lors d'un push sur la branche main, le workflow suivant est exécuté :
+
+
+1. Installation des dépendances
+2. Vérification du code avec ESLint
+3. Déploiement des fichiers via FTPS vers le serveur de production
+
+
+## Remarques
+Assurez-vous que toutes les variables d'environnement sont correctement définies dans le fichier .env avant de lancer l'application.
+Les tokens d'authentification générés ont une durée de validité limitée et doivent être renouvelés régulièrement.
+Vérifiez que les permissions de la base de données sont correctement configurées pour l'utilisateur spécifié dans le fichier .env.
+Après authentification, le token reçu doit être stocké côté client et inclus dans les requêtes pour accéder aux routes protégées.
+
 
 ## Remarques
 

@@ -1,0 +1,32 @@
+name: Lint Code Before Merge
+
+on:
+  push:
+    branches:
+      - develop  # Exécuter l'action uniquement sur la branche develop
+  pull_request:
+    branches:
+      - develop  # Vérifier aussi avant de fusionner un PR
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest  # Utiliser une machine Linux pour exécuter l'action
+
+    steps:
+      # 1. Récupérer le code source
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2. Installer Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 'lts/*'  # Utilise la dernière version stable (LTS)
+
+      # 3. Installer les dépendances du projet
+      - name: Install dependencies
+        run: npm install
+
+      # 4. Exécuter ESLint
+      - name: Run ESLint
+        run: npm run lint  # Assurez-vous que "lint" est bien défini dans package.json

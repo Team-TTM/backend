@@ -19,22 +19,22 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '22'  # Spécifie la version de Node.js
+        node-version: 'lts/*'  # Utilise la dernière version stable (LTS)
 
       # 3️⃣ Installation des dépendances du backend
       - name: Install backend dependencies
-        working-directory: ./backend  # Spécifie le répertoire du backend
+        working-directory: .  # Spécifie le répertoire du backend
         run: |
           npm install
 
       # 4️⃣ Exécution du linting et du build en parallèle
       - name: Run Lint
-        working-directory: ./backend  # Assure que le lint s'exécute dans le répertoire backend
+        working-directory: .  # Assure que le lint s'exécute dans le répertoire backend
         run: npm run lint
         continue-on-error: false  # Arrête si le lint échoue
 
       - name: Build Backend
-        working-directory: ./backend  # Assure que le build s'exécute dans le répertoire backend
+        working-directory: .  # Assure que le build s'exécute dans le répertoire backend
         run: npm run build
         continue-on-error: false  # Arrête si le build échoue
 
