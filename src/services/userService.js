@@ -1,12 +1,13 @@
 const UsersModel = require('../models/usersModel');
 const User = require('../models/User');
+const UserModel = require('../models/usersModel');
 
 
 /**
  * Trouver un utilisateur par son Google ID.
  * @async
  * @param {string} googleId - L'identifiant Google de l'utilisateur.
- * @returns {Promise<User|null>} L'utilisateur trouvé ou null s'il n'existe pas.
+ * @returns {User|null} L'utilisateur trouvé ou null s'il n'existe pas.
  */
 const findUserByGoogleId = async (googleId) => {
     const userData = await UsersModel.findUserByGoogleId(googleId);
@@ -20,7 +21,7 @@ const findUserByGoogleId = async (googleId) => {
  * Trouver un utilisateur par son Facebook ID.
  * @async
  * @param {string} facebookId - L'identifiant Facebook de l'utilisateur.
- * @returns {Promise<User|null>} L'utilisateur trouvé ou null s'il n'existe pas.
+ * @returns {User|null} L'utilisateur trouvé ou null s'il n'existe pas.
  */
 const findUserByFacebookId = async (facebookId) => {
     const userData = await UsersModel.findUserByFacebookId(facebookId);
@@ -142,6 +143,25 @@ const mergeUserFacebookAndGoogleIds = async (user1, user2) => {
     }
 };
 
+const deleteGoogleId = async (googleID) => {
+    const userData = await UsersModel.findUserByGoogleId(googleID);
+    if (!userData) {
+        throw new Error('Utilisateur non trouver ');
+    }
+    const user = User.createUserFromDataBase(userData);
+    await UsersModel.deleteGoogleId(user);
+};
+
+const deleteFacebookId = async (facebokId) => {
+    const userData = await UsersModel.findUserByFacebookId(facebokId);
+    if (!userData) {
+        throw new Error('Utilisateur non trouver ');
+    }
+    const user = User.createUserFromDataBase(userData);
+    UserModel.deleleteFacebookId(user);
+    await UserModel.updateGoogleId(user);
+};
+
 
 // ✅ Exportation des fonctions
 module.exports = {
@@ -153,5 +173,7 @@ module.exports = {
     createUserGoogle,
     updateUserLicence,
     mergeUserFacebookAndGoogleIds,
+    deleteGoogleId,
+    deleteFacebookId,
 
 };

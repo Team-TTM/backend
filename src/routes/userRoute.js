@@ -1,13 +1,18 @@
 const express = require('express');
 const router = express.Router();
 const passport = require('passport');
-authenticateJWT = require('../middleware/auth');
+const authenticateJWT = require('../middleware/auth');
 const authController = require('../controllers/authController');
 const adherentController = require('../controllers/adherentController');
 const path = require('path');
+const userController = require('../controllers/userController');
 
 
 router.get('/auth/google', passport.authenticate('google'));
+
+router.delete('/google',authenticateJWT,userController.deleteGoogle);
+
+router.delete('/facebook',authenticateJWT,userController.deleteFacebook);
 
 router.get('/auth/google/callback', passport.authenticate('google', {session: false}), authController.googleAuthController);
 
@@ -17,9 +22,9 @@ router.get('/auth/facebook/callback', passport.authenticate('facebook', {session
 
 router.post('/licence-check',authenticateJWT,authController.licenceSignInController);
 
-// TODO changer la route de mise en prod
-// router.post('/getAllAdherent',authenticateJWT,adherentController.getAllAdherents);
-router.get('/getAllAdherents',adherentController.getAllAdherents);
+router.get('/getAllAdherents',authenticateJWT,adherentController.getAllAdherents);
+
+router.get('/adherent',authenticateJWT,adherentController.getAdherent);
 
 
 router.get('/{*splat}', (req, res) => {
