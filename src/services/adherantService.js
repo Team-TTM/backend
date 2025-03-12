@@ -1,8 +1,10 @@
+
 const xlsx = require('xlsx');
 const AdherentsModel = require('../models/adherantModel');
 const Adherent = require('../models/Adherent');
 const {insertLicenceSaisonAssociation} = require('../models/licenceSaisonAssociationModel');
 const {insertIfNotExists} = require('../models/saisonModel');
+const {findUserByUserId} = require('./userService');
 
 
 
@@ -35,6 +37,48 @@ const getAllAdherents = async () => {
         return adherentList;
     } catch (error) {
         console.error('❌ [SERVICE] Erreur lors de la récupération des adhérents:', error);
+        throw error;
+    }
+};
+
+
+/**
+ * Récupère tous les adhérents liés à un utilisateur donné.
+ * @async
+ * @function getAdherent
+ * @param {string} userId - L'ID unique de l'utilisateur.
+ * @returns {Promise<Adherent[]>} - Une promesse qui résout un tableau d'adhérents.
+ * @throws {Error} - En cas d'échec de la récupération des adhérents.
+ */
+const getAdherent = async (userId) => {
+    try {
+        console.log(`📌 [SERVICE] Début de récupération des adhérents pour l'utilisateur ID: ${userId}...`);
+
+        // Recherche de l'utilisateur
+        const user = await findUserByUserId(userId);
+        if (!user) {
+            throw new Error(`Utilisateur introuvable pour l'ID: ${userId}`);
+        }
+        if (!user.numero_licence) {
+            throw new Error(`Numéro de licence manquant pour l'utilisateur ID: ${userId}`);
+        }
+
+        console.log(`🔍 [SERVICE] Utilisateur trouvé: ${userId}, Licence: ${user.numero_licence}`);
+
+        // Récupération des adhérents
+        const adherentData = await AdherentsModel.getAdherentDetails(user.numero_licence);
+        if (!adherentData || adherentData.length === 0) {
+            console.warn(`⚠️ [SERVICE] Aucun adhérent trouvé pour l'utilisateur ${user.numero_licence}`);
+            return [];
+        }
+
+        // Conversion en objets Adherent
+        const adherents = Adherent.fromDataBase(adherentData);
+
+        console.log(`✅ [SERVICE] ${adherents.length} adhérent(s) récupéré(s) pour l'utilisateur ${user.numero_licence}`);
+        return adherents;
+    } catch (error) {
+        console.error(`❌ [SERVICE] Erreur lors de la récupération des adhérents pour l'utilisateur ID ${userId}: ${error.message}`);
         throw error;
     }
 };
@@ -120,6 +164,8 @@ async function importerXlsx(fichierXlsx) {
 }
 
 
+
+
 /**
  * Vérifie si un adhérent existe en base de données.
  * @param {string} num_licence - Le numéro de licence de l'adhérent.
@@ -128,4 +174,4 @@ async function importerXlsx(fichierXlsx) {
 async function checkAdherentLicence(num_licence) {
     return AdherentsModel.adherentExist(num_licence);
 }
-module.exports = { importerXlsx, checkAdherentLicence, getAllAdherents };
+module.exports = { importerXlsx, checkAdherentLicence, getAllAdherents ,getAdherent};
