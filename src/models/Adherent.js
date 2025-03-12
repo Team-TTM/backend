@@ -165,7 +165,7 @@ class Adherent {
      * @returns {string|null} - La saison la plus récente au format 'YYYY/YYYY+1' ou `null` si aucune saison n'est trouvée.
      */
     getDerniereSaison() {
-        return getSaisonPlusRecente(this._saison);
+        return getSaisonPlusRecente(this.saison);
     }
 
     /**
@@ -174,7 +174,7 @@ class Adherent {
      */
     merge(adherent) {
         if (adherent.saison) {
-            this._saison = this._saison.concat(adherent.saison);
+            this.saison = this.saison.concat(adherent.saison);
         }
     }
 }
