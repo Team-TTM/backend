@@ -1,49 +1,5 @@
-const pool = require('../config/database'); // Connexion à la base de données
+const pool = require('../../config/database'); // Connexion à la base de données
 
-
-/**
- * Crée la table 'adherants' dans la base de données si elle n'existe pas.
- * @async
- * @returns {Promise<void>}
- */
-const createAdherentTable = async () => {
-    const query = `
-        CREATE TABLE IF NOT EXISTS adherants
-        (
-            numero_licence    VARCHAR(255) PRIMARY KEY,
-            prenom            VARCHAR(255) NOT NULL,
-            nom               VARCHAR(255) NOT NULL,
-            nom_usage         VARCHAR(255),
-            date_naissance    DATE         NOT NULL,
-            sexe              CHAR(1)      NOT NULL,
-            profession        VARCHAR(255),
-            principale        VARCHAR(255) NOT NULL,
-            details           VARCHAR(255),
-            lieu_dit          VARCHAR(255),
-            code_postale      VARCHAR(5),
-            ville             VARCHAR(255),
-            pays              VARCHAR(255),
-            telephone         VARCHAR(20),
-            mobile            VARCHAR(20),
-            email             VARCHAR(255) NOT NULL,
-            urgency_telephone VARCHAR(20),
-            statut            BOOLEAN      NOT NULL,
-            type              VARCHAR(255) NOT NULL,
-            demi_tarif        BOOLEAN      NOT NULL,
-            hors_club         BOOLEAN      NOT NULL,
-            categorie         VARCHAR(255) NOT NULL,
-            annee_blanche     BOOLEAN      NOT NULL,
-            pratique          VARCHAR(255) NOT NULL
-        );
-
-    `;
-    try {
-        await pool.execute(query);
-    } catch (err) {
-        console.error('❌ Erreur lors de la création de la table \'adherant\':', err);
-        throw err;
-    }
-};
 
 /**
  * Crée un nouvel adhérent dans la base de données via le modèle AdherentsModel.
@@ -53,20 +9,22 @@ const createAdherentTable = async () => {
  */
 const createAdherent = async (adherent) => {
     const query = `
-        INSERT INTO adherants (numero_licence, prenom, nom, nom_usage, date_naissance, sexe, profession,
+        INSERT INTO adherents (numero_licence, prenom, nom, nom_usage, date_naissance, sexe, profession,
                                principale, details, lieu_dit, code_postale, ville, pays,
                                telephone, mobile, email, urgency_telephone,
-                               statut, type, demi_tarif, hors_club, categorie, annee_blanche, pratique) VALUES (?, ?, ?,
-                                                                                                                ?, ?, ?,
-                                                                                                                ?,
-                                                                                                                ?, ?, ?,
-                                                                                                                ?, ?, ?,
-                                                                                                                ?,
-                                                                                                                ?, ?, ?,
-                                                                                                                ?, ?, ?,
-                                                                                                                ?, ?, ?,
-                                                                                                                ?)
-            RETURNING *;
+                            type, demi_tarif, hors_club, categorie, annee_blanche, pratique)
+        VALUES (?, ?, ?,
+                ?, ?, ?,
+                ?,
+                ?, ?, ?,
+                ?, ?, ?,
+                ?,
+                ?, ?,
+                ?, ?, ?,
+                ?, ?, ?,
+                ?)
+        RETURNING *;
+
     `;
     try {
         const [rows] = await pool.execute(query, [
@@ -90,7 +48,6 @@ const createAdherent = async (adherent) => {
             adherent.email,
             adherent.urgenceTelephone,
 
-            adherent.statut,
             adherent.type,
             adherent.demiTarif,
             adherent.horsClub,
@@ -98,7 +55,7 @@ const createAdherent = async (adherent) => {
             adherent.anneeBlanche,
             adherent.pratique,
         ]);
-        console.log('⌛ creation Adherant : ', adherent.numeroLicence);
+        console.log('⌛ creation Adherent : ', adherent.numeroLicence);
         return rows;
     } catch (err) {
         console.error('❌ Erreur lors de l\'insertion de l\'adhérant:', err, adherent);
@@ -115,7 +72,7 @@ const createAdherent = async (adherent) => {
  */
 const updateAdherent = async (adherent) => {
     const query = `
-        UPDATE adherants
+        UPDATE adherents
         SET prenom            = ?,
             nom               = ?,
             nom_usage         = ?,
@@ -132,7 +89,6 @@ const updateAdherent = async (adherent) => {
             mobile            = ?,
             email             = ?,
             urgency_telephone = ?,
-            statut            = ?,
             type              = ?,
             demi_tarif        = ?,
             hors_club         = ?,
@@ -159,7 +115,6 @@ const updateAdherent = async (adherent) => {
             adherent.mobile,
             adherent.email,
             adherent.urgenceTelephone,
-            adherent.statut,
             adherent.type,
             adherent.demiTarif,
             adherent.horsClub,
@@ -183,7 +138,7 @@ const updateAdherent = async (adherent) => {
 const adherentExist = async (num_licence) => {
     const query = `
         SELECT 1
-        FROM adherants
+        FROM adherents
         WHERE numero_licence = ?
         LIMIT 1;
     `;
@@ -207,12 +162,12 @@ const adherentExist = async (num_licence) => {
  */
 const getAdherentDetails = async (numeroLicence) => {
     const query = `
-        SELECT adherants.*, GROUP_CONCAT(licence_saison_association.saison) AS saisons
-        FROM adherants
+        SELECT adherents.*, GROUP_CONCAT(licence_saison_association.saison) AS saisons
+        FROM adherents
                  LEFT JOIN licence_saison_association
-                           ON adherants.numero_licence = licence_saison_association.numero_licence
-        WHERE adherants.numero_licence = ?
-        GROUP BY adherants.numero_licence
+                           ON adherents.numero_licence = licence_saison_association.numero_licence
+        WHERE adherents.numero_licence = ?
+        GROUP BY adherents.numero_licence
     `;
     const values = [numeroLicence];
     try {
@@ -233,11 +188,11 @@ const getAdherentDetails = async (numeroLicence) => {
  * **/
 const getAllAdherents = async () => {
     const query = `
-        SELECT adherants.*, GROUP_CONCAT(licence_saison_association.saison) AS saisons
-        FROM adherants
+        SELECT adherents.*, GROUP_CONCAT(licence_saison_association.saison) AS saisons
+        FROM adherents
                  LEFT JOIN licence_saison_association
-                           ON adherants.numero_licence = licence_saison_association.numero_licence
-        GROUP BY adherants.numero_licence
+                           ON adherents.numero_licence = licence_saison_association.numero_licence
+        GROUP BY adherents.numero_licence
     `;
     try {
         const [rows] = await pool.execute(query);
@@ -251,7 +206,6 @@ const getAllAdherents = async () => {
 
 
 module.exports = {
-    createAdherentTable,
     createAdherent,
     adherentExist,
     getAdherentDetails,

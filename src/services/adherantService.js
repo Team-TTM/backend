@@ -1,8 +1,8 @@
 const xlsx = require('xlsx');
-const AdherentsModel = require('../models/adherantModel');
-const Adherent = require('../models/Adherent');
-const {insertLicenceSaisonAssociation} = require('../models/licenceSaisonAssociationModel');
-const {insertIfNotExists} = require('../models/saisonModel');
+const AdherentsModel = require('../models/repositories/adherentModel');
+const Adherent = require('../models/entities/Adherent');
+const {insertLicenceSaisonAssociation} = require('../models/repositories/licenceSaisonAssociationModel');
+const {insertIfNotExists} = require('../models/repositories/saisonModel');
 
 
 

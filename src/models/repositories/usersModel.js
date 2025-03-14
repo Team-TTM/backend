@@ -1,32 +1,4 @@
-const pool = require('../config/database'); // Connexion à la base de données
-
-/**
- * Crée la table `users` si elle n'existe pas déjà.
- * @async
- * @throws {Error} En cas d'échec de la création de la table.
- */
-const createUserTable = async () => {
-    const query = `
-        CREATE TABLE IF NOT EXISTS users
-        (
-            id_user        INT AUTO_INCREMENT PRIMARY KEY,
-            numero_licence VARCHAR(255) UNIQUE,
-            role           ENUM ('user', 'dirigent') NOT NULL DEFAULT 'user',
-            charte_signe   BOOLEAN                   NOT NULL DEFAULT FALSE,
-            google_id      VARCHAR(255) UNIQUE,
-            facebook_id    VARCHAR(255) UNIQUE,
-            newsletter     BOOLEAN                   NOT NULL DEFAULT FALSE,
-            FOREIGN KEY (numero_licence) REFERENCES adherants (numero_licence) ON DELETE CASCADE
-        );
-    `;
-    try {
-        await pool.execute(query);
-        // console.log('✅ Table 'users' créée ou déjà existante.');
-    } catch (err) {
-        console.error('❌ Erreur lors de la création de la table \'users\':', err);
-        throw err;
-    }
-};
+const pool = require('../../config/database'); // Connexion à la base de données
 
 
 /**
@@ -280,7 +252,6 @@ const deleteUserById = async (user) => {
 
 
 module.exports = {
-    createUserTable,
     createFacebookUser,
     createGoogleUser,
     findUserByFacebookId,

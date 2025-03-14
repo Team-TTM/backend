@@ -1,4 +1,4 @@
-const {getSaisonPlusRecente, calculerSaison, convertirDate, calculetStatut} = require('../utils/saisonUtils');
+const {getSaisonPlusRecente, calculerSaison, convertirDate, calculetStatut} = require('../../utils/saisonUtils');
 
 class Adherent {
     /**
@@ -94,6 +94,13 @@ class Adherent {
 
         const saison = calculerSaison(convertirDate(row['Date validation de la licence']));
         const dateNaisance = convertirDate(row['Date de naissance']);
+        let telephone = formaterNumeroTelephone(row['Téléphone']);
+        let mobile = formaterNumeroTelephone(row['Mobile']);
+
+        if (!telephone) {
+            telephone = mobile;
+            mobile = null;
+        }
 
         return new Adherent(
             row['Numéro de licence'] || null,
@@ -116,10 +123,10 @@ class Adherent {
             row['Code Postal'] || null,
             row['Ville'] || null,
             row['Pays'] || null,
-            row['Téléphone'] || null,
-            row['Mobile'] | null,
+            telephone,
+            mobile,
             row['Email'] || null,
-            row['Téléphone contact d\'urgence'] || null,
+            formaterNumeroTelephone(row['Téléphone contact d\'urgence']) || null,
             [saison] // Saison calculée et ajoutée
         );
     }
@@ -165,7 +172,7 @@ class Adherent {
      * @returns {string|null} - La saison la plus récente au format 'YYYY/YYYY+1' ou `null` si aucune saison n'est trouvée.
      */
     getDerniereSaison() {
-        return getSaisonPlusRecente(this._saison);
+        return getSaisonPlusRecente(this.saison);
     }
 
     /**
@@ -174,10 +181,30 @@ class Adherent {
      */
     merge(adherent) {
         if (adherent.saison) {
-            this._saison = this._saison.concat(adherent.saison);
+            this.saison = this.saison.concat(adherent.saison);
         }
     }
 }
 
+const formaterNumeroTelephone = (numero)=>{
+    if (!numero) {
+        return null;
+    }
+    numero = numero.replace(/[ -]/g, '');
+    const regexMap = [
+        { regex: /^0[1-9]\d{8}$/, format: (num) => num }, // Format classique 0X XXXXXXXX
+        { regex: /^0033[1-9]\d{8}$/, format: (num) => num.replace(/^0033/, '0') }, // Format international 0033X XXXXXXXX
+        { regex: /^[1-9]\d{8}$/, format: (num) => '0' + num }, // Format sans indicatif national
+        { regex: /^\+33[1-9]\d{8}$/, format: (num) => num.replace(/^\+33/, '0') }, // Format international +33X XXXXXXXX
+        { regex: /^33[1-9]\d{8}$/, format: (num) => num.replace(/^33/, '0') }, // Format international 33X XXXXXXXX
+    ];
+
+    for (const { regex, format } of regexMap) {
+        if (regex.test(numero)) {
+            return format(numero);
+        }
+    }
+    return null;
+};
 
 module.exports = Adherent;

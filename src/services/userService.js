@@ -1,5 +1,5 @@
-const UsersModel = require('../models/usersModel');
-const User = require('../models/User');
+const UsersModel = require('../models/repositories/usersModel');
+const User = require('../models/entities/User');
 
 
 /**
@@ -81,7 +81,7 @@ const createUserFacebook = async (facebookID) => {
  */
 const createUserGoogle = async (googleID) => {
     const user = User.createGoogleUser(googleID);
-    user.id_user = await UsersModel.createGoogleUser(user);
+    user.id_user = await UsersModel.createUser(user);
     return user;
 };
 /**

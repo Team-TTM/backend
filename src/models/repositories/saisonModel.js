@@ -1,27 +1,5 @@
-const pool = require('../config/database'); // Connexion à la base de données
+const pool = require('../../config/database'); // Connexion à la base de données
 
-/**
- * Crée la table 'saison' si elle n'existe pas déjà.
- * @async
- * @function createSaisonTable
- * @returns {Promise<void>} Une promesse qui se résout lorsque la table est créée ou déjà existante.
- * @throws {Error} Si une erreur survient lors de la création de la table.
- */
-const createSaisonTable = async () => {
-    const query = `
-        CREATE TABLE IF NOT EXISTS saison
-        (
-            saison_id VARCHAR(9) PRIMARY KEY
-        );
-    `;
-    try {
-        await pool.query(query);
-        console.log('✅ Table \'saison\' créée ou déjà existante.');
-    } catch (err) {
-        console.error('❌ Erreur lors de la création de la table \'saison\':', err);
-        throw err;
-    }
-};
 
 /**
  * Insère une saison dans la table 'saison' si elle n'existe pas déjà.
@@ -47,6 +25,5 @@ const insertIfNotExists = async (saison) => {
 };
 
 module.exports = {
-    createSaisonTable,
     insertIfNotExists
 };
