@@ -18,8 +18,6 @@ const deleteSocialAccount = async (req, res, platform) => {
 const deleteGoogle = (req, res) => deleteSocialAccount(req, res, 'Google');
 const deleteFacebook = (req, res) => deleteSocialAccount(req, res, 'Facebook');
 
-export { deleteGoogle, deleteFacebook };
-
 module.exports = {
     deleteGoogle,
     deleteFacebook
