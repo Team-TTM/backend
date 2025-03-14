@@ -1,4 +1,5 @@
-const pool = require('../../config/database'); // Connexion à la base de données
+const pool = require('../../config/database');
+const User = require('../entities/User');// Connexion à la base de données
 
 
 /**
@@ -52,7 +53,7 @@ const createGoogleUser = async (user) => {
  * Recherche un utilisateur par son Facebook ID.
  * @async
  * @param {string} facebookId - L'ID Facebook de l'utilisateur.
- * @returns {Promise<Object|null>} L'utilisateur trouvé ou `null` si non trouvé.
+ * @returns {Promise<User|null>} L'utilisateur trouvé ou `null` si non trouvé.
  * @throws {Error} En cas d'erreur de requête.
  */
 const findUserByFacebookId = async (facebookId) => {
@@ -65,8 +66,7 @@ const findUserByFacebookId = async (facebookId) => {
         const [rows] = await pool.execute(query, [facebookId]);
         if (rows[0]) {
             console.log(`🔍 Utilisateur trouvé avec Facebook ID ${facebookId}:`, rows[0].id_user);
-            return rows[0];
-
+            return User.createUserFromDataBase(rows[0]);
         } else {
             console.log(`🔍 Utilisateur non trouvé avec Facebook ID ${facebookId}`);
             return null;
@@ -81,7 +81,7 @@ const findUserByFacebookId = async (facebookId) => {
  * Recherche un utilisateur par son Google ID.
  * @async
  * @param {string} googleId - L'ID Google de l'utilisateur.
- * @returns {Promise<Object|null>} L'utilisateur trouvé ou `null` si non trouvé.
+ * @returns {Promise<User|null>} L'utilisateur trouvé ou `null` si non trouvé.
  * @throws {Error} En cas d'erreur de requête.
  */
 const findUserByGoogleId = async (googleId) => {
@@ -94,7 +94,7 @@ const findUserByGoogleId = async (googleId) => {
         const [rows] = await pool.execute(query, [googleId]);
         if (rows[0]) {
             console.log(`🔍 Utilisateur trouvé avec Google ID ${googleId}:`, rows[0].id_user);
-            return rows[0];
+            return User.createUserFromDataBase(rows[0]);
         } else {
             console.log(`🔍 Utilisateur non trouvé avec Google ID ${googleId}`);
             return null;
@@ -109,7 +109,7 @@ const findUserByGoogleId = async (googleId) => {
  * Recherche un utilisateur par son numéro de licence.
  * @async
  * @param {string} numberLicence - Le numéro de licence de l'utilisateur.
- * @returns {Promise<Object|null>} L'utilisateur trouvé (contenant `id_user`) ou `null` si aucun utilisateur n'est trouvé.
+ * @returns {Promise<User|null>} L'utilisateur trouvé (contenant `id_user`) ou `null` si aucun utilisateur n'est trouvé.
  * @throws {Error} En cas d'erreur lors de la requête à la base de données.
  */
 const findUserByLicence = async (numberLicence) => {
@@ -120,8 +120,14 @@ const findUserByLicence = async (numberLicence) => {
     `;
     try {
         const [rows] = await pool.execute(query, [numberLicence]);
-        console.log(`🔍 Utilisateur trouvé avec le numéro de licence ${numberLicence}:`, rows[0]);
-        return rows[0] || null;
+        if (rows[0]) {
+            console.log(`🔍 Utilisateur trouvé avec le numéro de licence ${numberLicence}:`, rows[0]);
+            return User.createUserFromDataBase(rows[0]);
+        } else {
+            console.log(`🔍 Utilisateur non trouvé avec le numéro de licence ${numberLicence}`);
+            return null;
+        }
+
     } catch (err) {
         console.error('❌ Erreur lors de la récupération de l’utilisateur:', err);
         throw err;
@@ -132,7 +138,7 @@ const findUserByLicence = async (numberLicence) => {
  * Recherche un utilisateur par son ID utilisateur.
  * @async
  * @param {number} userId - L'ID de l'utilisateur.
- * @returns {Promise<Object|null>} L'utilisateur trouvé ou `null` si non trouvé.
+ * @returns {Promise<User|null>} L'utilisateur trouvé ou `null` si non trouvé.
  * @throws {Error} En cas d'erreur de requête.
  */
 const findUserById = async (userId) => {
@@ -143,8 +149,13 @@ const findUserById = async (userId) => {
     `;
     try {
         const [rows] = await pool.execute(query, [userId]);
-        console.log(`🔍 Utilisateur trouvé avec l'user ID ${userId}:`, rows[0]);
-        return rows[0] || null;
+        if (rows[0]) {
+            console.log(`🔍 Utilisateur trouvé avec l'user ID ${userId}:`, rows[0]);
+            return User.createUserFromDataBase(rows[0]);
+        } else {
+            console.log(`🔍 Utilisateur non trouvé avec l'user ID ${userId}`);
+            return null;
+        }
     } catch (err) {
         console.error('❌ Erreur lors de la récupération de l’utilisateur:', err);
         throw err;

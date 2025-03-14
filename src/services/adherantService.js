@@ -24,7 +24,7 @@ function chargerDonneesExcel(fichierXlsx) {
  */
 const getAllAdherents = async () => {
     try {
-        console.log('📌 [SERVICE] Récupération de tous les adhérents...');
+
         const adherents = await AdherentsModel.getAllAdherents();
         const adherentList = [];
         adherents.map(adherent => {

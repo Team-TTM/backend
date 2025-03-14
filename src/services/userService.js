@@ -1,5 +1,6 @@
-const UsersModel = require('../models/usersModel');
-const User = require('../models/User');
+const UsersModel = require('../models/repositories/usersModel');
+const User = require('../models/entities/User');
+const user = require('../models/entities/User');
 
 
 /**
@@ -9,11 +10,11 @@ const User = require('../models/User');
  * @returns {Promise<User|null>} L'utilisateur trouvé ou null s'il n'existe pas.
  */
 const findUserByGoogleId = async (googleId) => {
-    const userData = await UsersModel.findUserByGoogleId(googleId);
-    if (!userData) {
+    const user = await UsersModel.findUserByGoogleId(googleId);
+    if (!user) {
         return null;
     }
-    return userData;
+    return user;
 };
 
 /**
@@ -23,11 +24,11 @@ const findUserByGoogleId = async (googleId) => {
  * @returns {User|null} L'utilisateur trouvé ou null s'il n'existe pas.
  */
 const findUserByFacebookId = async (facebookId) => {
-    const userData = await UsersModel.findUserByFacebookId(facebookId);
-    if (!userData) {
+    const user = await UsersModel.findUserByFacebookId(facebookId);
+    if (!user) {
         return null;
     }
-    return userData;
+    return user;
 };
 
 /**
@@ -37,12 +38,12 @@ const findUserByFacebookId = async (facebookId) => {
  * @returns {Promise<User|null>} L'utilisateur trouvé ou null s'il n'existe pas.
  */
 const findUserByUserId = async (userId) => {
-    const userData = await UsersModel.findUserById(userId);
-    if (!userData) {
+    const user = await UsersModel.findUserById(userId);
+    if (!user) {
         return null;
     }
     // Retourner un objet de type User
-    return User.createUserFromDataBase(userData);
+    return User.createUserFromDataBase(user);
 };
 
 /**
@@ -53,11 +54,11 @@ const findUserByUserId = async (userId) => {
  * @throws {Error} En cas d'erreur lors de la requête à la base de données.
  */
 const findUserByLicence = async (numberLicence) => {
-    const userData = await UsersModel.findUserByLicence(numberLicence);
-    if (!userData) {
+    const user = await UsersModel.findUserByLicence(numberLicence);
+    if (!user) {
         return null;
     }
-    return User.createUserFromDataBase(userData);
+    return User.createUserFromDataBase(user);
 };
 
 /**
@@ -143,20 +144,21 @@ const mergeUserFacebookAndGoogleIds = async (user1, user2) => {
 };
 
 const deleteGoogleId = async (googleID) => {
-    const userData = await UsersModel.findUserByGoogleId(googleID);
-    if (!userData) {
+    const user = await UsersModel.findUserByGoogleId(googleID);
+    if (!user) {
         throw new Error('Utilisateur non trouver ');
     }
-    const user = User.createUserFromDataBase(userData);
+    user.google_id = null;
     await UsersModel.deleteGoogleId(user);
 };
 
 const deleteFacebookId = async (facebokId) => {
-    const userData = await UsersModel.findUserByFacebookId(facebokId);
-    if (!userData) {
+    const user = await UsersModel.findUserByFacebookId(facebokId);
+    if (!user) {
         throw new Error('Utilisateur non trouver ');
     }
-    await UserModel.updateGoogleId(user);
+    user.facebook_id = null;
+    await UsersModel.deleteFacebookId(facebokId);
 };
 
 
