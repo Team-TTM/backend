@@ -188,7 +188,7 @@ const updateGoogleId = async (user) => {
     const query = `
         UPDATE users
         SET google_id = ?
-        WHERE id_user = ? RETURNING *;
+        WHERE id_user = ?;
     `;
     try {
         console.log('⌛️ Ajout de googleId :', user.google_id, 'à l\'utilisateur :', user.id_user);
@@ -250,6 +250,53 @@ const deleteUserById = async (user) => {
     }
 };
 
+/**
+ * Supprime l'ID Facebook d'un utilisateur.
+ * @async
+ * @param {Object} user - L'objet utilisateur contenant `id_user` à mettre à jour.
+ * @returns {Promise<void>} Une promesse qui se résout lorsque l'ID Facebook est supprimé.
+ * @throws {Error} En cas d'erreur de mise à jour.
+ */
+const deleteFacebookId = async (user) => {
+    const query = `
+        UPDATE users
+        SET facebook_id = NULL
+        WHERE id_user = ?;
+    `;
+    try {
+        console.log(`⌛️ Suppression de l'ID Facebook de l'utilisateur avec ID: ${user.id_user}`);
+        await pool.execute(query, [user.id_user]);
+        console.log(`✅ ID Facebook supprimé pour l'utilisateur avec ID: ${user.id_user}`);
+    } catch (err) {
+        console.error('❌ Erreur lors de la suppression de l\'ID Facebook de l\'utilisateur:', err);
+        throw err;
+    }
+};
+
+/**
+ * Supprime l'ID Google d'un utilisateur.
+ * @async
+ * @param {Object} user - L'objet utilisateur contenant `id_user` à mettre à jour.
+ * @returns {Promise<void>} Une promesse qui se résout lorsque l'ID Google est supprimé.
+ * @throws {Error} En cas d'erreur de mise à jour.
+ */
+const deleteGoogleId = async (user) => {
+    const query = `
+        UPDATE users
+        SET google_id = NULL
+        WHERE id_user = ?;
+    `;
+    try {
+        console.log(`⌛️ Suppression de l'ID Google de l'utilisateur avec ID: ${user.id_user}`);
+        await pool.execute(query, [user.id_user]);
+        console.log(`✅ ID Google supprimé pour l'utilisateur avec ID: ${user.id_user}`);
+    } catch (err) {
+        console.error('❌ Erreur lors de la suppression de l’ID Google de l’utilisateur:', err);
+        throw err;
+    }
+};
+
+
 
 module.exports = {
     createFacebookUser,
@@ -262,4 +309,6 @@ module.exports = {
     updateGoogleId,
     updateAdherentId,
     deleteUserById,
+    deleteFacebookId,
+    deleteGoogleId,
 };
