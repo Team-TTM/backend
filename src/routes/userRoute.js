@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const passport = require('passport');
-const authenticateJWT = require('../middleware/auth');
 const authController = require('../controllers/authController');
 const adherentController = require('../controllers/adherentController');
 const path = require('path');
 const userController = require('../controllers/userController');
+const {authenticateJWT} = require('../middleware/auth');
 
 
 router.get('/auth/google', passport.authenticate('google'));

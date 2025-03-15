@@ -79,6 +79,7 @@ Le projet utilise Passport.js pour gérer l'authentification via Google et Faceb
 
 ### **Google Authentication**
 - `GET users/auth/google` : Redirige l'utilisateur vers la page de connexion Google.
+   
 - `GET users/auth/google/callback` : Callback après l'authentification Google, renvoie un token d'authentification.
 
 ### **Facebook Authentication**
@@ -87,6 +88,71 @@ Le projet utilise Passport.js pour gérer l'authentification via Google et Faceb
 
 ### **Licence Check**
 - `POST /licence-check` : Vérifie la licence de l'utilisateur. Cette route nécessite un token d'identification dans l'en-tête de la requête.
+   retourne 
+401 Unauthorized si le token n'est pas fourni ou est invalide.
+
+### **GET adherent**
+- `GET users/adherent` : Récupère les informations de l'adhérent. Cette route nécessite un token d'identification dans l'en-tête de la requête.
+Requête 
+L'en-tête de la requête doit contenir un token d'authentification valide.
+
+```http request
+Authorization : Bearer <token>
+```
+
+Réponses
+* **401 Unauthorized** si le token n'est pas fourni ou est invalide.
+```json
+{
+  "message": "Authentification échouée"
+}
+```
+
+* **200 OK** si l'adhérent est trouvé.
+```json
+{
+   "numeroLicence": "numeroLicence",
+   "statut": "statut",
+   "type": "type",
+   "demiTarif": true,
+   "horsClub": false,
+   "categorie": "categorie",
+   "anneeBlanche": false,
+   "pratique": "pratique",
+   "prenom": "prenom",
+   "nom": "nom",
+   "nomUsage": "nomUsage",
+   "dateNaissance": "YYYY-MM-DD",
+   "sexe": "sexe",
+   "profession": "profession",
+   "principale": "adresse principale",
+   "details": "détails supplémentaires",
+   "lieuDit": "lieu-dit",
+   "codePostal": "12345",
+   "ville": "ville",
+   "pays": "pays",
+   "telephone": "0123456789",
+   "mobile": "0612345678",
+   "email": "email@example.com",
+   "urgenceTelephone": "0787654321",
+   "saison": "[saison]"
+}
+```
+
+* **404 Not Found** : Si aucun adhérent correspondant n’est trouvé
+```json
+{
+  "message": "Adhérent non trouvé"
+}
+```
+
+* **500 Internal Server Error** : En cas d'erreur serveur
+```json
+{
+  "message": "Erreur serveur"
+}
+```
+
 
 ## Déploiement
 Le déploiement est automatisé via GitHub Actions. Lors d'un push sur la branche main, le workflow suivant est exécuté :

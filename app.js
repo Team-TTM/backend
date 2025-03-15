@@ -26,6 +26,8 @@ app.use((req, res, next) => {
     next(error);
 });
 
+
+
 // Middleware de gestion des erreurs globales
 app.use((error, req, res) => {
     res.status(error.status && Number.isInteger(error.status) ? error.status : 500);
