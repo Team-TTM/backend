@@ -19,59 +19,82 @@ const createTable = async (tableName, query) => {
 
 // Définition des requêtes SQL pour chaque table
 const queries = {
-    saison: `
-        CREATE TABLE IF NOT EXISTS saison (
-            saison_id VARCHAR(9) PRIMARY KEY
-        );
-    `,
     adherents: `
-        CREATE TABLE IF NOT EXISTS adherents (
-            numero_licence    VARCHAR(20) PRIMARY KEY,
-            prenom            VARCHAR(255) NOT NULL,
-            nom               VARCHAR(255) NOT NULL,
-            nom_usage         VARCHAR(255),
-            date_naissance    DATE NOT NULL,
-            sexe              CHAR(1) NOT NULL,
-            profession        VARCHAR(255),
-            principale        VARCHAR(255) NOT NULL,
-            details           VARCHAR(255),
-            lieu_dit          VARCHAR(255),
-            code_postale      VARCHAR(5),
-            ville             VARCHAR(255),
-            pays              VARCHAR(255),
-            telephone         VARCHAR(10),
-            mobile            VARCHAR(10),
-            email             VARCHAR(255) NOT NULL,
+        CREATE TABLE adherents (
+            licence_id VARCHAR(20) PRIMARY KEY,
+            prenom VARCHAR(255) NOT NULL,
+            nom VARCHAR(255) NOT NULL,
+            nom_usage VARCHAR(255),
+            date_naissance DATE NOT NULL,
+            sexe CHAR(1) NOT NULL,
+            profession VARCHAR(255),
+            principale VARCHAR(255) NOT NULL,
+            details VARCHAR(255),
+            lieu_dit VARCHAR(255),
+            code_postale VARCHAR(5),
+            ville VARCHAR(255),
+            pays VARCHAR(255),
+            telephone VARCHAR(10) NOT NULL,
+            mobile VARCHAR(10),
+            email VARCHAR(255) NOT NULL,
             urgency_telephone VARCHAR(10),
-            type              VARCHAR(255) NOT NULL,
-            demi_tarif        BOOLEAN NOT NULL,
-            hors_club         BOOLEAN NOT NULL,
-            categorie         VARCHAR(255) NOT NULL,
-            annee_blanche     BOOLEAN NOT NULL,
-            pratique          VARCHAR(255) NOT NULL
+            type VARCHAR(255) NOT NULL,
+            demi_tarif BOOLEAN NOT NULL,
+            hors_club BOOLEAN NOT NULL,
+            categorie VARCHAR(255) NOT NULL,
+            annee_blanche BOOLEAN NOT NULL,
+            pratique VARCHAR(255) NOT NULL
         );
     `,
     users: `
-        CREATE TABLE IF NOT EXISTS users (
-            id_user        INT AUTO_INCREMENT PRIMARY KEY,
-            numero_licence VARCHAR(20) UNIQUE,
-            role           ENUM ('user', 'dirigent') NOT NULL DEFAULT 'user',
-            charte_signe   BOOLEAN NOT NULL DEFAULT FALSE,
-            google_id      VARCHAR(255) UNIQUE,
-            facebook_id    VARCHAR(255) UNIQUE,
-            newsletter     BOOLEAN NOT NULL DEFAULT FALSE,
-            FOREIGN KEY (numero_licence) REFERENCES adherents (numero_licence) ON DELETE CASCADE
+        CREATE TABLE users (
+            user_id INT AUTO_INCREMENT PRIMARY KEY,
+            licence_id VARCHAR(20) UNIQUE,
+            role ENUM('user', 'dirigeant') NOT NULL DEFAULT 'user',
+            charte_signe BOOLEAN NOT NULL DEFAULT false,
+            google_id VARCHAR(255) UNIQUE,
+            facebook_id VARCHAR(255) UNIQUE,
+            newsletter BOOLEAN NOT NULL DEFAULT false
         );
     `,
-    licence_saison_association: `
-        CREATE TABLE IF NOT EXISTS licence_saison_association (
-            saison         VARCHAR(9) NOT NULL,
-            numero_licence VARCHAR(255) NOT NULL,
-            PRIMARY KEY (saison, numero_licence),
-            FOREIGN KEY (saison) REFERENCES saison (saison_id) ON DELETE CASCADE,
-            FOREIGN KEY (numero_licence) REFERENCES adherents (numero_licence) ON DELETE CASCADE
+    events: `
+        CREATE TABLE events (
+            event_id INT AUTO_INCREMENT PRIMARY KEY ,
+            dirigeant_id INTEGER,
+            name VARCHAR(255),
+            description TEXT,
+            created_at DATETIME,
+            end_at DATETIME
         );
-    `
+    `,
+    saison: `
+        CREATE TABLE saison (
+            saison_id varchar(9) PRIMARY KEY
+        );
+    `,
+    events_users: `
+        CREATE TABLE events_users (
+            events_event_id INT,
+            users_user_id INT,
+            PRIMARY KEY (events_event_id, users_user_id)
+        );
+    `,
+    saison_adherents: `
+        CREATE TABLE saison_adherents (
+            saison_id varchar(9),
+            licence_id VARCHAR(20),
+            PRIMARY KEY (saison_id, licence_id)
+        );
+    `,
+    // ALTER TABLE commands
+    addForeignKeys: [
+        'ALTER TABLE users ADD FOREIGN KEY (licence_id) REFERENCES adherents  (licence_id) ON DELETE CASCADE;',
+        'ALTER TABLE events ADD FOREIGN KEY (`dirigeant_id`) REFERENCES users (`user_id`);',
+        'ALTER TABLE events_users ADD FOREIGN KEY (events_event_id) REFERENCES events (event_id);',
+        'ALTER TABLE events_users ADD FOREIGN KEY (users_user_id) REFERENCES users (user_id);',
+        'ALTER TABLE saison_adherents ADD FOREIGN KEY (saison_id) REFERENCES saison (saison_id);',
+        'ALTER TABLE saison_adherents ADD FOREIGN KEY (licence_id) REFERENCES adherents (licence_id);',
+    ]
 };
 
 /**
@@ -79,12 +102,19 @@ const queries = {
  */
 async function initDatabase() {
     try {
-        // Création des tables
         for (const [tableName, query] of Object.entries(queries)) {
-            await createTable(tableName, query);
+            if (Array.isArray(query)) {
+                // Si la valeur est un tableau (pour les ALTER TABLE)
+                for (const alterQuery of query) {
+                    await createTable(tableName, alterQuery);
+                }
+            } else {
+                // Si la valeur est une requête SQL (pour les tables)
+                await createTable(tableName, query);
+            }
         }
 
-        // Importation du fichier XLSX
+        // Importation du fichier XLSX (si besoin)
         await importerXlsx(path.resolve(__dirname, '../../data', process.env.XLSX_FILE2024));
 
     } catch (err) {
@@ -100,9 +130,11 @@ async function dropAllTables() {
     try {
         const tableNames = Object.keys(queries).reverse();
         for (const tableName of tableNames) {
-            const query = `DROP TABLE IF EXISTS \`${tableName}\``;
-            await pool.query(query);
-            console.log(`✅ Table '${tableName}' supprimée.`);
+            if (!Array.isArray(tableName)) {
+                const query = `DROP TABLE IF EXISTS \`${tableName}\``;
+                await pool.query(query);
+                console.log(`✅ Table '${tableName}' supprimée.`);
+            }
         }
         console.log('✅ Toutes les tables ont été supprimées.');
     } catch (err) {
