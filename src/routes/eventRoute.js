@@ -10,3 +10,4 @@ router.put('editEvent',authenticateDirigeant,eventController.editEvent);
 router.delete('deleteEvent/:id',authenticateDirigeant,eventController.deleteEvent);
 
 
+module.exports = router;
