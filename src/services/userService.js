@@ -43,7 +43,7 @@ const findUserByUserId = async (userId) => {
         return null;
     }
     // Retourner un objet de type User
-    return User.createUserFromDataBase(user);
+    return user;
 };
 
 /**
@@ -58,7 +58,7 @@ const findUserByLicence = async (numberLicence) => {
     if (!user) {
         return null;
     }
-    return User.createUserFromDataBase(user);
+    return user;
 };
 
 /**
