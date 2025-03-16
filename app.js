@@ -19,7 +19,7 @@ app.use(passport.initialize());
 app.use(indexRouter);
 app.use('/users', usersRouter);
 app.use('/assets', assetsRouter);
-app.use('api/event', eventRouter);
+app.use('/api/event', eventRouter);
 
 // Gestion des erreurs 404
 app.use((req, res, next) => {

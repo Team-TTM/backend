@@ -80,7 +80,7 @@ const deleteEvent = async (req, res) => {
 
 const getEvent = async (req, res) => {
     console.log('📌 [CONTROLLER] Récupération de l\'événement...');
-    const eventId = req.params?.eventId;
+    const eventId = parseInt(req.params?.eventId, 10);
 
     if (!eventId) {
         console.error('ID de l\'événement manquant');
@@ -89,29 +89,31 @@ const getEvent = async (req, res) => {
         });
     }
 
+    if (isNaN(eventId)) {
+        return res.status(400).json({ error: 'eventId est invalide' });
+    }
+
     try {
         const query = 'SELECT * FROM events WHERE event_id = ?';
         const [rows] = await pool.execute(query, [eventId]);
         if (rows.length === 0) {
             console.log('⚠️ Aucun événement trouvé pour cet ID.');
-            return res.status(404).json({
-                error: 'Événement non trouvé',
-            });
+            return res.status(204).send();
         }
 
         const event = Event.fromDataBase(rows[0]);
-        const query2 = `SELECT a.adherents
-                        FROM adherents a
-                                 JOIN users u ON u.id_user = a.id_user
-                                 JOIN events_users eu ON u.user_id = eu.user_id
-                                 JOIN events_event_id e ON e.event_id = eu.event_id
-                        WHERE e.event_id = ?;`;
-        const result = await pool.execute(query2, [event.eventId]);
-
-        result[0].forEach(row => {
-            const adherent = Adherent.fromDataBase(row);
-            event.addParticipant(adherent);
-        });
+        // const query2 = `SELECT a.adherents
+        //                 FROM adherents a
+        //                          JOIN users u ON u.id_user = a.id_user
+        //                          JOIN events_users eu ON u.user_id = eu.user_id
+        //                          JOIN events_event_id e ON e.event_id = eu.event_id
+        //                 WHERE e.event_id = ?;`;
+        // const result = await pool.execute(query2, [event.eventId]);
+        //
+        // result[0].forEach(row => {
+        //     const adherent = Adherent.fromDataBase(row);
+        //     event.addParticipant(adherent);
+        // });
 
         return res.status(200).json({ event });
     } catch (error) {

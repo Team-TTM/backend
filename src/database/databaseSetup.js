@@ -63,8 +63,8 @@ const queries = {
             dirigeant_id INTEGER,
             name VARCHAR(255),
             description TEXT,
-            created_at DATETIME,
-            end_at DATETIME
+            created_at DATE,
+            end_at DATE
         );
     `,
     saison: `
