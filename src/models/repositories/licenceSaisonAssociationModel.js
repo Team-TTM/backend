@@ -13,7 +13,7 @@ const pool = require('../../config/database'); // Connexion à la base de donné
  */
 const insertLicenceSaisonAssociation = async (idAnne, numeroLicence) => {
     const query = `
-        INSERT INTO licence_saison_association (saison, numero_licence)
+        INSERT INTO saison_adherents (saison_id, licence_id)
         VALUES (?, ?)
     `;
     const values = [idAnne, numeroLicence];
@@ -30,9 +30,9 @@ const insertLicenceSaisonAssociation = async (idAnne, numeroLicence) => {
 
 const saisonbyLicence = async (numeroLicence) => {
     const query = `
-        SELECT saison
-        FROM licence_saison_association
-        WHERE numero_licence = ?;
+        SELECT saison_id
+        FROM saison_adherents
+        WHERE licence_id = ?;
     `;
     try {
         await pool.execute(query, numeroLicence);

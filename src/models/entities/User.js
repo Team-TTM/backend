@@ -85,8 +85,8 @@ class User {
     }
 
     static createUserFromDataBase(userData) {
-        return new User(userData.id_user,
-            userData.numero_licence,
+        return new User(userData.user_id,
+            userData.licence_id,
             userData.role,
             userData.charte_signe,
             userData.google_id,

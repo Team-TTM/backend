@@ -9,7 +9,7 @@ const pool = require('../../config/database'); // Connexion à la base de donné
  */
 const createAdherent = async (adherent) => {
     const query = `
-        INSERT INTO adherents (numero_licence, prenom, nom, nom_usage, date_naissance, sexe, profession,
+        INSERT INTO adherents (licence_id, prenom, nom, nom_usage, date_naissance, sexe, profession,
                                principale, details, lieu_dit, code_postale, ville, pays,
                                telephone, mobile, email, urgency_telephone,
                             type, demi_tarif, hors_club, categorie, annee_blanche, pratique)
@@ -95,7 +95,7 @@ const updateAdherent = async (adherent) => {
             categorie         = ?,
             annee_blanche     = ?,
             pratique          = ?
-        WHERE numero_licence = ?
+        WHERE licence_id = ?
     `;
     try {
         await pool.execute(query, [
@@ -139,7 +139,7 @@ const adherentExist = async (num_licence) => {
     const query = `
         SELECT 1
         FROM adherents
-        WHERE numero_licence = ?
+        WHERE licence_id = ?
         LIMIT 1;
     `;
 
@@ -162,12 +162,12 @@ const adherentExist = async (num_licence) => {
  */
 const getAdherentDetails = async (numeroLicence) => {
     const query = `
-        SELECT adherents.*, GROUP_CONCAT(licence_saison_association.saison) AS saisons
+        SELECT adherents.*, GROUP_CONCAT(saison_adherents.saison) AS saisons
         FROM adherents
-                 LEFT JOIN licence_saison_association
-                           ON adherents.numero_licence = licence_saison_association.numero_licence
-        WHERE adherents.numero_licence = ?
-        GROUP BY adherents.numero_licence
+                 LEFT JOIN saison_adherents
+                           ON adherents.licence_id = saison_adherents.licence_id
+        WHERE adherents.licence_id = ?
+        GROUP BY adherents.licence_id
     `;
     const values = [numeroLicence];
     try {
@@ -188,11 +188,11 @@ const getAdherentDetails = async (numeroLicence) => {
  * **/
 const getAllAdherents = async () => {
     const query = `
-        SELECT adherents.*, GROUP_CONCAT(licence_saison_association.saison) AS saisons
+        SELECT adherents.*, GROUP_CONCAT(saison_adherents.saison_id) AS saisons
         FROM adherents
-                 LEFT JOIN licence_saison_association
-                           ON adherents.numero_licence = licence_saison_association.numero_licence
-        GROUP BY adherents.numero_licence
+                 LEFT JOIN saison_adherents
+                           ON adherents.licence_id = saison_adherents.licence_id
+        GROUP BY adherents.licence_id
     `;
     try {
         const [rows] = await pool.execute(query);
