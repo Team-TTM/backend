@@ -3,26 +3,22 @@ const pool = require('../config/database'); // Connexion à la base de données
 
 const createEvent = async (req, res) => {
     console.log('📌 [CONTROLLER] Création d\'un événement...');
-    const event = req.body?.event;
-    if (event === undefined) {
-        console.error('Objet manquant dans la requête');
-        return res.status(400).json({
-            error: 'Objet manquant dans la requête',
-        });
-    }
-    if (event.name === undefined || event.description === undefined || event.endAt === undefined) {
-        console.error('Clé manquante dans l\'objet : event');
-        return res.status(400).json({
-            error: 'Clé manquante dans l\'objet : event',
-        });
-    }
-    const query = `
-        INSERT INTO events (dirigeant_id, name, description, created_at, end_at)
-        VALUES (?, ?, ?, ?, ?)
-        RETURNING *;
-    `;
+    const data = req?.body?.event;
+    const {userId} = req.auth;
     try {
-        const [rows] = await pool.query(query, [event.dirigeantId, event.name, event.description, new Date(), event.endAt]);
+        if (data === undefined) {
+            console.error('Objet Event manquant dans la requête');
+            return res.status(400).json({
+                error: 'Objet Event manquant dans la requête',
+            });
+        }
+        const event = Event.createEvent(data,userId);
+        const query = `
+            INSERT INTO events (dirigeant_id, name, description,created_at, end_at)
+            VALUES (?, ?, ?,?, ?)
+            RETURNING *;
+        `;
+        const [rows] = await pool.query(query, [event.dirigeantId, event.name, event.description, event.createdAT,event.endAt]);
         const eventFetch = Event.fromDataBase(rows[0]);
         return res.status(200).json({ eventFetch });
     } catch (error) {
@@ -231,4 +227,31 @@ class Event {
     addParticipant(participant) {
         this.participants.push(participant);
     }
+
+    static createEvent(data,userId) {
+        const currentDate = new Date();
+        const formattedDate = currentDate.toISOString().split('T')[0]; // Format: "YYYY-MM-DD"
+
+        if (!data?.name || typeof data?.name !== 'string') {
+            throw new Error('Nom de l\'événement manquant ou invalide');
+        }
+
+        // Vérification de la description
+        if (!data?.description || typeof data?.description !== 'string') {
+            throw new Error('Description manquante ou invalide');
+        }
+        // Vérification de endAt (doit être une date valide)
+        if (!data?.endAt || isNaN(new Date(data?.endAt).getTime())) {
+            throw new Error('endAt manquante ou invalide');
+        }
+        return new Event(
+            null,
+            userId,
+            data.name,
+            data.description,
+            formattedDate,
+            data.endAt,
+            null,
+        );
+    };
 }

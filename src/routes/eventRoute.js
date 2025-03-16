@@ -1,13 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const {authenticateDirigeant} = require('../middleware/auth');
+const {authenticateDirigeant, authenticateJWT} = require('../middleware/auth');
 const eventController = require('../controllers/eventController');
 
-router.get('getEvents',authenticateDirigeant,eventController.getEvents);
-router.get('getEvent/:id',authenticateDirigeant,eventController.getEvent);
-router.post('createEvent',authenticateDirigeant,eventController.createEvent);
-router.put('editEvent',authenticateDirigeant,eventController.editEvent);
-router.delete('deleteEvent/:id',authenticateDirigeant,eventController.deleteEvent);
+router.get('/get',authenticateJWT,eventController.getEvents);
+router.get('/get/:eventId',authenticateJWT,eventController.getEvent);
+router.post('/create',authenticateDirigeant,eventController.createEvent);
+router.put('/edit',authenticateDirigeant,eventController.editEvent);
+router.delete('/delete/:eventId',authenticateDirigeant,eventController.deleteEvent);
 
 
 module.exports = router;
