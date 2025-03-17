@@ -136,6 +136,44 @@ class Event {
     }
 
     /**
+     * Crée un nouvel événement à partir des données de la requête.
+     * @param {Object} data - Données de l'événement.
+     * @param {int} data.id - Le nom de l'événement.
+     * @param {string} data.name - Le nom de l'événement.
+     * @param {string} data.description - La description de l'événement.
+     * @param {string} data.endAt - La date de fin de l'événement (format ISO).
+     * @param {number} userId - L'ID de l'utilisateur qui crée l'événement.
+     * @returns {Event} L'instance de l'événement créé.
+     * @throws {Error} Si les données sont invalides.
+     */
+    static editEvent(data, userId) {
+        if (!data?.id || typeof data?.id !== 'number') {
+            throw new Error('Id de l\'événement manquant ou invalide');
+        }
+        if (!data?.name || typeof data?.name !== 'string') {
+            throw new Error('Nom de l\'événement manquant ou invalide');
+        }
+
+        if (!data?.description || typeof data?.description !== 'string') {
+            throw new Error('Description manquante ou invalide');
+        }
+
+        if (!data?.endAt || isNaN(new Date(data?.endAt).getTime())) {
+            throw new Error('endAt manquante ou invalide');
+        }
+
+        return new Event(
+            data.id,
+            userId,
+            data.name,
+            data.description,
+            null,
+            data.endAt,
+            null
+        );
+    }
+
+    /**
      * Ajoute un participant à l'événement.
      * @param {Object} participant - Le participant à ajouter.
      */

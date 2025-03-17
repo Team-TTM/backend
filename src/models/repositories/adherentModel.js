@@ -181,11 +181,12 @@ const getAdherentDetails = async (numeroLicence) => {
 };
 
 /**
- * Renvoie tous les adhérents de la base de données
+ * Récupère tous les adhérents de la base de données.
  *
  * @async
- * @return les infos des adhérents
- * **/
+ * @returns {Promise<Array<Object>>} - Une promesse qui se résout avec un tableau contenant les informations des adhérents.
+ * @throws {Error} - Lance une erreur si la requête SQL échoue.
+ */
 const getAllAdherents = async () => {
     const query = `
         SELECT adherents.*, GROUP_CONCAT(saison_adherents.saison_id) AS saisons
