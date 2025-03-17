@@ -28,12 +28,20 @@ const createEvent = async (req, res) => {
         });
     }
 };
-
+//TODO a verif
 const editEvent = async (req, res) => {
+    const data = req?.body?.event;
+    const {userId} = req.auth;
     try {
-        const event = Event.fromDataBase(req.body);
+        if (data === undefined) {
+            console.error('Objet Event manquant dans la requête');
+            return res.status(400).json({
+                error: 'Objet Event manquant dans la requête',
+            });
+        }
+        const event = Event.createEvent(data,userId);
         const query = `UPDATE events
-                       SET dirigeant_id = ?,
+                       SET 
                            name         = ?,
                            description  = ?,
                            end_at       = ?
@@ -52,13 +60,18 @@ const editEvent = async (req, res) => {
 
 const deleteEvent = async (req, res) => {
     console.log('📌 [CONTROLLER] Suppression d\'un événement...');
-    const eventId = req.params?.eventId;
+    const eventId = parseInt(req.params?.eventId, 10);
+
     if (eventId === undefined) {
         console.error('Événement non trouvé');
         return res.status(400).json({
             error: 'Événement non trouvé',
         });
     }
+    if (isNaN(eventId)) {
+        return res.status(400).json({ error: 'eventId est invalide' });
+    }
+
     try {
         const query = 'SELECT * FROM events WHERE event_id = ?';
         const [rows] = await pool.execute(query, [eventId]);
@@ -102,9 +115,9 @@ const getEvent = async (req, res) => {
         }
 
         const event = Event.fromDataBase(rows[0]);
-        // const query2 = `SELECT a.adherents
+        // const query2 = `SELECT a.adherents.prenom,a.adherents.nom,a.adherents.licence_id
         //                 FROM adherents a
-        //                          JOIN users u ON u.id_user = a.id_user
+        //                          JOIN users u ON u.licence_id = a.licence_id
         //                          JOIN events_users eu ON u.user_id = eu.user_id
         //                          JOIN events_event_id e ON e.event_id = eu.event_id
         //                 WHERE e.event_id = ?;`;
