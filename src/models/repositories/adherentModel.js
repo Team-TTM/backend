@@ -162,7 +162,7 @@ const adherentExist = async (num_licence) => {
  */
 const getAdherentDetails = async (numeroLicence) => {
     const query = `
-        SELECT adherents.*, GROUP_CONCAT(saison_adherents.saison) AS saisons
+        SELECT adherents.*, GROUP_CONCAT(saison_adherents.saison_id) AS saisons
         FROM adherents
                  LEFT JOIN saison_adherents
                            ON adherents.licence_id = saison_adherents.licence_id

@@ -3,6 +3,7 @@ const AdherentsModel = require('../models/repositories/adherentModel');
 const Adherent = require('../models/entities/Adherent');
 const {insertLicenceSaisonAssociation} = require('../models/repositories/licenceSaisonAssociationModel');
 const {insertIfNotExists} = require('../models/repositories/saisonModel');
+const {findUserByUserId} = require('./userService');
 
 
 
@@ -45,7 +46,7 @@ const getAllAdherents = async () => {
  * @async
  * @function getAdherent
  * @param {string} userId - L'ID unique de l'utilisateur.
- * @returns {Promise<Adherent[]>} - Une promesse qui résout un tableau d'adhérents.
+ * @returns {Promise<Adherent>} - Une promesse qui résout un adhérent.
  * @throws {Error} - En cas d'échec de la récupération des adhérents.
  */
 const getAdherent = async (userId) => {
@@ -170,4 +171,4 @@ async function importerXlsx(fichierXlsx) {
 async function checkAdherentLicence(num_licence) {
     return AdherentsModel.adherentExist(num_licence);
 }
-module.exports = { importerXlsx, checkAdherentLicence, getAllAdherents };
+module.exports = { importerXlsx, checkAdherentLicence, getAllAdherents,getAdherent };
