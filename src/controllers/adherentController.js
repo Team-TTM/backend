@@ -1,5 +1,3 @@
-
-
 const adherantService = require('../services/adherantService');
 
 const getAllAdherents = async (req, res) => {

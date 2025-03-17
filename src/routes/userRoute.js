@@ -27,6 +27,8 @@ router.get('/getAllAdherents',authenticateJWT,adherentController.getAllAdherents
 router.get('/adherent',authenticateJWT,adherentController.getAdherent);
 
 
+
+
 router.get('/{*splat}', (req, res) => {
     res.sendFile(path.join(__dirname, '..','..','..','frontend','dist', 'index.html'));
 });

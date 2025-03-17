@@ -8,6 +8,7 @@ const app = express();
 const indexRouter = require('./src/routes/index');
 const usersRouter = require('./src/routes/userRoute');
 const assetsRouter = require('./src/routes/assets');
+const eventRouter = require('./src/routes/eventRoute');
 
 // Middleware
 app.use(morganLogger); // Utilisation de Morgan pour logger les requêtes HTTP
@@ -18,6 +19,7 @@ app.use(passport.initialize());
 app.use(indexRouter);
 app.use('/users', usersRouter);
 app.use('/assets', assetsRouter);
+app.use('/api/event', eventRouter);
 
 // Gestion des erreurs 404
 app.use((req, res, next) => {

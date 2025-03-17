@@ -17,8 +17,8 @@ const createFacebookUser = async (user) => {
     `;
     try {
         const [rows] = await pool.execute(query, [user.facebook_id]);
-        console.log('✅ Utilisateur Facebook inséré :', rows[0].id_user);
-        return rows[0].id_user;
+        console.log('✅ Utilisateur Facebook inséré :', rows[0].user_id);
+        return rows[0].user_id;
     } catch (err) {
         console.error('❌ Erreur lors de l’insertion de l’utilisateur Facebook:', err);
         throw err;
@@ -41,8 +41,8 @@ const createGoogleUser = async (user) => {
     `;
     try {
         const [rows] = await pool.execute(query, [user.google_id]);
-        console.log('✅ Utilisateur Google inséré :', rows[0].id_user);
-        return rows[0].id_user;
+        console.log('✅ Utilisateur Google inséré :', rows[0].user_id);
+        return rows[0].user_id;
     } catch (err) {
         console.error('❌ Erreur lors de l’insertion de l’utilisateur Google:', err);
         throw err;
@@ -65,7 +65,7 @@ const findUserByFacebookId = async (facebookId) => {
     try {
         const [rows] = await pool.execute(query, [facebookId]);
         if (rows[0]) {
-            console.log(`🔍 Utilisateur trouvé avec Facebook ID ${facebookId}:`, rows[0].id_user);
+            console.log(`🔍 Utilisateur trouvé avec Facebook ID ${facebookId}:`, rows[0].user_id);
             return User.createUserFromDataBase(rows[0]);
         } else {
             console.log(`🔍 Utilisateur non trouvé avec Facebook ID ${facebookId}`);
@@ -93,7 +93,7 @@ const findUserByGoogleId = async (googleId) => {
     try {
         const [rows] = await pool.execute(query, [googleId]);
         if (rows[0]) {
-            console.log(`🔍 Utilisateur trouvé avec Google ID ${googleId}:`, rows[0].id_user);
+            console.log(`🔍 Utilisateur trouvé avec Google ID ${googleId}:`, rows[0].user_id);
             return User.createUserFromDataBase(rows[0]);
         } else {
             console.log(`🔍 Utilisateur non trouvé avec Google ID ${googleId}`);
@@ -116,7 +116,7 @@ const findUserByLicence = async (numberLicence) => {
     const query = `
         SELECT *
         FROM users
-        WHERE numero_licence = ?;
+        WHERE licence_id = ?;
     `;
     try {
         const [rows] = await pool.execute(query, [numberLicence]);
@@ -145,7 +145,7 @@ const findUserById = async (userId) => {
     const query = `
         SELECT *
         FROM users
-        WHERE id_user = ?;
+        WHERE user_id = ?;
     `;
     try {
         const [rows] = await pool.execute(query, [userId]);
@@ -174,7 +174,7 @@ const updateFacebookId = async (user) => {
     const query = `
         UPDATE users
         SET facebook_id = ?
-        WHERE id_user = ?
+        WHERE user_id = ?
     `;
     try {
         console.log(`⌛️ Ajout de Facebook ID: ${user.facebook_id} à l'utilisateur ID: ${user.id_user}`);
@@ -199,7 +199,7 @@ const updateGoogleId = async (user) => {
     const query = `
         UPDATE users
         SET google_id = ?
-        WHERE id_user = ?;
+        WHERE user_id = ?;
     `;
     try {
         console.log('⌛️ Ajout de googleId :', user.google_id, 'à l\'utilisateur :', user.id_user);
@@ -223,12 +223,12 @@ const updateGoogleId = async (user) => {
 const updateAdherentId = async (user) => {
     const query = `
         UPDATE users
-        SET numero_licence = ?
-        WHERE id_user = ?;
+        SET licence_id = ?
+        WHERE user_id = ?;
     `;
     try {
-        console.log('⌛️ Ajout de la licence :', user.numero_licence, 'à l\'utilisateur :', user.id_user);
-        const [result] = await pool.query(query, [user.numero_licence, user.id_user]);
+        console.log('⌛️ Ajout de la licence :', user.licence_id, 'à l\'utilisateur :', user.id_user);
+        const [result] = await pool.query(query, [user.licence_id, user.id_user]);
         if (result.affectedRows > 0) {
             console.log(`✅ Numéro de licence mis à jour pour l'utilisateur ID: ${user.id_user}`);
         }
@@ -249,7 +249,7 @@ const deleteUserById = async (user) => {
     const query = `
         DELETE
         FROM users
-        WHERE id_user = ?
+        WHERE user_id = ?
     `;
     try {
         console.log(`⌛️ Suppression de l'utilisateur avec ID: ${user.id_user}`);
@@ -272,7 +272,7 @@ const deleteFacebookId = async (user) => {
     const query = `
         UPDATE users
         SET facebook_id = NULL
-        WHERE id_user = ?;
+        WHERE user_id = ?;
     `;
     try {
         console.log(`⌛️ Suppression de l'ID Facebook de l'utilisateur avec ID: ${user.id_user}`);
@@ -295,7 +295,7 @@ const deleteGoogleId = async (user) => {
     const query = `
         UPDATE users
         SET google_id = NULL
-        WHERE id_user = ?;
+        WHERE user_id = ?;
     `;
     try {
         console.log(`⌛️ Suppression de l'ID Google de l'utilisateur avec ID: ${user.id_user}`);
