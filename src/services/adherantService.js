@@ -3,6 +3,7 @@ const AdherentsModel = require('../models/repositories/adherentModel');
 const Adherent = require('../models/entities/Adherent');
 const {insertLicenceSaisonAssociation} = require('../models/repositories/licenceSaisonAssociationModel');
 const {insertIfNotExists} = require('../models/repositories/saisonModel');
+const {findUserByUserId} = require('./userService');
 
 
 

@@ -39,6 +39,7 @@ const authenticateJWT = (req, res, next) => {
     }
 };
 
+// eslint-disable-next-line consistent-return
 const authenticateDirigeant = async (req, res, next) => {
     try {
         const authHeader = req.headers.authorization;
