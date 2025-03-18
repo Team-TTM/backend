@@ -1,0 +1,174 @@
+openapi: 3.0.3
+info:
+  title: Event Service API
+  description: API de gestion des événements avec authentification et contrôle des rôles.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:3000/api
+    description: Serveur local de développement
+
+paths:
+  /events:
+    get:
+      summary: Récupérer tous les événements
+      description: Retourne la liste de tous les événements enregistrés.
+      operationId: getAllEvents
+      security:
+        - authDirigeant: []  # Middleware d'authentification + vérification du rôle 'dirigeant'
+      responses:
+        "200":
+          description: Liste des événements récupérée avec succès.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Event"
+        "404":
+          description: Aucun événement trouvé.
+        "401":
+          description: Non autorisé (JWT manquant ou invalide).
+        "500":
+          description: Erreur interne du serveur.
+
+    post:
+      summary: Créer un nouvel événement
+      description: Ajoute un nouvel événement à la base de données.
+      operationId: createEvent
+      security:
+        - authDirigeant: []  # Authentification + rôle dirigeant requis
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Event"
+      responses:
+        "201":
+          description: Événement créé avec succès.
+        "400":
+          description: Données invalides envoyées.
+        "401":
+          description: Non autorisé (JWT manquant ou invalide).
+        "403":
+          description: Accès interdit (Rôle insuffisant).
+        "500":
+          description: Erreur interne du serveur.
+
+  /events/{eventId}:
+    get:
+      summary: Récupérer un événement par ID
+      description: Retourne les détails d'un événement spécifique.
+      operationId: getEvent
+      security:
+        - authDirigeant: []  # Authentification + rôle dirigeant requis
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          description: ID de l'événement à récupérer.
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Détails de l'événement récupérés avec succès.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Event"
+        "401":
+          description: Non autorisé (JWT manquant ou invalide).
+        "403":
+          description: Accès interdit (Rôle insuffisant).
+        "404":
+          description: Événement non trouvé.
+        "500":
+          description: Erreur interne du serveur.
+
+    put:
+      summary: Mettre à jour un événement
+      description: Met à jour un événement existant.
+      operationId: updateEvent
+      security:
+        - authDirigeant: []  # Authentification + rôle dirigeant requis
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          description: ID de l'événement à mettre à jour.
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Event"
+      responses:
+        "204":
+          description: Événement mis à jour avec succès.
+        "400":
+          description: Données invalides envoyées.
+        "401":
+          description: Non autorisé (JWT manquant ou invalide).
+        "403":
+          description: Accès interdit (Rôle insuffisant).
+        "404":
+          description: Événement non trouvé.
+        "500":
+          description: Erreur interne du serveur.
+
+    delete:
+      summary: Supprimer un événement
+      description: Supprime un événement de la base de données.
+      operationId: deleteEvent
+      security:
+        - authDirigeant: []  # Authentification + rôle dirigeant requis
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          description: ID de l'événement à supprimer.
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Événement supprimé avec succès.
+        "400":
+          description: Données invalides envoyées.
+        "401":
+          description: Non autorisé (JWT manquant ou invalide).
+        "403":
+          description: Accès interdit (Rôle insuffisant).
+        "404":
+          description: Événement non trouvé.
+
+        "500":
+          description: Erreur interne du serveur.
+
+components:
+  securitySchemes:
+    authDirigeant:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "JWT avec vérification du rôle 'dirigeant'. L'utilisateur doit avoir ce rôle pour accéder aux routes."
+
+  schemas:
+    Event:
+      type: object
+      properties:
+        eventId:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Concert"
+        description:
+          type: string
+          example: "Un concert de jazz"
+        endAt:
+          type: string
+          format: date-time
+          example: "2025-03-31T23:59:59Z"
