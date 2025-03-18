@@ -162,6 +162,10 @@ const deleteFacebookId = async (facebokId) => {
 };
 
 
+const getUserRole = async (userId) => {
+    return await UsersModel.getRole(userId);
+};
+
 // ✅ Exportation des fonctions
 module.exports = {
     findUserByGoogleId,
@@ -174,5 +178,5 @@ module.exports = {
     mergeUserFacebookAndGoogleIds,
     deleteGoogleId,
     deleteFacebookId,
-
+    getUserRole,
 };

@@ -227,8 +227,8 @@ const updateAdherentId = async (user) => {
         WHERE user_id = ?;
     `;
     try {
-        console.log('⌛️ Ajout de la licence :', user.licence_id, 'à l\'utilisateur :', user.id_user);
-        const [result] = await pool.query(query, [user.licence_id, user.id_user]);
+        console.log('⌛️ Ajout de la licence :', user.numero_licence, 'à l\'utilisateur :', user.id_user);
+        const [result] = await pool.query(query, [user.numero_licence, user.id_user]);
         if (result.affectedRows > 0) {
             console.log(`✅ Numéro de licence mis à jour pour l'utilisateur ID: ${user.id_user}`);
         }
@@ -306,7 +306,29 @@ const deleteGoogleId = async (user) => {
         throw err;
     }
 };
+/**
+ * Récupère le rôle d'un utilisateur par son ID.
+ *
+ * @async
+ * @param {number} userId - L'ID de l'utilisateur.
+ * @returns {Promise<string|null>} - Le rôle de l'utilisateur ou `null` si aucun utilisateur n'est trouvé.
+ * @throws {Error} - Lance une erreur si la requête SQL échoue.
+ */
+const getRole = async (userId) => {
+    const query = 'SELECT role from users WHERE user_id = ?;';
+    try {
+        const [rows] = await pool.execute(query, [userId]);
+        if (rows.length > 0) {
+            return rows[0].role;
+        } else {
+            return null;
+        }
 
+    } catch (err) {
+        console.error('❌ Erreur lors de la récupération du role l’utilisateur:', err);
+        throw err;
+    }
+};
 
 
 module.exports = {
@@ -322,4 +344,5 @@ module.exports = {
     deleteUserById,
     deleteFacebookId,
     deleteGoogleId,
+    getRole,
 };
