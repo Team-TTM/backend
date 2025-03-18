@@ -1,21 +1,21 @@
-openapi: 3.0.3
+openapi: 3.1.0
 info:
   title: Event Service API
   description: API de gestion des événements avec authentification et contrôle des rôles.
   version: 1.0.0
 
 servers:
-  - url: http://localhost:3000/api
+  - url: http://localhost:3000
     description: Serveur local de développement
 
 paths:
-  /events:
+  /api/events:
     get:
       summary: Récupérer tous les événements
       description: Retourne la liste de tous les événements enregistrés.
       operationId: getAllEvents
       security:
-        - authDirigeant: []  # Middleware d'authentification + vérification du rôle 'dirigeant'
+        - authUser: [ ]  # Middleware d'authentification + vérification du rôle 'dirigeant'
       responses:
         "200":
           description: Liste des événements récupérée avec succès.
@@ -43,10 +43,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Event"
+              $ref: "#/components/schemas/EventCreate"
       responses:
         "201":
           description: Événement créé avec succès.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Event"
         "400":
           description: Données invalides envoyées.
         "401":
@@ -55,14 +59,43 @@ paths:
           description: Accès interdit (Rôle insuffisant).
         "500":
           description: Erreur interne du serveur.
+    put:
+      summary: Mettre à jour un événement
+      description: Met à jour un événement existant.
+      operationId: updateEvent
+      security:
+        - authDirigeant: []  # Authentification + rôle dirigeant requis
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EventEdit"
+      responses:
+        "204":
+          description: Événement mis à jour avec succès.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Event"
+        "400":
+          description: Données invalides envoyées.
+        "401":
+          description: Non autorisé (JWT manquant ou invalide).
+        "403":
+          description: Accès interdit (Rôle insuffisant).
+        "404":
+          description: Événement non trouvé.
+        "500":
+          description: Erreur interne du serveur.
 
-  /events/{eventId}:
+  /api/events/{eventId}:
     get:
       summary: Récupérer un événement par ID
       description: Retourne les détails d'un événement spécifique.
       operationId: getEvent
       security:
-        - authDirigeant: []  # Authentification + rôle dirigeant requis
+        - authUser: [ ]  # Authentification + rôle dirigeant requis
       parameters:
         - name: eventId
           in: path
@@ -85,40 +118,6 @@ paths:
           description: Événement non trouvé.
         "500":
           description: Erreur interne du serveur.
-
-    put:
-      summary: Mettre à jour un événement
-      description: Met à jour un événement existant.
-      operationId: updateEvent
-      security:
-        - authDirigeant: []  # Authentification + rôle dirigeant requis
-      parameters:
-        - name: eventId
-          in: path
-          required: true
-          description: ID de l'événement à mettre à jour.
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Event"
-      responses:
-        "204":
-          description: Événement mis à jour avec succès.
-        "400":
-          description: Données invalides envoyées.
-        "401":
-          description: Non autorisé (JWT manquant ou invalide).
-        "403":
-          description: Accès interdit (Rôle insuffisant).
-        "404":
-          description: Événement non trouvé.
-        "500":
-          description: Erreur interne du serveur.
-
     delete:
       summary: Supprimer un événement
       description: Supprime un événement de la base de données.
@@ -149,6 +148,12 @@ paths:
 
 components:
   securitySchemes:
+    authUser:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "Verifies si le token donné est valide"
+
     authDirigeant:
       type: http
       scheme: bearer
@@ -162,6 +167,48 @@ components:
         eventId:
           type: integer
           example: 1
+        dirigeantId:
+          type: integer
+          example: 4
+        name:
+          type: string
+          example: "Concert"
+        description:
+          type: string
+          example: "Un concert de jazz"
+        createdAT:
+          type: string
+          format: date
+          example: "2025-03-16"
+        endAt:
+          type: string
+          format: date
+          example: "2025-03-31"
+        participants:
+          type: array
+          items:
+            type: integer
+
+    EventCreate:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "bingo"
+        description:
+          type: string
+          example: ""
+        endAt:
+          type: string
+          format: date
+          example: "2025-03-31"
+
+    EventEdit:
+      type: object
+      properties:
+        eventId:
+          type: integer
+          example: 1
         name:
           type: string
           example: "Concert"
@@ -170,5 +217,5 @@ components:
           example: "Un concert de jazz"
         endAt:
           type: string
-          format: date-time
-          example: "2025-03-31T23:59:59Z"
+          format: date
+          example: "2025-03-31"

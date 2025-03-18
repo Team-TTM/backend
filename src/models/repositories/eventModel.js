@@ -25,15 +25,9 @@ const createEvent = async (event) => {
  * @throws {Error} - Lance une erreur si la requête SQL échoue.
  */
 const deleteEvent = async (eventId) => {
-    const query = 'SELECT * FROM events WHERE event_id = ?';
-    const [rows] = await pool.execute(query, [eventId]);
-    if (rows.length === 0) {
-        return false; // 204 : Pas d'événement trouvé
-    }
-    const event = Event.fromDataBase(rows[0]);
-    const query2 = 'DELETE FROM events WHERE event_id = ?;'; // Correction du "delete events"
-    await pool.execute(query2, [event.eventId]);
-    return true;
+    const query2 = 'DELETE FROM events WHERE event_id = ?;';
+    const [rows] = await pool.execute(query2, [eventId]);
+    return rows.length > 0;
 };
 
 /**

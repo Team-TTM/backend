@@ -9,5 +9,9 @@ router.post('/',authenticateJWT,authenticateDirigeant,eventController.createEven
 router.put('/',authenticateJWT,authenticateDirigeant,eventController.updateEvent);
 router.delete('/:eventId',authenticateJWT,authenticateDirigeant,eventController.deleteEvent);
 
+router.all('/{*splat}', (req, res) => {
+    return res.status(404).json({error: 'Route non trouvée'});
+});
+
 
 module.exports = router;
