@@ -15,12 +15,13 @@ const createEvent = async (event) => {
  * Met à jour un événement existant.
  *
  * @param {Event} event - L'objet Event contenant les nouvelles informations de l'événement.
- * @returns {Promise<boolean>} - Retourne true si la mise à jour a réussi, sinon false.
+ * @returns {Promise<null>} - Retourne true si la mise à jour a réussi, sinon false.
  * @throws {Error} - Lance une erreur si l'événement n'existe pas ou si la mise à jour échoue.
  */
 const updateEvent = async (event) => {
     if (!await eventModel.exist(event.eventId)) {
         throw new Error(`Aucun événement trouvé avec l'id ${event.eventId}`);
+        return false;
     }
     return await eventModel.updateEvent(event);
 };

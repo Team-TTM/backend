@@ -12,14 +12,20 @@ const createEvent = async (req, res) => {
     console.log('📌 [CONTROLLER] Création d\'un événement...');
     const data = req?.body?.event;
     const {userId} = req.auth;
+    let event;
     try {
         if (data === undefined) {
             console.error('Objet Event manquant dans la requête');
             return res.status(400).json({error: 'Objet Event manquant dans la requête',});
         }
-        const event = Event.createEvent(data,userId);
+        event = Event.createEvent(data,userId);
+    }catch(err) {
+        console.error(err);
+        return res.status(400).json(err.message);
+    }
+    try {
         const eventFetch = await eventService.createEvent(event);
-        return res.status(200).json({ eventFetch });
+        return res.status(201).json({ eventFetch });
     } catch (error) {
         console.error('❌ [CONTROLLER] Erreur lors de la création de l\'événement :', error);
         return res.status(500).json({
@@ -66,13 +72,19 @@ const updateEvent = async (req, res) => {
  */
 const deleteEvent = async (req, res) => {
     console.log('📌 [CONTROLLER] Suppression d\'un événement...');
+    let eventId;
+    try{
+        eventId = validateEventId(req.params?.eventId);
+    }catch(err) {
+        console.error(err);
+        return res.status(400).json(err.message);
+    }
     try {
-        const eventId = validateEventId(req.params?.eventId);
         const isDeleted = await eventService.deleteEvent(eventId);
         if (isDeleted) {
             return res.status(200).send();
         } else {
-            return res.status(204).send();
+            return res.status(404).send();
         }
     } catch (error) {
         console.error('❌ [CONTROLLER] Erreur lors de la suppression de l\'événement :', error);
@@ -91,15 +103,19 @@ const deleteEvent = async (req, res) => {
  */
 const getEvent = async (req, res) => {
     console.log('📌 [CONTROLLER] Récupération de l\'événement...');
+    let eventId;
+    try{
+        eventId = validateEventId(req.params?.eventId);
+    }catch(err) {
+        console.error(err);
+        return res.status(400).json(err.message);
+    }
     try {
-        const eventId = validateEventId(req.params?.eventId);
-
         const event = await eventService.getEvent(eventId);
-
         if (!event) {
-            return res.status(204).send();
+            return res.status(404).send();
         } else {
-            return res.status(200).json({ event });
+            return res.status(200).json({event});
         }
     } catch (error) {
         if (error.message === 'Événement non trouvé' || error.message === 'eventId est invalide') {
@@ -119,7 +135,7 @@ const getEvents = async (req, res) => {
         const events = await eventService.getAllEvents();
         if (events.length === 0) {
             console.log('⚠️ Aucun événement trouvé.');
-            return res.status(204).send(); // 204 : Pas d'événements trouvés
+            return res.status(404).send(); // 404 : Pas d'événements trouvés
         }
         console.log(`✅ ${events.length} événements récupérés avec succès.`);
         return res.status(200).json({ events });
