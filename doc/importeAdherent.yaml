@@ -8,7 +8,7 @@ servers:
     description: Serveur local de développement
 
 paths:
-  /api/importAdherent:
+  /api/import/adherent:
     post:
       summary: Importer des adhérents depuis un xlxs
       description: Retourne le nombre de ligne ajouter et modifier
