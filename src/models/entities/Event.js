@@ -157,8 +157,8 @@ class Event {
         if (!data?.description || typeof data?.description !== 'string') {
             throw new Error('Description manquante ou invalide');
         }
-
-        if (!data?.endAt || isNaN(new Date(data?.endAt).getTime())) {
+        const regex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!data?.endAt || !regex.test(data?.endAt)) {
             throw new Error('endAt manquante ou invalide');
         }
 

@@ -44,6 +44,7 @@ const createEvent = async (req, res) => {
 const updateEvent = async (req, res) => {
     const data = req?.body?.event;
     const {userId} = req.auth;
+    let event;
     try {
         if (data === undefined) {
             console.error('Objet Event manquant dans la requête');
@@ -51,8 +52,12 @@ const updateEvent = async (req, res) => {
                 error: 'Objet Event manquant dans la requête',
             });
         }
-        const event = Event.editEvent(data,userId);
-        console.log(event);
+        event = Event.editEvent(data, userId);
+    } catch (err) {
+        console.error(err);
+        return res.status(400).json(err.message);
+    }
+    try {
         const newEvent = await eventService.updateEvent(event);
         return res.status(200).json(newEvent);
     } catch (error) {
