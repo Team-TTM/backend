@@ -26,8 +26,9 @@ const createEvent = async (event) => {
  */
 const deleteEvent = async (eventId) => {
     const query2 = 'DELETE FROM events WHERE event_id = ?;';
-    const [rows] = await pool.execute(query2, [eventId]);
-    return rows.length > 0;
+    const result = await pool.execute(query2, [eventId]);
+    const [ResultSetHeader] = result;
+    return ResultSetHeader.affectedRows > 0;
 };
 
 /**
