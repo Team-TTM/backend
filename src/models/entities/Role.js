@@ -1,5 +1,5 @@
 const Role = Object.freeze({
-    DIRIGEANT: 'dirgeant',
+    DIRIGEANT: 'dirigeant',
     USER: 'user',
     ADMIN: 'admin',
 });

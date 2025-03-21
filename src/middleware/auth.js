@@ -45,7 +45,6 @@ const authenticateDirigeant = async (req, res, next) => {
     try {
         const userId = req.auth.userId;
         const role = await getUserRole(userId);
-        console.log(role);
         if (role === null) {
             return res.status(401).json({message: 'Utilisateur non trouvé'});
         }

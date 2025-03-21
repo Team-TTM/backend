@@ -67,68 +67,62 @@ const createAdherent = async (adherent) => {
  * Met à jour les informations d'un adhérent.
  * @async
  * @param {Adherent} adherent - L'objet Adherent contenant les informations à mettre à jour.
- * @returns {Promise} L'adhérent mis à jour.
+ * @returns {Promise<Boolean>} L'adhérent mis à jour.
  * @throws {Error} En cas d'erreur de mise à jour.
  */
 const updateAdherent = async (adherent) => {
-    const query = `
-        UPDATE adherents
-        SET prenom            = ?,
-            nom               = ?,
-            nom_usage         = ?,
-            date_naissance    = ?,
-            sexe              = ?,
-            profession        = ?,
-            principale        = ?,
-            details           = ?,
-            lieu_dit          = ?,
-            code_postale      = ?,
-            ville             = ?,
-            pays              = ?,
-            telephone         = ?,
-            mobile            = ?,
-            email             = ?,
-            urgency_telephone = ?,
-            type              = ?,
-            demi_tarif        = ?,
-            hors_club         = ?,
-            categorie         = ?,
-            annee_blanche     = ?,
-            pratique          = ?
-        WHERE licence_id = ?
-    `;
+    if (!adherent || !adherent.numeroLicence) {
+        throw new Error('L\'adhérent fourni est invalide.');
+    }
+
     try {
-        await pool.execute(query, [
-            adherent.prenom,
-            adherent.nom,
-            adherent.nomUsage,
-            adherent.dateNaissance,
-            adherent.sexe,
-            adherent.profession,
-            adherent.principale,
-            adherent.details,
-            adherent.lieuDit,
-            adherent.codePostal,
-            adherent.ville,
-            adherent.pays,
-            adherent.telephone,
-            adherent.mobile,
-            adherent.email,
-            adherent.urgenceTelephone,
-            adherent.type,
-            adherent.demiTarif,
-            adherent.horsClub,
-            adherent.categorie,
-            adherent.anneeBlanche,
-            adherent.pratique,
-            adherent.numeroLicence
-        ]);
+        const [currentAdherent] = await pool.execute('SELECT * FROM adherents WHERE licence_id = ?', [adherent.numeroLicence]);
+
+        if (currentAdherent.length === 0) {
+            throw new Error('Aucun adhérent trouvé avec cette licence.');
+        }
+
+        const updates = [];
+        const values = [];
+        const fieldsToUpdate = [
+            'prenom', 'nom', 'nom_usage', 'date_naissance', 'sexe', 'profession', 'principale', 'details',
+            'lieu_dit', 'code_postale', 'ville', 'pays', 'telephone', 'mobile', 'email', 'urgency_telephone',
+            'type', 'demi_tarif', 'hors_club', 'categorie', 'annee_blanche', 'pratique'
+        ];
+
+        fieldsToUpdate.forEach(field => {
+            const newValue = adherent[field];
+            const currentValue = currentAdherent[0][field];
+
+            if (newValue !== currentValue) {
+                updates.push(`${field} = ?`);
+                values.push(newValue ?? null); // Remplacer par null si la nouvelle valeur est undefined
+            }
+        });
+
+        // Si aucune valeur n'a été modifiée, ne pas effectuer de mise à jour
+        if (updates.length === 0) {
+            return false; // Aucune modification à effectuer
+        }
+
+        values.push(adherent.numeroLicence);
+
+        const query = `
+            UPDATE adherents
+            SET ${updates.join(', ')}
+            WHERE licence_id = ?
+              AND (${updates.join(' OR ')})
+        `;
+
+        const [result] = await pool.execute(query, values);
+
+        return result.affectedRows > 0;
+
     } catch (err) {
-        console.error('❌ Erreur lors de la mise à jour de l\'adhérant:', err, adherent);
+        console.error('❌ Erreur lors de la mise à jour de l\'adhérent:', err);
         throw err;
     }
 };
-
 
 /**
  * Vérifie si un adhérent existe en base de données.
@@ -172,7 +166,7 @@ const getAdherentDetails = async (numeroLicence) => {
     const values = [numeroLicence];
     try {
         const [rows] = await pool.execute(query, values);
-        console.log(rows);
+        // console.log(rows);
         return rows[0];
     } catch (err) {
         console.error('Erreur lors de la récupération des informations de l\'adhérent:', err);

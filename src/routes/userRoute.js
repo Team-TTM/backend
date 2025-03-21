@@ -24,17 +24,6 @@ router.post('/licence-check',authenticateJWT,authController.licenceSignInControl
 
 router.get('/getAllAdherents',authenticateJWT,adherentController.getAllAdherents);
 
-/**
- * @swagger
- * /events:
- *   get:
- *     summary: Récupère tous les événements
- *     responses:
- *       200:
- *         description: Liste des événements récupérés
- *       400:
- *         description: Erreur de requête
- */
 router.get('/adherent',authenticateJWT,adherentController.getAdherent);
 
 

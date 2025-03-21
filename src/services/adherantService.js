@@ -1,9 +1,13 @@
 const xlsx = require('xlsx');
 const AdherentsModel = require('../models/repositories/adherentModel');
 const Adherent = require('../models/entities/Adherent');
-const {insertLicenceSaisonAssociation} = require('../models/repositories/licenceSaisonAssociationModel');
+const {
+    insertLicenceSaisonAssociation,
+    saisonbyLicence
+} = require('../models/repositories/licenceSaisonAssociationModel');
 const {insertIfNotExists} = require('../models/repositories/saisonModel');
 const {findUserByUserId} = require('./userService');
+const {getSaisonPlusRecente} = require('../utils/saisonUtils');
 
 
 
@@ -98,20 +102,27 @@ const createAdherent = async (adherent) => {
 /**
  * Met à jour un adhérent existant dans la base de données.
  * @param {Adherent} adherent - Les nouvelles données de l'adhérent à mettre à jour.
- * @returns {Promise} - Une promesse indiquant le succès ou l'échec de la mise à jour.
+ * @returns {Promise<Boolean>} - Une promesse indiquant le succès ou l'échec de la mise à jour.
  */
 const updateAdherent = async (adherent) => {
-    const adherentData = await AdherentsModel.getAdherentDetails(adherent.numeroLicence);
-
-    const adherentFromDb = Adherent.fromDataBase(adherentData);
-
-    if (adherent.getDerniereSaison() > adherentFromDb.getDerniereSaison()) {
-        adherent.merge(adherentFromDb);
+    const saisonData = await saisonbyLicence(adherent.numeroLicence);
+    const saison = [];
+    saisonData.map(id => {
+        saison.push(id.saison_id);
+    });
+    if (!saison.includes(adherent.getDerniereSaison())) {
         await insertIfNotExists(adherent.getDerniereSaison());
-        await Promise.all([
-            insertLicenceSaisonAssociation(adherent.getDerniereSaison(), adherent.numeroLicence),
-            AdherentsModel.updateAdherent(adherent)
-        ]);
+        if (getSaisonPlusRecente(saison) < adherent.saison) {
+            await Promise.all([
+                insertLicenceSaisonAssociation(adherent.getDerniereSaison(), adherent.numeroLicence),
+                AdherentsModel.updateAdherent(adherent)
+            ]);
+        } else {
+            await insertLicenceSaisonAssociation(adherent.getDerniereSaison(), adherent.numeroLicence);
+        }
+        return true;
+    } else {
+        return false;
     }
 };
 
@@ -132,7 +143,8 @@ async function transformerDonneesEnAdherents(donnees) {
 /**
  * Importe les données à partir d'un fichier Excel et les insère dans la base de données.
  * @param {string} fichierXlsx - Le chemin vers le fichier Excel à importer.
- * @returns {Promise} - Une promesse qui se résout après l'importation complète des données.
+ * @returns {Promise<Object|null>} - Une promesse qui se résout après l'importation complète des données.
+ * @throws {Error}
  */
 async function importerXlsx(fichierXlsx) {
     try {
@@ -148,17 +160,20 @@ async function importerXlsx(fichierXlsx) {
         for (const adherent of adherents) {
             const exist = await checkAdherentLicence(adherent.numeroLicence);
             if (exist) {
-                await updateAdherent(adherent);
-                majCount++;
+                const isupdate = await updateAdherent(adherent);
+                if (isupdate) {
+                    majCount++;
+                }
             } else {
                 await createAdherent(adherent);
                 ajoutCount++;
             }
         }
-
         console.log(`✅ Importation terminée avec succès. ${ajoutCount} documents ajoutés, ${majCount} documents mis à jour.`);
+        return {add: ajoutCount, update: majCount};
     } catch (err) {
         console.error('❌ Erreur lors de l\'importation :', err.message);
+        return null;
     }
 }
 

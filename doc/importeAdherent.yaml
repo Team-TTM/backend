@@ -22,10 +22,10 @@ paths:
             schema:
               type: object
               properties:
-                file:
+                excel:
                   type: string
                   format: binary
-                  description: "Le fichier CSV contenant les données des adhérents à importer."
+                  description: Fichier Excel à télécharger
       responses:
         "200":
           description: Import terminé avec succès.
