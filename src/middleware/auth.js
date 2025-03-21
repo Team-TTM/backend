@@ -49,9 +49,9 @@ const authenticateDirigeant = async (req, res, next) => {
         if (role === null) {
             return res.status(401).json({message: 'Utilisateur non trouvé'});
         }
-        if (role === USER) {
-            return res.status(403).json({message: 'Vous n\'avez pas les droits pour accéder à cette ressource'});
-        }
+        // if (role === USER) {
+        //     return res.status(403).json({message: 'Vous n\'avez pas les droits pour accéder à cette ressource'});
+        // }
 
         next();
     } catch (error) {
