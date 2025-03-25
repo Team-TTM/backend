@@ -1,6 +1,6 @@
-const UsersModel = require('../models/repositories/usersModel');
 const User = require('../models/entities/User');
-const user = require('../models/entities/User');
+const UserCredentialModel = require('../models/repositories/userCredentialModel');
+const UsersModel = require('../models/repositories/usersModel');
 
 
 /**
@@ -46,6 +46,16 @@ const findUserByUserId = async (userId) => {
     return user;
 };
 
+
+/**
+ * Trouver un utilisateur par son ID utilisateur.
+ * @async
+ * @param {String} mail - L'identifiant de l'utilisateur.
+ * @returns {Promise<UserCredential|null>} L'utilisateur trouvé ou null s'il n'existe pas.
+ */
+const findByMail = async (mail) => {
+    return await UserCredentialModel.findByMail(mail);
+};
 /**
  * Recherche un utilisateur par son numéro de licence.
  * @async
@@ -72,6 +82,20 @@ const createUserFacebook = async (facebookID) => {
     const user = User.createFacebookUser(facebookID);
     user.id_user = await UsersModel.createFacebookUser(user);
     return user;
+};
+
+/**
+ * Créer les informations d'identification d'un utilisateur.
+ * @async
+ * @function createUserCredential
+ * @param {UserCredential} userCredential - L'objet contenant les informations d'identification de l'utilisateur.
+ * @returns {Promise<UserCredential>} Les informations d'identification de l'utilisateur créées.
+ */
+const createUserCredential = async (userCredential) => {
+    const user = await UsersModel.createUser();
+    userCredential.userId = user.id_user;
+    await UserCredentialModel.createUserCredential(userCredential);
+    return userCredential;
 };
 
 /**
@@ -162,8 +186,24 @@ const deleteFacebookId = async (facebokId) => {
 };
 
 
+/**
+ * Obtenir le rôle d'un utilisateur par son ID.
+ * @async
+ * @param {number} userId - L'identifiant de l'utilisateur.
+ * @returns {Promise<string>} Le rôle de l'utilisateur.
+ */
 const getUserRole = async (userId) => {
     return await UsersModel.getRole(userId);
+};
+
+/**
+ * Vérifier si un email existe déjà dans la base de données.
+ * @async
+ * @param {string} mail - L'email à vérifier.
+ * @returns {Promise<boolean>} `true` si l'email existe, sinon `false`.
+ */
+const checkIfEmailExists = async (mail) => {
+    return await UserCredentialModel.findByMail(mail) !== null;
 };
 
 // ✅ Exportation des fonctions
@@ -172,8 +212,11 @@ module.exports = {
     findUserByFacebookId,
     findUserByUserId,
     findUserByLicence,
+    findByMail,
     createUserFacebook,
     createUserGoogle,
+    createUserCredential,
+    checkIfEmailExists,
     updateUserLicence,
     mergeUserFacebookAndGoogleIds,
     deleteGoogleId,

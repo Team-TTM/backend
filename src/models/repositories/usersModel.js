@@ -2,6 +2,18 @@ const pool = require('../../config/database');
 const User = require('../entities/User');// Connexion à la base de données
 
 
+const createUser = async () => {
+    const query = 'INSERT INTO users () VALUES ()RETURNING *';
+    try {
+        const [rows] = await pool.query(query);
+        console.log('✅ Nouvelle utilisateur creer :', rows[0]);
+        return User.createUserFromDataBase(rows[0]);
+    } catch (err) {
+        console.log('❌ Erreur lors de la creation d\'utilisateur :', err);
+        throw err;
+    }
+};
+
 /**
  * Insère un utilisateur avec un Facebook ID.
  * @async
@@ -334,6 +346,7 @@ const getRole = async (userId) => {
 module.exports = {
     createFacebookUser,
     createGoogleUser,
+    createUser,
     findUserByFacebookId,
     findUserByGoogleId,
     findUserByLicence,

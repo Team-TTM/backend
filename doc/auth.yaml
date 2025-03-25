@@ -1,0 +1,75 @@
+openapi: 3.0.0
+info:
+  title: API d'Authentification
+  description: Documentation de l'API pour l'authentification des utilisateurs.
+  version: 1.0.0
+
+paths:
+  /api/auth/sign-up:
+    post:
+      summary: Inscription d'un nouvel utilisateur
+      description: Crée un compte utilisateur avec un email et un mot de passe.
+      tags:
+        - Authentification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - mail
+                - password
+              properties:
+                mail:
+                  type: string
+                  format: email
+                  example: "user@example.com"
+                password:
+                  type: string
+                  format: password
+                  example: "strongpassword123"
+      responses:
+        200:
+          description: Utilisateur créé avec succès, retourne un token d'authentification.
+        400:
+          description:
+            Erreur dans la requête (ex: données invalides).
+        409:
+          description: L'email est déjà utilisé.
+        500:
+          description: Erreur serveur.
+
+  /api/auth/sign-in:
+    post:
+      summary: Connexion utilisateur
+      description: Authentifie un utilisateur avec son email et son mot de passe.
+      tags:
+        - Authentification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - mail
+                - password
+              properties:
+                mail:
+                  type: string
+                  format: email
+                  example: "user@example.com"
+                password:
+                  type: string
+                  format: password
+                  example: "strongpassword123"
+      responses:
+        200:
+          description: Connexion réussie, retourne un token et un statut de vérification.
+        401:
+          description: Mot de passe incorrect.
+        422:
+          description: Aucun compte trouvé pour cet email.
+        500:
+          description: Erreur serveur.
