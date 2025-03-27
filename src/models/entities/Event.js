@@ -59,7 +59,6 @@ class Event {
      * @throws {Error} Si les données sont invalides.
      */
     static fromRequestData(data) {
-        console.log('Data serialize',data);
         if (!data?.eventId || typeof data?.eventId !== 'number') {
             throw new Error('eventId manquant ou invalide');
         }
