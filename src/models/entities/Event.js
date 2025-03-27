@@ -59,6 +59,7 @@ class Event {
      * @throws {Error} Si les données sont invalides.
      */
     static fromRequestData(data) {
+        console.log('Data serialize',data);
         if (!data?.eventId || typeof data?.eventId !== 'number') {
             throw new Error('eventId manquant ou invalide');
         }
@@ -138,7 +139,7 @@ class Event {
     /**
      * Crée un nouvel événement à partir des données de la requête.
      * @param {Object} data - Données de l'événement.
-     * @param {int} data.id - Le nom de l'événement.
+     * @param {int} data.eventId - Le nom de l'événement.
      * @param {string} data.name - Le nom de l'événement.
      * @param {string} data.description - La description de l'événement.
      * @param {string} data.endAt - La date de fin de l'événement (format ISO).
@@ -147,7 +148,7 @@ class Event {
      * @throws {Error} Si les données sont invalides.
      */
     static editEvent(data, userId) {
-        if (!data?.id || typeof data?.id !== 'number') {
+        if (!data?.eventId || typeof data?.eventId !== 'number') {
             throw new Error('Id de l\'événement manquant ou invalide');
         }
         if (!data?.name || typeof data?.name !== 'string') {
@@ -163,7 +164,7 @@ class Event {
         }
 
         return new Event(
-            data.id,
+            data.eventId,
             userId,
             data.name,
             data.description,
