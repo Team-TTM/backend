@@ -48,9 +48,9 @@ const findUserByUserId = async (userId) => {
 
 
 /**
- * Trouver un utilisateur par son ID utilisateur.
+ * Trouver un utilisateur credential par son mail utilisateur.
  * @async
- * @param {String} mail - L'identifiant de l'utilisateur.
+ * @param {String} mail - Le mail de l'utilisateur.
  * @returns {Promise<UserCredential|null>} L'utilisateur trouvé ou null s'il n'existe pas.
  */
 const findByMail = async (mail) => {
@@ -72,6 +72,16 @@ const findUserByLicence = async (numberLicence) => {
 };
 
 /**
+ * Trouver un utilisateur par son ID utilisateur.
+ * @async
+ * @param {Number} userId - L'identifiant de l'utilisateur.
+ * @returns {Promise<UserCredential|null>} L'utilisateur trouvé ou null s'il n'existe pas.
+ */
+const findUserCredentialById = async (userId) => {
+    return await UserCredentialModel.findById(userId);
+};
+
+/**
  * Créer un utilisateur avec un Facebook ID.
  * @async
  * @param {string} facebookID - L'identifiant Facebook de l'utilisateur.
@@ -84,6 +94,10 @@ const createUserFacebook = async (facebookID) => {
     return user;
 };
 
+const createUserLicence = async (licence) => {
+    return UsersModel.createUserLicence(licence);
+};
+
 /**
  * Créer les informations d'identification d'un utilisateur.
  * @async
@@ -92,10 +106,7 @@ const createUserFacebook = async (facebookID) => {
  * @returns {Promise<UserCredential>} Les informations d'identification de l'utilisateur créées.
  */
 const createUserCredential = async (userCredential) => {
-    const user = await UsersModel.createUser();
-    userCredential.userId = user.id_user;
-    await UserCredentialModel.createUserCredential(userCredential);
-    return userCredential;
+    await UserCredentialModel.create(userCredential);
 };
 
 /**
@@ -212,8 +223,10 @@ module.exports = {
     findUserByFacebookId,
     findUserByUserId,
     findUserByLicence,
+    findUserCredentialById,
     findByMail,
     createUserFacebook,
+    createUserLicence,
     createUserGoogle,
     createUserCredential,
     checkIfEmailExists,

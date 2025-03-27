@@ -6,6 +6,7 @@ const adherentController = require('../controllers/adherentController');
 const path = require('path');
 const userController = require('../controllers/userController');
 const {authenticateJWT} = require('../middleware/auth');
+const checkoutLicence = require('../middleware/checkoutLicence');
 
 
 router.get('/auth/google', passport.authenticate('google'));
@@ -20,7 +21,7 @@ router.get('/auth/facebook', passport.authenticate('facebook'));
 
 router.get('/auth/facebook/callback', passport.authenticate('facebook', {session: false}),authController.facebookAuthController);
 
-router.post('/licence-check',authenticateJWT,authController.licenceSignInController);
+router.post('/licence-check', authenticateJWT, checkoutLicence, authController.licenceSignInController);
 
 router.get('/getAllAdherents',authenticateJWT,adherentController.getAllAdherents);
 

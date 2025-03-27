@@ -30,14 +30,17 @@ class UserCredential {
      */
     static fromRequestData(data) {
         if (!data) {
-            throw new Error('data manquant ou invalide');
+            throw new Error('Les données de la requête sont manquantes ou invalides');
         }
-        if (!data?.mail || !regexMail.test(data?.mail)) {
-            throw new Error('mail manquant ou invalide');
+
+        if (!data.mail || !regexMail.test(data.mail)) {
+            throw new Error('L\'email est manquant ou invalide');
         }
-        if (!data?.password || !regexPassword.test(data.password)) {
-            throw new Error('mot de passe manquant ou invalide');
+
+        if (!data.password || !regexPassword.test(data.password)) {
+            throw new Error('Le mot de passe est manquant ou invalide');
         }
+
         return new UserCredential(null, data.mail, data.password);
     }
 

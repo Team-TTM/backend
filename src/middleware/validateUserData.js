@@ -1,5 +1,6 @@
 const {fromRequestData} = require('../models/entities/UserCredential');
 
+// eslint-disable-next-line consistent-return
 const validateUserCredentialData = (req, res, next) => {
     try {
         const data = req.body;
@@ -10,7 +11,7 @@ const validateUserCredentialData = (req, res, next) => {
         next();
     } catch (err) {
         console.error(err.message);
-        return res.status(400).json({error: err.message});
+        return res.status(404).json({message: err.message});
     }
 };
 

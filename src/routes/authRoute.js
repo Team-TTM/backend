@@ -3,9 +3,10 @@ const router = express.Router();
 const path = require('path');
 const {signUpController, signInController} = require('../controllers/authController');
 const validateUserCredentialData = require('../middleware/validateUserData');
+const checkoutLicence = require('../middleware/checkoutLicence');
 
 
-router.post('/sign-up', validateUserCredentialData, signUpController);
+router.post('/sign-up', validateUserCredentialData, checkoutLicence, signUpController);
 
 router.post('/sign-in', validateUserCredentialData, signInController);
 
