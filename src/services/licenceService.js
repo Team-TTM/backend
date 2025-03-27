@@ -11,11 +11,11 @@ const userService = require('./userService');
 const processLicenceSignIn = async (userId, licence) => {
     let updatedUser;
     let message;
+    const user = await userService.findUserByUserId(userId);
+    if (!user) {
+        throw new Error('Utilisateur non trouvé.');
+    }
     try {
-        const user = await userService.findUserByUserId(userId);
-        if (!user) {
-            throw new Error('Utilisateur non trouvé.');
-        }
         const existingUser = await userService.findUserByLicence(licence);
         if (existingUser) {
 
