@@ -1,5 +1,4 @@
 const userService = require('./userService');
-const {checkAdherentLicence} = require('./adherantService');
 
 /**
  * Vérifie et associe une licence à un utilisateur.
@@ -10,19 +9,13 @@ const {checkAdherentLicence} = require('./adherantService');
  * @throws {Error} Si la licence est invalide ou si une erreur survient.
  */
 const processLicenceSignIn = async (userId, licence) => {
-    const isLicenceValid = await checkAdherentLicence(licence);
     let updatedUser;
     let message;
-
+    const user = await userService.findUserByUserId(userId);
+    if (!user) {
+        throw new Error('Utilisateur non trouvé.');
+    }
     try {
-        if (!isLicenceValid) {
-            throw new Error(`Licence ${licence} introuvable.`);
-        }
-
-        const user = await userService.findUserByUserId(userId);
-        if (!user) {
-            throw new Error('Utilisateur non trouvé.');
-        }
         const existingUser = await userService.findUserByLicence(licence);
         if (existingUser) {
 

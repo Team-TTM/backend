@@ -10,6 +10,7 @@ const usersRouter = require('./src/routes/userRoute');
 const assetsRouter = require('./src/routes/assets');
 const eventRouter = require('./src/routes/eventRoute');
 const importRouter = require('./src/routes/importRoute');
+const authRouter = require('./src/routes/authRoute');
 
 // Middleware
 app.use(morganLogger); // Utilisation de Morgan pour logger les requêtes HTTP
@@ -22,6 +23,7 @@ app.use('/users', usersRouter);
 app.use('/assets', assetsRouter);
 app.use('/api/events', eventRouter);
 app.use('/api/import', importRouter);
+app.use('/api/auth', authRouter);
 
 // Gestion des erreurs 404
 app.use((req, res, next) => {

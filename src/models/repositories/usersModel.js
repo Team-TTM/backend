@@ -3,6 +3,26 @@ const User = require('../entities/User');// Connexion à la base de données
 
 
 /**
+ * Créer un utilisateur avec un numéro de licence.
+ * @async
+ * @param {string} licence - Le numéro de licence de l'utilisateur.
+ * @returns {Promise<number>} L'ID de l'utilisateur créé.
+ * @throws {Error} En cas d'erreur lors de la création de l'utilisateur.
+ */
+const createUserLicence = async (licence) => {
+    const query = 'INSERT INTO users (licence_id) VALUES (?) RETURNING user_id';
+    try {
+        const [rows] = await pool.query(query, [licence]);
+        const userId = rows[0].user_id;
+        console.log('✅ Nouvelle utilisateur créé :', userId);
+        return userId;
+    } catch (err) {
+        console.log('❌ Erreur lors de la création d\'utilisateur :', err);
+        throw err;
+    }
+};
+
+/**
  * Insère un utilisateur avec un Facebook ID.
  * @async
  * @param {User} user - L'utilisateur a inséré avec un ID Facebook.
@@ -334,6 +354,7 @@ const getRole = async (userId) => {
 module.exports = {
     createFacebookUser,
     createGoogleUser,
+    createUserLicence,
     findUserByFacebookId,
     findUserByGoogleId,
     findUserByLicence,
