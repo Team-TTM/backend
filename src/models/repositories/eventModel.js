@@ -1,5 +1,6 @@
 const pool = require('../../config/database');
 const Event = require('../entities/Event');
+const Participant = require('../entities/Participant');
 /**
  * Crée un nouvel événement dans la base de données.
  *
@@ -88,19 +89,6 @@ const getEvent = async (eventId) => {
         console.log('⚠️ Aucun événement trouvé pour cet ID.');
         return null;
     }
-
-    /*    const query2 = `SELECT  a.prenom, a.nom, a.licence_id
-                    FROM adherents a
-                             JOIN users u ON u.licence_id = a.licence_id
-                             JOIN events_users eu ON u.user_id = eu.user_id
-                             JOIN events e ON e.event_id = eu.event_id
-                    WHERE e.event_id = ?;`;
-    const result = await pool.execute(query2, [event.eventId]);
-
-    result[0].forEach(row => {
-        const adherent = Adherent.fromDataBase(row);
-        event.addParticipant(adherent);
-    });*/
     return Event.fromDataBase(rows[0]);
 };
 
@@ -137,4 +125,43 @@ const exist = async (eventId) => {
     return rows.length > 0;
 };
 
-module.exports = { createEvent ,deleteEvent,getEvent,getAllEvents,updateEvent,exist};
+const subscribeEvent = async (eventId, userId) => {
+    const query = `
+        INSERT IGNORE INTO events_users (event_id, user_id)
+        VALUES (?, ?);`
+    ;
+    const [result] = await pool.execute(query, [eventId, userId]);
+    return result.affectedRows > 0;
+};
+const unsubscribeEvent = async (eventId, userId) => {
+    const query = `
+        DELETE
+        FROM events_users
+        WHERE event_id = ?
+          AND user_id = ?;`
+    ;
+    const [result] = await pool.execute(query, [eventId, userId]);
+    return result.affectedRows > 0;
+};
+const getParticipant = async (eventId) => {
+    const query = `
+        SELECT a.nom, a.prenom, a.licence_id
+        FROM adherents a
+                 JOIN users u ON a.licence_id = u.licence_id
+                 JOIN events_users eu ON u.user_id = eu.user_id
+        WHERE event_id = ?;`
+    ;
+    const [rows] = await pool.execute(query, [eventId]);
+    return Participant.fromDatabaseArray(rows);
+};
+module.exports = {
+    createEvent,
+    deleteEvent,
+    getEvent,
+    getAllEvents,
+    updateEvent,
+    exist,
+    subscribeEvent,
+    unsubscribeEvent,
+    getParticipant,
+};

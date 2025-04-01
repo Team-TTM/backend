@@ -11,9 +11,8 @@ const pool = require('../../config/database'); // Connexion à la base de donné
  */
 const insertIfNotExists = async (saison) => {
     const query = `
-        INSERT INTO saison (saison_id)
-        VALUES (?)
-        ON DUPLICATE KEY UPDATE saison_id = saison_id;
+        INSERT IGNORE INTO saison (saison_id)
+        VALUES (?);
     `;
     try {
         await pool.execute(query, [saison]);
