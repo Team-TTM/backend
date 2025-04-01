@@ -6,6 +6,7 @@ const adherentController = require('../controllers/adherentController');
 const path = require('path');
 const userController = require('../controllers/userController');
 const {authenticateJWT} = require('../middleware/auth');
+const checkoutLicence = require('../middleware/checkoutLicence');
 
 
 router.get('/auth/google', passport.authenticate('google'));
@@ -20,21 +21,10 @@ router.get('/auth/facebook', passport.authenticate('facebook'));
 
 router.get('/auth/facebook/callback', passport.authenticate('facebook', {session: false}),authController.facebookAuthController);
 
-router.post('/licence-check',authenticateJWT,authController.licenceSignInController);
+router.post('/licence-check', authenticateJWT, checkoutLicence, authController.licenceSignInController);
 
 router.get('/getAllAdherents',authenticateJWT,adherentController.getAllAdherents);
 
-/**
- * @swagger
- * /events:
- *   get:
- *     summary: Récupère tous les événements
- *     responses:
- *       200:
- *         description: Liste des événements récupérés
- *       400:
- *         description: Erreur de requête
- */
 router.get('/adherent',authenticateJWT,adherentController.getAdherent);
 
 

@@ -1,0 +1,156 @@
+openapi: 3.0.0
+info:
+  title: API d'Authentification
+  description: Documentation de l'API pour l'authentification des utilisateurs.
+  version: 1.0.0
+
+paths:
+  /api/auth/sign-up:
+    post:
+      summary: Inscription d'un nouvel utilisateur
+      description: Crée un compte utilisateur avec un email, un mot de passe et un numéro de Licence.
+      tags:
+        - Authentification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - mail
+                - password
+              properties:
+                mail:
+                  type: string
+                  format: email
+                  example: "user@example.com"
+                password:
+                  type: string
+                  format: password
+                  example: "strongpassword123"
+                licence:
+                  type: string
+                  format: string
+                  example: "C4232DDFSF432FR"
+      responses:
+        200:
+          description: Utilisateur créé avec succès, retourne un token d'authentification dans l'en-tête.
+          headers:
+            Authorization:
+              schema:
+                type: string
+                example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        400:
+          description: Erreur dans la requête (données invalides).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Le body est vide"
+        404:
+          description: La licence n'existe pas .
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Licence C4232DDFSF432FR est introuvable."
+        409:
+          description: L'email ou le numéro de licence est déjà utilisé.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Cet email est déjà associé à un autre compte"
+        500:
+          description: Erreur serveur.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Une erreur inattendue est survenue"
+  /api/auth/sign-in:
+    post:
+      summary: Connexion d'un utilisateur
+      description: Authentifie un utilisateur avec son email et son mot de passe.
+      tags:
+        - Authentification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - mail
+                - password
+              properties:
+                mail:
+                  type: string
+                  format: email
+                  example: "user@example.com"
+                password:
+                  type: string
+                  example: "strongpassword123"
+
+      responses:
+        200:
+          description: Connexion réussie, retourne un token d'authentification dans l'en-tête.
+          headers:
+            Authorization:
+              schema:
+                type: string
+                example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        400:
+          description: Erreur dans la requête (données invalides).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Le body est vide"
+        401:
+          description: Mot de passe incorrect.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Mot de passe incorrect"
+        422:
+          description: Aucun compte associé à cet email.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Aucun compte associé à cet email"
+        500:
+          description: Erreur serveur.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Une erreur inattendue est survenue"
+

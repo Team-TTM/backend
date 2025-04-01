@@ -1,0 +1,57 @@
+openapi: 3.1.0
+info:
+  title: import adherent
+  description: API de gestion des import adherent
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+    description: Serveur local de développement
+
+paths:
+  /api/import/adherent:
+    post:
+      summary: Importer des adhérents depuis un xlxs
+      description: Retourne le nombre de ligne ajouter et modifier
+      operationId: importAdherents
+      security:
+        - authDirigeant: [ ]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                excel:
+                  type: string
+                  format: binary
+                  description: Fichier Excel à télécharger
+      responses:
+        "200":
+          description: Import terminé avec succès.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  add:
+                    type: integer
+                    example: 15
+                  update:
+                    type: integer
+                    example: 34
+        "400":
+          description: Erreur de format ou données invalides.
+        "401":
+          description: Non autorisé (JWT manquant ou invalide)
+        "500":
+          description: Erreur interne du serveur.
+security:
+  - authDirigeant: [ ]
+components:
+  securitySchemes:
+    authDirigeant:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "JWT avec vérification du rôle 'dirigeant'. L'utilisateur doit avoir ce rôle pour accéder aux routes."
