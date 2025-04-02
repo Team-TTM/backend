@@ -146,6 +146,10 @@ const subscribeEvent = async (req, res) => {
         const eventId = req.params.eventId;
         const userId = req.auth.userId;
         const isSubsribe = await eventService.subscribeEvent(eventId, userId);
+        const event = await eventService.getEvent(eventId);
+        if (!event.participants.length >= event.nombreMax) {
+            return res.status(400).send({error: 'La limite de participant a cette événement a était attient'});
+        }
         if (isSubsribe) {
             return res.status(200).send();
         } else {
