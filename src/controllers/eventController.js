@@ -21,7 +21,7 @@ const createEvent = async (req, res) => {
         event = Event.createEvent(data,userId);
     }catch(err) {
         console.error(err);
-        return res.status(400).json(err.message);
+        return res.status(400).json({error: err.message});
     }
     try {
         const eventFetch = await eventService.createEvent(event);
