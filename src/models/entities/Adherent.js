@@ -139,7 +139,7 @@ class Adherent {
     static fromDataBase(adherentData) {
         return new Adherent(
             adherentData.licence_id,
-            calculetStatut(getSaisonPlusRecente(adherentData.saisons)),
+            calculetStatut(adherentData.saisons),
             adherentData.type || null,
             adherentData.demi_tarif || false,
             adherentData.hors_club || false,
