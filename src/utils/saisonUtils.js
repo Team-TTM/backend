@@ -42,18 +42,17 @@ const getSaisonPlusRecente = (saisons) => {
         const anneeB = parseInt(b.split('/')[0], 10);
         return anneeB - anneeA; // Tri décroissant
     });
-
     return saisons[0]; // Retourne la première (plus récente)
 };
 
 /**
  * Calcule le statut de la saison donnée.
- * @param {string} saison - La saison a vérifié sous le format 'YYYY/YYYY+1'.
+ * @param {string[]} saison - La saison a vérifié sous le format 'YYYY/YYYY+1'.
  * @returns {boolean} - Vrai si la saison est la saison actuelle, faux sinon.
  */
 const calculetStatut = (saison) => {
-    return saison === calculerSaison(new Date());
-    // return saison === calculerSaison(convertirDate('22/11/2026'))
+    const saisonNow = calculerSaison(new Date());
+    return saison.includes(saisonNow);
 
 };
 
