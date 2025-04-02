@@ -10,11 +10,20 @@ const Participant = require('../entities/Participant');
  */
 const createEvent = async (event) => {
     const query = `
-        INSERT INTO events (dirigeant_id, name, description, created_at, end_at)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO events (dirigeant_id, name, description, created_at, end_at, type, nombre_max, lieu)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         RETURNING *;
     `;
-    const [rows] = await pool.query(query, [event.dirigeantId, event.name, event.description, event.createdAT, event.endAt]);
+    const values = [
+        event.dirigeantId,
+        event.name,
+        event.description,
+        event.createdAT,
+        event.endAt,
+        event.type,
+        event.nombreMax,
+        event.lieu];
+    const [rows] = await pool.query(query, values);
     return Event.fromDataBase(rows[0]);
 };
 
@@ -50,20 +59,29 @@ const updateEvent = async (event) => {
             SET
                 name = ?,
                 description = ?,
-                end_at = ?
+                end_at     = ?,
+                type       = ?,
+                nombre_max = ?,
+                lieu       = ?
             WHERE
                 event_id = ?
-              AND (name != ? OR description != ? OR end_at != ?);
+              AND (name != ? OR description != ? OR end_at != ? OR type != ? OR nombre_max != ? OR lieu != ?);
         `;
 
         const values = [
             event.name ?? null,
             event.description ?? null,
             event.endAt ?? null,
+            event.type ?? null,
+            event.nombreMax ?? null,
+            event.lieu ?? null,
             event.eventId ?? null,
             event.name ?? null,
             event.description ?? null,
-            event.endAt ?? null
+            event.endAt ?? null,
+            event.type ?? null,
+            event.nombreMax ?? null,
+            event.lieu ?? null,
         ];
 
         const [result] = await pool.execute(query, values);

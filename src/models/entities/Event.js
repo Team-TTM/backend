@@ -11,8 +11,11 @@ class Event {
      * @param {string} createdAT - La date de création de l'événement (format ISO).
      * @param {string} endAt - La date de fin de l'événement (format ISO).
      * @param {Array} participants - Liste des participants à l'événement.
+     * @param {String} type - type de l'événement.
+     * @param {int} nombreMax - Le nombre de participants maximum a l'événement.
+     * @param {String} lieu - Lieux de l'événement.
      */
-    constructor(eventId, dirigeantId, name, description, createdAT, endAt, participants) {
+    constructor(eventId, dirigeantId, name, description, createdAT, endAt, participants, type, nombreMax, lieu) {
         this.eventId = eventId;
         this.dirigeantId = dirigeantId;
         this.name = name;
@@ -20,17 +23,23 @@ class Event {
         this.createdAT = createdAT;
         this.endAt = endAt;
         this.participants = participants;
+        this.type = type;
+        this.nombreMax = nombreMax;
+        this.lieu = lieu;
     }
 
     /**
      * Crée un événement à partir des données de la base de données.
      * @param {Object} eventData - Données récupérées depuis la base de données.
      * @param {number} eventData.event_id - L'ID de l'événement.
-     * @param {number} eventData.dirigeant_id - L'ID du dirigeant associé.
+     * @param {number} eventData.dirigeant_id - L'ID du dirigeant associé à l'événement.
      * @param {string} eventData.name - Le nom de l'événement.
      * @param {string} eventData.description - La description de l'événement.
      * @param {string} eventData.created_at - La date de création de l'événement (format ISO).
      * @param {string} eventData.end_at - La date de fin de l'événement (format ISO).
+     * @param {string} eventData.type - Le type de l'événement.
+     * @param {number} eventData.nombre_max - Le nombre maximum de participants.
+     * @param {string} eventData.lieux - Le lieu de l'événement.
      * @returns {Event} L'instance de l'événement.
      */
     static fromDataBase(eventData) {
@@ -41,63 +50,12 @@ class Event {
             eventData.description,
             eventData.created_at,
             eventData.end_at,
-            []
+            [],
+            eventData.type,
+            eventData.nombre_max,
+            eventData.lieux
         );
     }
-
-    /**
-     * Crée un événement à partir des données de la requête.
-     * @param {Object} data - Données de l'événement.
-     * @param {number} data.eventId - L'ID de l'événement.
-     * @param {number} data.dirigeantId - L'ID du dirigeant associé.
-     * @param {string} data.name - Le nom de l'événement.
-     * @param {string} data.description - La description de l'événement.
-     * @param {string} data.createdAT - La date de création de l'événement (format ISO).
-     * @param {string} data.endAt - La date de fin de l'événement (format ISO).
-     * @param {Array} data.participants - Liste des participants à l'événement.
-     * @returns {Event} L'instance de l'événement.
-     * @throws {Error} Si les données sont invalides.
-     */
-    static fromRequestData(data) {
-        if (!data?.eventId || typeof data?.eventId !== 'number') {
-            throw new Error('eventId manquant ou invalide');
-        }
-
-        if (!data?.dirigeantId || typeof data?.dirigeantId !== 'number') {
-            throw new Error('dirigeantId manquant ou invalide');
-        }
-
-        if (!data?.name || typeof data?.name !== 'string') {
-            throw new Error('Nom de l\'événement manquant ou invalide');
-        }
-
-        if (!data?.description || typeof data?.description !== 'string') {
-            throw new Error('Description manquante ou invalide');
-        }
-
-        if (!data?.createdAT || isNaN(new Date(data?.createdAT).getTime())) {
-            throw new Error('createdAT manquante ou invalide');
-        }
-
-        if (!data?.endAt || isNaN(new Date(data?.endAt).getTime())) {
-            throw new Error('endAt manquante ou invalide');
-        }
-
-        if (!Array.isArray(data?.participants)) {
-            throw new Error('participants manquants ou invalides');
-        }
-
-        return new Event(
-            data.eventId,
-            data.dirigeantId,
-            data.name,
-            data.description,
-            data.createdAT,
-            data.endAt,
-            data.participants
-        );
-    }
-
     /**
      * Crée un nouvel événement à partir des données de la requête.
      * @param {Object} data - Données de l'événement.
@@ -123,6 +81,15 @@ class Event {
         if (!data?.endAt || isNaN(new Date(data?.endAt).getTime())) {
             throw new Error('endAt manquante ou invalide');
         }
+        if (!data?.type || typeof data?.type !== 'string') {
+            throw new Error('type manquant ou invalide');
+        }
+        if (!data?.nombreMax || typeof data?.nombreMax !== 'number') {
+            throw new Error('nombreMax manquant ou invalide');
+        }
+        if (!data?.lieu || typeof data?.lieu !== 'string') {
+            throw new Error('lieu manquant ou invalide');
+        }
 
         return new Event(
             null,
@@ -131,7 +98,10 @@ class Event {
             data.description,
             formattedDate,
             data.endAt,
-            null
+            null,
+            data.type,
+            data.nombreMax,
+            data.lieu
         );
     }
 
@@ -161,6 +131,15 @@ class Event {
         if (!data?.endAt || !regex.test(data?.endAt)) {
             throw new Error('endAt manquante ou invalide');
         }
+        if (!data?.type || typeof data?.type !== 'string') {
+            throw new Error('type manquant ou invalide');
+        }
+        if (!data.nombre_max || typeof data.nombre_max !== 'number') {
+            throw new Error('nombreMax manquant ou invalide');
+        }
+        if (!data.lieu || typeof data.lieu !== 'string') {
+            throw new Error('lieu manquant ou invalide');
+        }
 
         return new Event(
             data.eventId,
@@ -169,16 +148,11 @@ class Event {
             data.description,
             null,
             data.endAt,
-            null
+            null,
+            data.type,
+            data.nombre_max,
+            data.lieu
         );
-    }
-
-    /**
-     * Ajoute un participant à l'événement.
-     * @param {Object} participant - Le participant à ajouter.
-     */
-    addParticipant(participant) {
-        this.participants.push(participant);
     }
 }
 
