@@ -110,7 +110,7 @@ const signInController = async (req, res) => {
                 const token = createToken(userCredentialFetch.userId);
                 const role = await userService.getUserRole(userCredentialFetch.userId);
                 res.setHeader('Authorization', `Bearer ${token}`);
-                return res.status(200).json(role);
+                return res.status(200).json({role: role});
             } else {
                 return res.status(401).json({error: 'Mot de passe incorrecte'});
             }
@@ -162,7 +162,7 @@ const signUpController = async (req, res) => {
         const role = await userService.getUserRole(newUserCredential.userId);
         const token = createToken(newUserCredential.userId);
         res.setHeader('Authorization', `Bearer ${token}`);
-        return res.status(201).json(role);
+        return res.status(201).json({role: role});
     } catch (err) {
         console.error(err);
         return res.status(500).json({error: 'Une erreur inattendue est survenue'});
