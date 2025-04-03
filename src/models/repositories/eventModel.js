@@ -1,5 +1,6 @@
 const pool = require('../../config/database');
 const Event = require('../entities/Event');
+const Participant = require('../entities/Participant');
 /**
  * Crée un nouvel événement dans la base de données.
  *
@@ -9,11 +10,20 @@ const Event = require('../entities/Event');
  */
 const createEvent = async (event) => {
     const query = `
-        INSERT INTO events (dirigeant_id, name, description, created_at, end_at)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO events (dirigeant_id, name, description, created_at, end_at, type, nombre_max, lieu)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         RETURNING *;
     `;
-    const [rows] = await pool.query(query, [event.dirigeantId, event.name, event.description, event.createdAT, event.endAt]);
+    const values = [
+        event.dirigeantId,
+        event.name,
+        event.description,
+        event.createdAT,
+        event.endAt,
+        event.type,
+        event.nombreMax,
+        event.lieu];
+    const [rows] = await pool.query(query, values);
     return Event.fromDataBase(rows[0]);
 };
 
@@ -49,20 +59,29 @@ const updateEvent = async (event) => {
             SET
                 name = ?,
                 description = ?,
-                end_at = ?
+                end_at     = ?,
+                type       = ?,
+                nombre_max = ?,
+                lieu       = ?
             WHERE
                 event_id = ?
-              AND (name != ? OR description != ? OR end_at != ?);
+              AND (name != ? OR description != ? OR end_at != ? OR type != ? OR nombre_max != ? OR lieu != ?);
         `;
 
         const values = [
             event.name ?? null,
             event.description ?? null,
             event.endAt ?? null,
+            event.type ?? null,
+            event.nombreMax ?? null,
+            event.lieu ?? null,
             event.eventId ?? null,
             event.name ?? null,
             event.description ?? null,
-            event.endAt ?? null
+            event.endAt ?? null,
+            event.type ?? null,
+            event.nombreMax ?? null,
+            event.lieu ?? null,
         ];
 
         const [result] = await pool.execute(query, values);
@@ -88,19 +107,6 @@ const getEvent = async (eventId) => {
         console.log('⚠️ Aucun événement trouvé pour cet ID.');
         return null;
     }
-
-    /*    const query2 = `SELECT  a.prenom, a.nom, a.licence_id
-                    FROM adherents a
-                             JOIN users u ON u.licence_id = a.licence_id
-                             JOIN events_users eu ON u.user_id = eu.user_id
-                             JOIN events e ON e.event_id = eu.event_id
-                    WHERE e.event_id = ?;`;
-    const result = await pool.execute(query2, [event.eventId]);
-
-    result[0].forEach(row => {
-        const adherent = Adherent.fromDataBase(row);
-        event.addParticipant(adherent);
-    });*/
     return Event.fromDataBase(rows[0]);
 };
 
@@ -137,4 +143,55 @@ const exist = async (eventId) => {
     return rows.length > 0;
 };
 
-module.exports = { createEvent ,deleteEvent,getEvent,getAllEvents,updateEvent,exist};
+const subscribeEvent = async (eventId, userId) => {
+    const query = `
+        INSERT IGNORE INTO events_users (event_id, user_id)
+        VALUES (?, ?);`
+    ;
+    const [result] = await pool.execute(query, [eventId, userId]);
+    return result.affectedRows > 0;
+};
+const unsubscribeEvent = async (eventId, userId) => {
+    const query = `
+        DELETE
+        FROM events_users
+        WHERE event_id = ?
+          AND user_id = ?;`
+    ;
+    const [result] = await pool.execute(query, [eventId, userId]);
+    return result.affectedRows > 0;
+};
+const getParticipant = async (eventId) => {
+    const query = `
+        SELECT a.nom, a.prenom, a.licence_id
+        FROM adherents a
+                 JOIN users u ON a.licence_id = u.licence_id
+                 JOIN events_users eu ON u.user_id = eu.user_id
+        WHERE event_id = ?;`
+    ;
+    const [rows] = await pool.execute(query, [eventId]);
+    return Participant.fromDatabaseArray(rows);
+};
+
+const getSubscribeEvent = async (userId) => {
+    const query = `
+        SELECT e.*
+        FROM events e
+                 JOIN events_users eu ON eu.event_id = e.event_id
+        WHERE user_id = ?;`
+    ;
+    const [rows] = await pool.execute(query, [userId]);
+    return Event.fromDataBaseArray(rows);
+};
+module.exports = {
+    createEvent,
+    deleteEvent,
+    getEvent,
+    getAllEvents,
+    updateEvent,
+    exist,
+    subscribeEvent,
+    unsubscribeEvent,
+    getParticipant,
+    getSubscribeEvent
+};

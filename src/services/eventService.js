@@ -44,7 +44,16 @@ const deleteEvent = async (eventId) =>{
  * @throws {Error} - Lance une erreur si la récupération échoue.
  */
 const getEvent = async (eventId) => {
-    return await eventModel.getEvent(eventId);
+    const [event, participants] = await Promise.all([
+        eventModel.getEvent(eventId),
+        eventModel.getParticipant(eventId)
+    ]);
+    if (!event) {
+        return null;
+    } else {
+        event.participants = participants;
+        return event;
+    }
 };
 
 /**
@@ -57,6 +66,16 @@ const getAllEvents = async () => {
     return await eventModel.getAllEvents();
 };
 
+const subscribeEvent = async (eventId, userId) => {
+    return await eventModel.subscribeEvent(eventId, userId);
+};
+
+const unsubscribeEvent = async (eventId, userId) => {
+    return await eventModel.unsubscribeEvent(eventId, userId);
+};
+const getSubscribeEvent = async (userId) => {
+    return await eventModel.getSubscribeEvent(userId);
+};
 
 module.exports = {
     createEvent,
@@ -64,4 +83,7 @@ module.exports = {
     getEvent,
     getAllEvents,
     updateEvent,
+    subscribeEvent,
+    unsubscribeEvent,
+    getSubscribeEvent
 };

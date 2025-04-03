@@ -54,36 +54,31 @@ const getAllAdherents = async () => {
  * @throws {Error} - En cas d'échec de la récupération des adhérents.
  */
 const getAdherent = async (userId) => {
-    try {
-        console.log(`📌 [SERVICE] Début de récupération des adhérents pour l'utilisateur ID: ${userId}...`);
+    console.log(`📌 [SERVICE] Début de récupération des adhérents pour l'utilisateur ID: ${userId}...`);
 
-        // Recherche de l'utilisateur
-        const user = await findUserByUserId(userId);
-        if (!user) {
-            throw new Error(`Utilisateur introuvable pour l'ID: ${userId}`);
-        }
-        if (!user.numero_licence) {
-            throw new Error(`Numéro de licence manquant pour l'utilisateur ID: ${userId}`);
-        }
-
-        console.log(`🔍 [SERVICE] Utilisateur trouvé: ${userId}, Licence: ${user.numero_licence}`);
-
-        // Récupération des adhérents
-        const adherentData = await AdherentsModel.getAdherentDetails(user.numero_licence);
-        if (!adherentData || adherentData.length === 0) {
-            console.warn(`⚠️ [SERVICE] Aucun adhérent trouvé pour l'utilisateur ${user.numero_licence}`);
-            return [];
-        }
-
-        // Conversion en objets Adherent
-        const adherents = Adherent.fromDataBase(adherentData);
-
-        console.log(`✅ [SERVICE] ${adherents.length} adhérent(s) récupéré(s) pour l'utilisateur ${user.numero_licence}`);
-        return adherents;
-    } catch (error) {
-        console.error(`❌ [SERVICE] Erreur lors de la récupération des adhérents pour l'utilisateur ID ${userId}: ${error.message}`);
-        throw error;
+    // Recherche de l'utilisateur
+    const user = await findUserByUserId(userId);
+    if (!user) {
+        throw new Error(`Utilisateur introuvable pour l'ID: ${userId}`);
     }
+    if (!user.numero_licence) {
+        throw new Error(`Numéro de licence manquant pour l'utilisateur ID: ${userId}`);
+    }
+
+    console.log(`🔍 [SERVICE] Utilisateur trouvé: ${userId}, Licence: ${user.numero_licence}`);
+
+    // Récupération des adhérents
+    const adherentData = await AdherentsModel.getAdherentDetails(user.numero_licence);
+    if (!adherentData || adherentData.length === 0) {
+        console.warn(`⚠️ [SERVICE] Aucun adhérent trouvé pour l'utilisateur ${user.numero_licence}`);
+        return [];
+    }
+
+    // Conversion en objets Adherent
+    const adherents = Adherent.fromDataBase(adherentData);
+
+    console.log(`✅ [SERVICE] ${adherents.length} adhérent(s) récupéré(s) pour l'utilisateur ${user.numero_licence}`);
+    return adherents;
 };
 
 /**
@@ -133,9 +128,8 @@ const updateAdherent = async (adherent) => {
  */
 async function transformerDonneesEnAdherents(donnees) {
     const adherents = [];
-
     for (const row of donnees) {
-        adherents.push(Adherent.fromCSV(row));
+        adherents.push(Adherent.fromXslx(row));
     }
     return adherents;
 }
@@ -147,34 +141,29 @@ async function transformerDonneesEnAdherents(donnees) {
  * @throws {Error}
  */
 async function importerXlsx(fichierXlsx) {
-    try {
-        console.log('📂 Chargement du fichier Excel...');
-        const donnees = chargerDonneesExcel(fichierXlsx);
-        console.log('🔄 Conversion des données..');
-        const adherents = await transformerDonneesEnAdherents(donnees);
-        console.log('🛠️ Importation des données dans la base de données...');
+    console.log('📂 Chargement du fichier Excel...');
+    const donnees = chargerDonneesExcel(fichierXlsx);
+    console.log('🔄 Conversion des données..');
+    const adherents = await transformerDonneesEnAdherents(donnees);
+    console.log('🛠️ Importation des données dans la base de données...');
 
-        let ajoutCount = 0;
-        let majCount = 0;
+    let ajoutCount = 0;
+    let majCount = 0;
 
-        for (const adherent of adherents) {
-            const exist = await checkAdherentLicence(adherent.numeroLicence);
-            if (exist) {
-                const isupdate = await updateAdherent(adherent);
-                if (isupdate) {
-                    majCount++;
-                }
-            } else {
-                await createAdherent(adherent);
-                ajoutCount++;
+    for (const adherent of adherents) {
+        const exist = await checkAdherentLicence(adherent.numeroLicence);
+        if (exist) {
+            const isupdate = await updateAdherent(adherent);
+            if (isupdate) {
+                majCount++;
             }
+        } else {
+            await createAdherent(adherent);
+            ajoutCount++;
         }
-        console.log(`✅ Importation terminée avec succès. ${ajoutCount} documents ajoutés, ${majCount} documents mis à jour.`);
-        return {add: ajoutCount, update: majCount};
-    } catch (err) {
-        console.error('❌ Erreur lors de l\'importation :', err.message);
-        return null;
     }
+    console.log(`✅ Importation terminée avec succès. ${ajoutCount} documents ajoutés, ${majCount} documents mis à jour.`);
+    return {add: ajoutCount, update: majCount};
 }
 
 

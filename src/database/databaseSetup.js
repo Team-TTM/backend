@@ -90,8 +90,8 @@ const queries = {
     addForeignKeys: [
         'ALTER TABLE users ADD FOREIGN KEY (licence_id) REFERENCES adherents  (licence_id) ON DELETE CASCADE;',
         'ALTER TABLE events ADD FOREIGN KEY (`dirigeant_id`) REFERENCES users (`user_id`);',
-        'ALTER TABLE events_users ADD FOREIGN KEY (events_event_id) REFERENCES events (event_id);',
-        'ALTER TABLE events_users ADD FOREIGN KEY (users_user_id) REFERENCES users (user_id);',
+        'ALTER TABLE events_users ADD FOREIGN KEY (event_id) REFERENCES events (event_id);',
+        'ALTER TABLE events_users ADD FOREIGN KEY (user_id) REFERENCES users (user_id);',
         'ALTER TABLE saison_adherents ADD FOREIGN KEY (saison_id) REFERENCES saison (saison_id);',
         'ALTER TABLE saison_adherents ADD FOREIGN KEY (licence_id) REFERENCES adherents (licence_id);',
     ]

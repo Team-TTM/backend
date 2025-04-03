@@ -27,6 +27,8 @@ router.get('/getAllAdherents',authenticateJWT,adherentController.getAllAdherents
 
 router.get('/adherent',authenticateJWT,adherentController.getAdherent);
 
+router.get('/adherent/licence', authenticateJWT, adherentController.getAdherent);
+
 
 
 

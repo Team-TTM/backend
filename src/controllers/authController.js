@@ -34,7 +34,7 @@ const licenceSignInController = async (req, res) => {
     try {
         const {user, message} = await licenceService.processLicenceSignIn(userId, licence);
         const token = createToken(user.id_user);
-        return res.status(200).json({token, message});
+        return res.status(200).json({token, message, role: user.role});
     } catch (error) {
         console.error('❌ Erreur dans l\'authentification de la licence :', error);
         return res.status(400).json({
@@ -108,8 +108,9 @@ const signInController = async (req, res) => {
             const match = await compare(userCredential.password, userCredentialFetch.password);
             if (match) {
                 const token = createToken(userCredentialFetch.userId);
+                const role = await userService.getUserRole(userCredentialFetch.userId);
                 res.setHeader('Authorization', `Bearer ${token}`);
-                return res.status(200).json();
+                return res.status(200).json({role: role});
             } else {
                 return res.status(401).json({error: 'Mot de passe incorrecte'});
             }
@@ -157,9 +158,11 @@ const signUpController = async (req, res) => {
         }
         await newUserCredential.hashedPassword();
         await userService.createUserCredential(newUserCredential);
+        // TODO Faire un promise all;
+        const role = await userService.getUserRole(newUserCredential.userId);
         const token = createToken(newUserCredential.userId);
         res.setHeader('Authorization', `Bearer ${token}`);
-        return res.status(201).send();
+        return res.status(201).json({role: role});
     } catch (err) {
         console.error(err);
         return res.status(500).json({error: 'Une erreur inattendue est survenue'});

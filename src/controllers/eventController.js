@@ -21,7 +21,7 @@ const createEvent = async (req, res) => {
         event = Event.createEvent(data,userId);
     }catch(err) {
         console.error(err);
-        return res.status(400).json(err.message);
+        return res.status(400).json({error: err.message});
     }
     try {
         const eventFetch = await eventService.createEvent(event);
@@ -77,14 +77,8 @@ const updateEvent = async (req, res) => {
  */
 const deleteEvent = async (req, res) => {
     console.log('📌 [CONTROLLER] Suppression d\'un événement...');
-    let eventId;
-    try{
-        eventId = validateEventId(req.params?.eventId);
-    }catch(err) {
-        console.error(err);
-        return res.status(400).json(err.message);
-    }
     try {
+        const eventId = req.params.eventId;
         const isDeleted = await eventService.deleteEvent(eventId);
         if (isDeleted) {
             return res.status(200).send();
@@ -108,13 +102,9 @@ const deleteEvent = async (req, res) => {
  */
 const getEvent = async (req, res) => {
     console.log('📌 [CONTROLLER] Récupération de l\'événement...');
-    let eventId;
-    try{
-        eventId = validateEventId(req.params?.eventId);
-    }catch(err) {
-        return res.status(400).json(err.message);
-    }
+
     try {
+        const eventId = req.params.eventId;
         const event = await eventService.getEvent(eventId);
         if (!event) {
             return res.status(404).send();
@@ -151,29 +141,62 @@ const getEvents = async (req, res) => {
     }
 };
 
-/**
- * Valide l'eventId pour vérifier qu'il est défini et un nombre.
- * @param {string} string - L'ID de l'événement à valider.
- * @returns {int} - Retourne vrai si l'eventId est valide, sinon faux.
- */
-const validateEventId = (string) => {
-    const eventId= +string;
-    if (eventId === undefined) {
-        console.error('⚠️ Événement non trouvé');
-        throw new Error('Événement non trouvé');
+const subscribeEvent = async (req, res) => {
+    try {
+        const eventId = req.params.eventId;
+        const userId = req.auth.userId;
+        const isSubsribe = await eventService.subscribeEvent(eventId, userId);
+        const event = await eventService.getEvent(eventId);
+        if (!event.participants.length >= event.nombreMax) {
+            return res.status(400).send({error: 'La limite de participant a cette événement a était attient'});
+        }
+        if (isSubsribe) {
+            return res.status(200).send();
+        } else {
+            return res.status(409).send();
+        }
+    } catch (error) {
+        return res.status(500).json({
+            error: error.message
+        });
     }
-    if (isNaN(eventId)) {
-        throw new Error('eventId est invalide');
+};
+const unsubscribeEvent = async (req, res) => {
+    try {
+        const eventId = req.params.eventId;
+        const userId = req.auth.userId;
+        const isUnsubscribe = await eventService.unsubscribeEvent(eventId, userId);
+        if (isUnsubscribe) {
+            return res.status(200).send();
+        } else {
+            return res.status(409).send();
+        }
+    } catch (error) {
+        return res.status(500).json({
+            error: error.message
+        });
     }
-    return eventId;
 };
 
-module.exports = validateEventId;
+const getSubscribeEvent = async (req, res) => {
+    try {
+        const userId = req.auth.userId;
+        const events = eventService.getSubscribeEvent(userId);
+        return res.status(200).json({events: events});
+    } catch (error) {
+        return res.status(500).json({
+            error: error.message
+        });
+    }
+};
 
 module.exports = {
     createEvent,
     updateEvent,
     deleteEvent,
     getEvents,
-    getEvent
+    getEvent,
+    subscribeEvent,
+    unsubscribeEvent,
+    getSubscribeEvent
 };
