@@ -13,7 +13,7 @@ class Event {
      * @param {Array} participants - Liste des participants à l'événement.
      * @param {String} type - type de l'événement.
      * @param {int} nombreMax - Le nombre de participants maximum a l'événement.
-     * @param {String} lieu - Lieux de l'événement.
+     * @param {String} lieu - lieu de l'événement.
      */
     constructor(eventId, dirigeantId, name, description, createdAT, endAt, participants, type, nombreMax, lieu) {
         this.eventId = eventId;
@@ -39,7 +39,7 @@ class Event {
      * @param {string} eventData.end_at - La date de fin de l'événement (format ISO).
      * @param {string} eventData.type - Le type de l'événement.
      * @param {number} eventData.nombre_max - Le nombre maximum de participants.
-     * @param {string} eventData.lieux - Le lieu de l'événement.
+     * @param {string} eventData.lieu - Le lieu de l'événement.
      * @returns {Event} L'instance de l'événement.
      */
     static fromDataBase(eventData) {
@@ -53,7 +53,7 @@ class Event {
             [],
             eventData.type,
             eventData.nombre_max,
-            eventData.lieux
+            eventData.lieu
         );
     }
     /**
