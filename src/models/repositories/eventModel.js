@@ -172,6 +172,17 @@ const getParticipant = async (eventId) => {
     const [rows] = await pool.execute(query, [eventId]);
     return Participant.fromDatabaseArray(rows);
 };
+
+const getSubscribeEvent = async (userId) => {
+    const query = `
+        SELECT e.*
+        FROM events e
+                 JOIN events_users eu ON eu.event_id = e.event_id
+        WHERE user_id = ?;`
+    ;
+    const [rows] = await pool.execute(query, [userId]);
+    return Event.fromDataBaseArray(rows);
+};
 module.exports = {
     createEvent,
     deleteEvent,
@@ -182,4 +193,5 @@ module.exports = {
     subscribeEvent,
     unsubscribeEvent,
     getParticipant,
+    getSubscribeEvent
 };

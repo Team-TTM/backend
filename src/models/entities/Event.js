@@ -56,6 +56,14 @@ class Event {
             eventData.lieu
         );
     }
+
+    static fromDataBaseArray(datas) {
+        const events = [];
+        datas.forEach((data) => {
+            events.push(this.fromDataBase(data));
+        });
+        return events;
+    }
     /**
      * Crée un nouvel événement à partir des données de la requête.
      * @param {Object} data - Données de l'événement.
