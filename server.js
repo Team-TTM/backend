@@ -1,6 +1,6 @@
 // server.js
 const { app, logConsole } = require('./app'); // Importer l'application Express
-const port = process.env.PORT || 3000; // Le port HTTPS standard est 443 (ne sera pas utilisé directement si Passenger gère SSL)
+const port = process.env.PORT || 3001; // Le port HTTPS standard est 443 (ne sera pas utilisé directement si Passenger gère SSL)
 
 // Démarrer le serveur HTTPS (géré par Passenger si SSL est configuré)
 const startServer = () => {
