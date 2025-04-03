@@ -181,7 +181,7 @@ const unsubscribeEvent = async (req, res) => {
 const getSubscribeEvent = async (req, res) => {
     try {
         const userId = req.auth.userId;
-        const events = eventService.getSubscribeEvent(userId);
+        const events = await eventService.getSubscribeEvent(userId);
         return res.status(200).json({events: events});
     } catch (error) {
         return res.status(500).json({
