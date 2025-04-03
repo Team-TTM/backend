@@ -8,7 +8,7 @@ const importAdherent = async (req, res) => {
         const {add, update} = await importerXlsx(req.file.path);
         return res.status(200).json({add, update});
     } catch (err) {
-        return res.status(500).send(err.message);
+        return res.status(500).send({error: err.message});
     }
 };
 

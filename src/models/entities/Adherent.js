@@ -90,7 +90,7 @@ class Adherent {
      * @param {Object} row - Ligne de données source (ex: fichier CSV).
      * @returns {Adherent} Une instance de Adherent.
      */
-    static fromCSV(row) {
+    static fromXslx(row) {
 
         const saison = calculerSaison(convertirDate(row['Date validation de la licence']));
         const dateNaisance = convertirDate(row['Date de naissance']);
@@ -187,6 +187,7 @@ class Adherent {
 }
 
 const formaterNumeroTelephone = (numero)=>{
+    numero = numero + '';
     if (!numero) {
         return null;
     }
