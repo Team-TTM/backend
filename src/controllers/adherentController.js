@@ -46,4 +46,39 @@ const getAdherent= async (req,res) => {
     }
 };
 
-module.exports = { getAllAdherents,getAdherent };
+const updateAdherent = async (req, res) => {
+    const { userId } = req.auth; // Récupère l'ID utilisateur authentifié
+
+    try {
+        console.log(`📌 [CONTROLLER] Mise à jour de l'adhérent ${userId} : ...`);
+        console.log(userId);
+
+        const adherent = req.body;
+
+        if (!adherent || !adherent.numeroLicence || !adherent.getDerniereSaison()) {
+            console.log('⚠️ Les informations de l\'adhérent sont incomplètes.');
+            return res.status(400).json({
+                error: 'Les informations de l\'adhérent sont incomplètes.'
+            });
+        }
+
+        const isAdherentUpdated = await adherantService.updateAdherent(adherent);
+
+        if (!isAdherentUpdated) {
+            console.log('⚠️ La mise à jour n\'a pas été effectuée.');
+            return res.status(204).send(); // Pas de contenu
+        }
+
+        console.log('✅ Adhérent mis à jour avec succès.');
+        return res.status(200).json({ message: 'Adhérent mis à jour avec succès.' });
+
+    } catch (error) {
+        console.error('❌ [CONTROLLER] Erreur lors de la mise à jour de l\'adhérent:', error);
+        return res.status(500).json({
+            error: error.message || 'Une erreur est survenue lors de la mise à jour de l\'adhérent.'
+        });
+    }
+};
+
+
+module.exports = { getAllAdherents,getAdherent,updateAdherent };
