@@ -135,14 +135,14 @@ class Event {
         if (!data?.description || typeof data?.description !== 'string') {
             throw new Error('Description manquante ou invalide');
         }
-        const regex = /^\d{4}-\d{2}-\d{2}$/;
+        const regex = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
         if (!data?.endAt || !regex.test(data?.endAt)) {
             throw new Error('endAt manquante ou invalide');
         }
         if (!data?.type || typeof data?.type !== 'string') {
             throw new Error('type manquant ou invalide');
         }
-        if (!data.nombre_max || typeof data.nombre_max !== 'number') {
+        if (!data.nombreMax || typeof data.nombreMax !== 'number') {
             throw new Error('nombreMax manquant ou invalide');
         }
         if (!data.lieu || typeof data.lieu !== 'string') {
@@ -158,7 +158,7 @@ class Event {
             data.endAt,
             null,
             data.type,
-            data.nombre_max,
+            data.nombreMax,
             data.lieu
         );
     }
