@@ -73,6 +73,9 @@ const subscribeEvent = async (eventId, userId) => {
 const unsubscribeEvent = async (eventId, userId) => {
     return await eventModel.unsubscribeEvent(eventId, userId);
 };
+const getSubscribeEvent = async (userId) => {
+    return await eventModel.getSubscribeEvent(userId);
+};
 
 module.exports = {
     createEvent,
@@ -81,5 +84,6 @@ module.exports = {
     getAllEvents,
     updateEvent,
     subscribeEvent,
-    unsubscribeEvent
+    unsubscribeEvent,
+    getSubscribeEvent
 };

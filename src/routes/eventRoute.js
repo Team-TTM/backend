@@ -10,6 +10,7 @@ router.post('/',authenticateJWT,authenticateDirigeant,eventController.createEven
 router.put('/',authenticateJWT,authenticateDirigeant,eventController.updateEvent);
 router.delete('/:eventId', authenticateJWT, authenticateDirigeant, checkoutEventId, eventController.deleteEvent);
 router.post('/subscribe/:eventId', authenticateJWT, checkoutEventId, eventController.subscribeEvent);
+router.get('/subscribe', authenticateJWT, eventController.getSubscribeEvent);
 router.delete('/unsubscribe/:eventId', authenticateJWT, checkoutEventId, eventController.unsubscribeEvent);
 
 router.all('/{*splat}', (req, res) => {
