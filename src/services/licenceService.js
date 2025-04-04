@@ -1,4 +1,6 @@
 const userService = require('./userService');
+const userCredentailModel = require('../models/repositories/userCredentialModel');
+const {deleteUserById} = require('./userService');
 
 /**
  * Vérifie et associe une licence à un utilisateur.
@@ -15,25 +17,38 @@ const processLicenceSignIn = async (userId, licence) => {
     if (!user) {
         throw new Error('Utilisateur non trouvé.');
     }
-    try {
-        const existingUser = await userService.findUserByLicence(licence);
-        if (existingUser) {
-
-            updatedUser = await userService.mergeUserFacebookAndGoogleIds(existingUser, user);
-            message = 'Fusion des comptes réussie (Facebook et Google).';
+    const existingUser = await userService.findUserByLicence(licence);
+    if (existingUser) {
+        const userCredential = await userCredentailModel.findById(existingUser.id_user);
+        if (userCredential) {
+            if (user.google_id && !existingUser.google_id) {
+                // TODO verifi sin on ecrase pas un compte google
+                await userService.deleteUserById(user);
+                existingUser.google_id = user.google_id;
+                await userService.updateGoogleId(existingUser);
+                message = 'Fusion Google et mail';
+            } else if (user.facebook_id && !existingUser.facebook_id) {
+                existingUser.facebook_id = existingUser.facebook_id;
+                await userService.deleteUserById(user);
+                await userService.updateFacebookId(existingUser);
+                message = 'Fusion Facebook et mail';
+            } else {
+                throw new Error('Cette licence est deja associé un compte');
+            }
+            updatedUser = existingUser;
         } else {
-            // Si la licence n'est pas encore associée, l'associer à l'utilisateur
-            updatedUser = await userService.updateUserLicence(user, licence);
-            message = `Licence ${licence} associée à l'utilisateur avec succès.`;
+            updatedUser = await userService.mergeUserFacebookAndGoogleIds(existingUser, user);
+            message = 'Fusion Google et Facebook';
         }
-
-        return {
-            user: updatedUser,
-            message: message,
-        };
-    } catch (err) {
-        throw err;
+    } else {
+        updatedUser = await userService.updateUserLicence(user, licence);
+        message = `Licence ${licence} associée à l'utilisateur avec succès.`;
     }
+
+    return {
+        user: updatedUser,
+        message: message,
+    };
 };
 
 module.exports = {

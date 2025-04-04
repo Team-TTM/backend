@@ -18,7 +18,7 @@ const {createToken} = require('./tokenService');
  */
 const handleAuthVerification = async (platform, profile, done) => {
     try {
-        const platformId = profile.id; // Identifiant spécifique à la plateforme (Google ou Facebook)
+        const platformId = profile.id;
 
         // Recherche de l'utilisateur via l'ID de la plateforme
         let user;
@@ -34,10 +34,9 @@ const handleAuthVerification = async (platform, profile, done) => {
                 : await userService.createUserFacebook(platformId);
         }
         const isAdherent = user.numero_licence !== null;
-
         const token = createToken(user.id_user);
 
-        return done(null, {token, licenceExiste: isAdherent});
+        return done(null, {token, licenceExiste: isAdherent, role: user.role});
     } catch (error) {
         console.error(`Erreur dans ${platform} Auth:`, error);
         return done(error);

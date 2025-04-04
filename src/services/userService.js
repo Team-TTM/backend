@@ -145,7 +145,7 @@ const updateUserLicence = async (user, adherentID) => {
 const mergeUserFacebookAndGoogleIds = async (user1, user2) => {
 
     if (!user1 || !user2) {
-        throw new Error(`❌ Fusion impossible : L'un des utilisateurs (ID: ${user1.id_user}, ID: ${user2.id_user}) est introuvable.`);
+        throw new Error('L\'un des utilisateurs est introuvable.');
     }
 
     const user1HasGoogle = !!user1.google_id;
@@ -154,11 +154,11 @@ const mergeUserFacebookAndGoogleIds = async (user1, user2) => {
     const user2HasFacebook = !!user2.facebook_id;
 
     if (user1HasGoogle && user2HasGoogle) {
-        throw new Error('❌ Fusion impossible : Ce numéro de licence est déjà liés à un compte Google.');
+        throw new Error('Ce numéro de licence est déjà liés à un compte Google.');
     } else if (user1HasFacebook && user2HasFacebook) {
-        throw new Error(`❌ Fusion impossible : Les deux comptes (ID: ${user1.id_user}, ID: ${user2.id_user}) sont déjà liés à Facebook.`);
+        throw new Error('Ce numéro de licence est déjà liés à un compte Facebook.');
     } else if (!user1HasGoogle && !user1HasFacebook && !user2HasGoogle && !user2HasFacebook) {
-        throw new Error(`❌ Fusion impossible : Aucun des comptes (ID: ${user1.id_user}, ID: ${user2.id_user}) n'est lié à Google ou Facebook.`);
+        throw new Error(' Aucune licence n\'est lié à Google ou Facebook.');
     } else if (user1HasGoogle && user2HasFacebook) {
         user1.facebook_id = user2.facebook_id;
         await UsersModel.deleteUserById(user2);
@@ -183,6 +183,17 @@ const deleteGoogleId = async (googleID) => {
     await UsersModel.deleteGoogleId(user);
 };
 
+const updateGoogleId = async (user) => {
+    await UsersModel.updateGoogleId(user);
+};
+const updateFacebookId = async (user) => {
+    await UsersModel.updateFacebookId(user);
+};
+
+const deleteUserById = async (user) => {
+    await UsersModel.deleteUserById(user);
+};
+
 const deleteFacebookId = async (facebokId) => {
     const user = await UsersModel.findUserByFacebookId(facebokId);
     if (!user) {
@@ -191,7 +202,6 @@ const deleteFacebookId = async (facebokId) => {
     user.facebook_id = null;
     await UsersModel.deleteFacebookId(facebokId);
 };
-
 
 /**
  * Obtenir le rôle d'un utilisateur par son ID.
@@ -227,7 +237,10 @@ module.exports = {
     createUserCredential,
     checkIfEmailExists,
     updateUserLicence,
+    updateFacebookId,
+    updateGoogleId,
     mergeUserFacebookAndGoogleIds,
+    deleteUserById,
     deleteGoogleId,
     deleteFacebookId,
     getUserRole,

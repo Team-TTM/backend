@@ -28,7 +28,7 @@ const URL = process.env.URL;
  * @returns {Promise<Response>} Une réponse JSON avec un message de confirmation ou une erreur.
  */
 const licenceSignInController = async (req, res) => {
-    const {licence} = req.licence;
+    const licence = req.licence;
     const {userId} = req.auth;
 
     try {
@@ -57,10 +57,10 @@ const handleAuthRedirection = async (req, res, platform) => {
         if (!req.user) {
             return res.status(401).json({error: 'Utilisateur non authentifié'});
         }
-        const {token, licenceExiste} = req.user;
+        const {token, licenceExiste, role} = req.user;
 
         const redirectUrl = licenceExiste
-            ? `${URL}/users/HomePage?token=${token}`
+            ? `${URL}/?token=${token}&role=${role}`
             : `${URL}/users/verify-licence?token=${token}`;
 
         return res.redirect(redirectUrl);
@@ -158,7 +158,6 @@ const signUpController = async (req, res) => {
         }
         await newUserCredential.hashedPassword();
         await userService.createUserCredential(newUserCredential);
-        // TODO Faire un promise all;
         const role = await userService.getUserRole(newUserCredential.userId);
         const token = createToken(newUserCredential.userId);
         res.setHeader('Authorization', `Bearer ${token}`);
