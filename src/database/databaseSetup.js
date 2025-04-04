@@ -50,7 +50,7 @@ const queries = {
         CREATE TABLE users (
             user_id INT AUTO_INCREMENT PRIMARY KEY,
             licence_id VARCHAR(20) UNIQUE,
-            role ENUM('user', 'dirigeant') NOT NULL DEFAULT 'user',
+            role ENUM ('user', 'dirigeant','admin') NOT NULL DEFAULT 'user',
             charte_signe BOOLEAN NOT NULL DEFAULT false,
             google_id VARCHAR(255) UNIQUE,
             facebook_id VARCHAR(255) UNIQUE,
@@ -96,7 +96,7 @@ const queries = {
         (
             user_id integer PRIMARY KEY,
             mail    varchar(255) UNIQUE,
-            passord varchar(255)
+            password varchar(255)
         );`,
     // ALTER TABLE commands
     addForeignKeys: [
