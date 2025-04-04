@@ -9,7 +9,7 @@ router.get('/all', authenticateJWT, authenticateDirigeant, adherentController.ge
 
 router.get('/', authenticateJWT, adherentController.getAdherent);
 
-router.post('/update-adherent', authenticateJWT, adherentController.updateAdherent);
+router.put('/update-adherent', authenticateJWT, adherentController.updateAdherent);
 
 
 router.get('/{*splat}', (req, res) => {
