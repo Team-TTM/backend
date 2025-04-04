@@ -19,13 +19,13 @@ app.use(express.json());
 app.use(passport.initialize());
 
 // Définir les routes
-app.use(indexRouter);
 app.use('/users', usersRouter);
 app.use('/assets', assetsRouter);
 app.use('/api/events', eventRouter);
 app.use('/api/import', importRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/adherent', adherentRouter);
+app.use(indexRouter);
 
 // Gestion des erreurs 404
 app.use((req, res, next) => {
