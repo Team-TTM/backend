@@ -175,4 +175,8 @@ async function importerXlsx(fichierXlsx) {
 async function checkAdherentLicence(num_licence) {
     return AdherentsModel.adherentExist(num_licence);
 }
-module.exports = { importerXlsx, checkAdherentLicence, getAllAdherents,getAdherent, updateAdherent };
+
+const editAdherent = async (adherent) => {
+    return await AdherentsModel.updateAdherent(adherent);
+};
+module.exports = {importerXlsx, checkAdherentLicence, getAllAdherents, getAdherent, updateAdherent, editAdherent};

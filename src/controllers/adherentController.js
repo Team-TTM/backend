@@ -1,4 +1,6 @@
 const adherantService = require('../services/adherantService');
+const {findById} = require('../models/repositories/userCredentialModel');
+const {findUserById} = require('../models/repositories/usersModel');
 
 const getAllAdherents = async (req, res) => {
     try {
@@ -46,29 +48,46 @@ const getAdherent= async (req,res) => {
     }
 };
 
-const updateAdherent = async (req, res) => {
-    const { userId } = req.auth; // Récupère l'ID utilisateur authentifié
 
+const updateAdherent = async (req, res) => {
+    const {userId} = req.auth;
     try {
         console.log(`📌 [CONTROLLER] Mise à jour de l'adhérent ${userId} : ...`);
-        console.log(userId);
-
-        const adherent = req.body;
-
-        if (!adherent || !adherent.numeroLicence || !adherent.getDerniereSaison()) {
-            console.log('⚠️ Les informations de l\'adhérent sont incomplètes.');
+        const adherentRequest = req.body.adherent;
+        const user = await findUserById(userId);
+        if (user.numero_licence !== adherentRequest.numero_licence) {
             return res.status(400).json({
-                error: 'Les informations de l\'adhérent sont incomplètes.'
+                error: 'Le numero de licence ne correspond pas a l\'utilisateur.'
             });
         }
-
-        const isAdherentUpdated = await adherantService.updateAdherent(adherent);
-
-        if (!isAdherentUpdated) {
-            console.log('⚠️ La mise à jour n\'a pas été effectuée.');
-            return res.status(204).send(); // Pas de contenu
+        const adherent = await adherantService.getAdherent(adherentRequest.numeroLicence);
+        if (!adherent) {
+            return res.status(400).json({
+                error: 'Adherent non trouvé'
+            });
         }
-
+        if (adherentRequest.nom !== undefined) {
+            adherent.nom = adherentRequest.nom;
+        }
+        if (adherentRequest.prenom !== undefined) {
+            adherent.prenom = adherentRequest.prenom;
+        }
+        if (adherentRequest.genre !== undefined) {
+            adherent.genre = adherentRequest.genre;
+        }
+        if (adherentRequest.email !== undefined) {
+            adherent.email = adherentRequest.email;
+        }
+        if (adherentRequest.dateNaissance !== undefined) {
+            adherent.dateNaissance = adherentRequest.dateNaissance;
+        }
+        if (adherentRequest.telephone !== undefined) {
+            adherent.telephone = adherentRequest.telephone;
+        }
+        if (adherentRequest.urgenceTelephone !== undefined) {
+            adherent.urgenceTelephone = adherentRequest.urgenceTelephone;
+        }
+        await adherantService.editAdherent(adherent);
         console.log('✅ Adhérent mis à jour avec succès.');
         return res.status(200).json({ message: 'Adhérent mis à jour avec succès.' });
 
