@@ -12,6 +12,7 @@ const eventRouter = require('./src/routes/eventRoute');
 const importRouter = require('./src/routes/importRoute');
 const authRouter = require('./src/routes/authRoute');
 const adherentRouter = require('./src/routes/adherentRoute');
+const path = require("path");
 
 // Middleware
 app.use(morganLogger); // Utilisation de Morgan pour logger les requêtes HTTP
@@ -27,6 +28,9 @@ app.use('/api/auth', authRouter);
 app.use('/api/adherent', adherentRouter);
 app.use(indexRouter);
 
+app.get('/{*splat}', (req, res) => {
+    res.sendFile(path.join(__dirname, '..','..','..','frontend','dist', 'index.html'));
+});
 // Gestion des erreurs 404
 app.use((req, res, next) => {
     const error = new Error('Ressource non trouvée');
