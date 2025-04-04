@@ -64,7 +64,10 @@ const queries = {
             name VARCHAR(255),
             description TEXT,
             created_at DATE,
-            end_at DATE
+            end_at     DATETIME,
+            type       VARCHAR(255),
+            nombre_max INT,
+            lieu       VARCHAR(255)
         );
     `,
     saison: `
@@ -73,11 +76,13 @@ const queries = {
         );
     `,
     events_users: `
-        CREATE TABLE events_users (
-            events_event_id INT,
-            users_user_id INT,
-            PRIMARY KEY (events_event_id, users_user_id)
+        CREATE TABLE events_users
+        (
+            event_id INT,
+            user_id  INT,
+            PRIMARY KEY (event_id, user_id)
         );
+
     `,
     saison_adherents: `
         CREATE TABLE saison_adherents (
@@ -86,14 +91,22 @@ const queries = {
             PRIMARY KEY (saison_id, licence_id)
         );
     `,
+    user_credentials: `
+        CREATE TABLE users_credentials
+        (
+            user_id integer PRIMARY KEY,
+            mail    varchar(255) UNIQUE,
+            passord varchar(255)
+        );`,
     // ALTER TABLE commands
     addForeignKeys: [
         'ALTER TABLE users ADD FOREIGN KEY (licence_id) REFERENCES adherents  (licence_id) ON DELETE CASCADE;',
-        'ALTER TABLE events ADD FOREIGN KEY (`dirigeant_id`) REFERENCES users (`user_id`);',
-        'ALTER TABLE events_users ADD FOREIGN KEY (event_id) REFERENCES events (event_id);',
-        'ALTER TABLE events_users ADD FOREIGN KEY (user_id) REFERENCES users (user_id);',
-        'ALTER TABLE saison_adherents ADD FOREIGN KEY (saison_id) REFERENCES saison (saison_id);',
-        'ALTER TABLE saison_adherents ADD FOREIGN KEY (licence_id) REFERENCES adherents (licence_id);',
+        'ALTER TABLE events ADD FOREIGN KEY (dirigeant_id) REFERENCES users (user_id)ON DELETE CASCADE;',
+        'ALTER TABLE events_users ADD FOREIGN KEY (event_id) REFERENCES events (event_id)ON DELETE CASCADE;',
+        'ALTER TABLE events_users ADD FOREIGN KEY (user_id) REFERENCES users (user_id)ON DELETE CASCADE;',
+        'ALTER TABLE saison_adherents ADD FOREIGN KEY (saison_id) REFERENCES saison (saison_id)ON DELETE CASCADE;',
+        'ALTER TABLE saison_adherents ADD FOREIGN KEY (licence_id) REFERENCES adherents (licence_id)ON DELETE CASCADE;',
+        'ALTER TABLE users_credentials ADD FOREIGN KEY (user_id) REFERENCES users (user_id)ON DELETE CASCADE;'
     ]
 };
 
@@ -115,7 +128,7 @@ async function initDatabase() {
         }
 
         // Importation du fichier XLSX (si besoin)
-        await importerXlsx(path.resolve(__dirname, '../../data', process.env.XLSX_FILE2024));
+        await importerXlsx(path.resolve(__dirname, '../../data', process.env.XLSX_DEV));
 
     } catch (err) {
         console.error('❌ Erreur de connexion à MySQL:', err);
