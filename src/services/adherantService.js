@@ -81,6 +81,10 @@ const getAdherent = async (userId) => {
     return adherents;
 };
 
+const recupAdherent = async (numeroLicence) => {
+    return await AdherentsModel.getAdherent(numeroLicence);
+};
+
 /**
  * Crée un nouvel adhérent dans la base de données via le modèle AdherentsModel.
  * @param {Adherent} adherent - L'objet Adherent à insérer dans la base de données.
@@ -179,4 +183,12 @@ async function checkAdherentLicence(num_licence) {
 const editAdherent = async (adherent) => {
     return await AdherentsModel.updateAdherent(adherent);
 };
-module.exports = {importerXlsx, checkAdherentLicence, getAllAdherents, getAdherent, updateAdherent, editAdherent};
+module.exports = {
+    importerXlsx,
+    checkAdherentLicence,
+    getAllAdherents,
+    getAdherent,
+    updateAdherent,
+    editAdherent,
+    recupAdherent
+};

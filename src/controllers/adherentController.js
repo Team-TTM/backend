@@ -1,6 +1,7 @@
 const adherantService = require('../services/adherantService');
 const {findById} = require('../models/repositories/userCredentialModel');
 const {findUserById} = require('../models/repositories/usersModel');
+const {fromDataBase} = require('../models/entities/Adherent');
 
 const getAllAdherents = async (req, res) => {
     try {
@@ -55,12 +56,16 @@ const updateAdherent = async (req, res) => {
         console.log(`📌 [CONTROLLER] Mise à jour de l'adhérent ${userId} : ...`);
         const adherentRequest = req.body.adherent;
         const user = await findUserById(userId);
-        if (user.numero_licence !== adherentRequest.numero_licence) {
+        console.log(adherentRequest);
+        if (user.numero_licence !== adherentRequest.numeroLicence) {
             return res.status(400).json({
                 error: 'Le numero de licence ne correspond pas a l\'utilisateur.'
             });
         }
-        const adherent = await adherantService.getAdherent(adherentRequest.numeroLicence);
+
+        const adherent = await adherantService.getAdherent(userId)
+
+        ;
         if (!adherent) {
             return res.status(400).json({
                 error: 'Adherent non trouvé'

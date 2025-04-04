@@ -180,6 +180,22 @@ const getAdherentDetails = async (numeroLicence) => {
     }
 };
 
+const getAdherent = async (numeroLicence) => {
+    const query = `
+        SELECT *
+        FROM adherents
+        WHERE adherents.licence_id = ?
+    `;
+    try {
+        const [rows] = await pool.execute(query, [numeroLicence]);
+        console.log(rows);
+        return rows[0];
+    } catch (err) {
+        console.error('Erreur lors de la récupération des informations de l\'adhérent:', err);
+        throw err;
+    }
+};
+
 /**
  * Récupère tous les adhérents de la base de données.
  *
@@ -210,6 +226,7 @@ module.exports = {
     createAdherent,
     adherentExist,
     getAdherentDetails,
+    getAdherent,
     updateAdherent,
     getAllAdherents,
 };
