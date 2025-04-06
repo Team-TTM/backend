@@ -1,44 +1,22 @@
 class User {
     constructor(id_user, numero_licence, role, charte_signe, google_id, facebook_id, newsletter) {
-        this._id_user = id_user;
-        this._numero_licence = numero_licence;
-        this._role = role;
-        this._charte_signe = charte_signe;
+        this.userId = id_user;
+        this.licenceId = numero_licence;
+        this.role = role;
+        this.chart = charte_signe;
         this._google_id = google_id;
         this._facebook_id = facebook_id;
-        this._newsletter = newsletter;
+        this.newsletter = newsletter;
     }
 
-    get id_user() {
-        return this._id_user;
-    }
 
-    set id_user(value) {
-        this._id_user = value;
-    }
-
-    get numero_licence() {
-        return this._numero_licence;
-    }
-
-    set numero_licence(value) {
-        this._numero_licence = value;
-    }
-
-    get role() {
-        return this._role;
-    }
-
-    set role(value) {
-        this._role = value;
-    }
 
     get charte_signe() {
-        return this._charte_signe;
+        return this.chart;
     }
 
     set charte_signe(value) {
-        this._charte_signe = value;
+        this.chart = value;
     }
 
     get google_id() {
@@ -55,14 +33,6 @@ class User {
 
     set facebook_id(value) {
         this._facebook_id = value;
-    }
-
-    get newsletter() {
-        return this._newsletter;
-    }
-
-    set newsletter(value) {
-        this._newsletter = value;
     }
 
     static createFacebookUser(facebookId) {

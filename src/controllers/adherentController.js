@@ -1,7 +1,5 @@
 const adherantService = require('../services/adherantService');
-const {findById} = require('../models/repositories/userCredentialModel');
 const {findUserById} = require('../models/repositories/usersModel');
-const {fromDataBase} = require('../models/entities/Adherent');
 
 const getAllAdherents = async (req, res) => {
     try {
@@ -57,7 +55,7 @@ const updateAdherent = async (req, res) => {
         const adherentRequest = req.body.adherent;
         const user = await findUserById(userId);
         console.log(adherentRequest);
-        if (user.numero_licence !== adherentRequest.numeroLicence) {
+        if (user.licenceId !== adherentRequest.numeroLicence) {
             return res.status(400).json({
                 error: 'Le numero de licence ne correspond pas a l\'utilisateur.'
             });

@@ -197,10 +197,10 @@ const updateFacebookId = async (user) => {
         WHERE user_id = ?
     `;
     try {
-        console.log(`⌛️ Ajout de Facebook ID: ${user.facebook_id} à l'utilisateur ID: ${user.id_user}`);
-        const [result] = await pool.query(query, [user.facebook_id, user.id_user]);
+        console.log(`⌛️ Ajout de Facebook ID: ${user.facebook_id} à l'utilisateur ID: ${user.userId}`);
+        const [result] = await pool.query(query, [user.facebook_id, user.userId]);
         if (result.affectedRows > 0) {
-            console.log(`✅ Facebook ID mis à jour pour l'utilisateur ID: ${user.id_user}`);
+            console.log(`✅ Facebook ID mis à jour pour l'utilisateur ID: ${user.userId}`);
         }
     } catch (err) {
         console.error('❌ Erreur lors de la mise à jour du Facebook ID:', err);
@@ -222,10 +222,10 @@ const updateGoogleId = async (user) => {
         WHERE user_id = ?;
     `;
     try {
-        console.log('⌛️ Ajout de googleId :', user.google_id, 'à l\'utilisateur :', user.id_user);
-        const [result] = await pool.query(query, [user.google_id, user.id_user]);
+        console.log('⌛️ Ajout de googleId :', user.google_id, 'à l\'utilisateur :', user.userId);
+        const [result] = await pool.query(query, [user.google_id, user.userId]);
         if (result.affectedRows > 0) {
-            console.log(`✅Google ID mis à jour pour l'utilisateur ID: ${user.id_user}`);
+            console.log(`✅Google ID mis à jour pour l'utilisateur ID: ${user.userId}`);
         }
     } catch (err) {
         console.error('❌ Erreur lors de la mise à jour du Google ID:', err);
@@ -247,10 +247,10 @@ const updateAdherentId = async (user) => {
         WHERE user_id = ?;
     `;
     try {
-        console.log('⌛️ Ajout de la licence :', user.numero_licence, 'à l\'utilisateur :', user.id_user);
-        const [result] = await pool.query(query, [user.numero_licence, user.id_user]);
+        console.log('⌛️ Ajout de la licence :', user.licenceId, 'à l\'utilisateur :', user.userId);
+        const [result] = await pool.query(query, [user.licenceId, user.userId]);
         if (result.affectedRows > 0) {
-            console.log(`✅ Numéro de licence mis à jour pour l'utilisateur ID: ${user.id_user}`);
+            console.log(`✅ Numéro de licence mis à jour pour l'utilisateur ID: ${user.userId}`);
         }
     } catch (err) {
         console.error('❌ Erreur lors de la mise à jour de l’ID adhérant:', err);

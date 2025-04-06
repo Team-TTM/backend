@@ -61,23 +61,23 @@ const getAdherent = async (userId) => {
     if (!user) {
         throw new Error(`Utilisateur introuvable pour l'ID: ${userId}`);
     }
-    if (!user.numero_licence) {
+    if (!user.licenceId) {
         throw new Error(`Numéro de licence manquant pour l'utilisateur ID: ${userId}`);
     }
 
-    console.log(`🔍 [SERVICE] Utilisateur trouvé: ${userId}, Licence: ${user.numero_licence}`);
+    console.log(`🔍 [SERVICE] Utilisateur trouvé: ${userId}, Licence: ${user.licenceId}`);
 
     // Récupération des adhérents
-    const adherentData = await AdherentsModel.getAdherentDetails(user.numero_licence);
+    const adherentData = await AdherentsModel.getAdherentDetails(user.licenceId);
     if (!adherentData || adherentData.length === 0) {
-        console.warn(`⚠️ [SERVICE] Aucun adhérent trouvé pour l'utilisateur ${user.numero_licence}`);
+        console.warn(`⚠️ [SERVICE] Aucun adhérent trouvé pour l'utilisateur ${user.licenceId}`);
         return [];
     }
 
     // Conversion en objets Adherent
     const adherents = Adherent.fromDataBaseDetails(adherentData);
 
-    console.log(`✅ [SERVICE] ${adherents.length} adhérent(s) récupéré(s) pour l'utilisateur ${user.numero_licence}`);
+    console.log(`✅ [SERVICE] ${adherents.length} adhérent(s) récupéré(s) pour l'utilisateur ${user.licenceId}`);
     return adherents;
 };
 

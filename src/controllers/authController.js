@@ -147,11 +147,11 @@ const signUpController = async (req, res) => {
         }
         const userFromLicence = await userService.findUserByLicence(licence);
         if (userFromLicence) {
-            const existingUserCredential = await userService.findUserCredentialById(userFromLicence.id_user);
+            const existingUserCredential = await userService.findUserCredentialById(userFromLicence.userId);
             if (existingUserCredential) {
                 return res.status(409).json({error: 'Ce numéro de licence est déjà associé à un autre compte'});
             } else {
-                newUserCredential.userId = userFromLicence.id_user;
+                newUserCredential.userId = userFromLicence.userId;
             }
         } else {
             newUserCredential.userId = await UserService.createUserLicence(licence);

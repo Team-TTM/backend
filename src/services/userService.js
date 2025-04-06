@@ -90,7 +90,7 @@ const findUserCredentialById = async (userId) => {
 const createUserFacebook = async (facebookID) => {
     // Appel à la méthode du modèle pour insérer l'utilisateur dans la base de données
     const user = User.createFacebookUser(facebookID);
-    user.id_user = await UsersModel.createFacebookUser(user);
+    user.userId = await UsersModel.createFacebookUser(user);
     return user;
 };
 
@@ -117,7 +117,7 @@ const createUserCredential = async (userCredential) => {
  */
 const createUserGoogle = async (googleID) => {
     const user = User.createGoogleUser(googleID);
-    user.id_user = await UsersModel.createGoogleUser(user);
+    user.userId = await UsersModel.createGoogleUser(user);
     return user;
 };
 /**
@@ -128,7 +128,7 @@ const createUserGoogle = async (googleID) => {
  * @returns {Promise<User>} L'utilisateur mis à jour.
  */
 const updateUserLicence = async (user, adherentID) => {
-    user.numero_licence = adherentID;
+    user.licenceId = adherentID;
     await UsersModel.updateAdherentId(user);
     return user;
 };
@@ -163,12 +163,12 @@ const mergeUserFacebookAndGoogleIds = async (user1, user2) => {
         user1.facebook_id = user2.facebook_id;
         await UsersModel.deleteUserById(user2);
         await UsersModel.updateFacebookId(user1);
-        console.log(`✅ Fusion réussie : Google ID conservé, Facebook ID fusionné sous user ${user1.id_user}`);
+        console.log(`✅ Fusion réussie : Google ID conservé, Facebook ID fusionné sous user ${user1.userId}`);
     } else if (user1HasFacebook && user2HasGoogle) {
         user1.google_id = user2.google_id;
         await UsersModel.deleteUserById(user2);
         await UsersModel.updateGoogleId(user1);
-        console.log(`✅ Fusion réussie : Facebook ID conservé, Google ID fusionné sous user ${user1.id_user}`);
+        console.log(`✅ Fusion réussie : Facebook ID conservé, Google ID fusionné sous user ${user1.userId}`);
     }
     return user1;
 

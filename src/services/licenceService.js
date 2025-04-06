@@ -19,7 +19,7 @@ const processLicenceSignIn = async (userId, licence) => {
     }
     const existingUser = await userService.findUserByLicence(licence);
     if (existingUser) {
-        const userCredential = await userCredentailModel.findById(existingUser.id_user);
+        const userCredential = await userCredentailModel.findById(existingUser.userId);
         if (userCredential) {
             if (user.google_id && !existingUser.google_id) {
                 // TODO verifi sin on ecrase pas un compte google
