@@ -75,7 +75,7 @@ const getAdherent = async (userId) => {
     }
 
     // Conversion en objets Adherent
-    const adherents = Adherent.fromDataBase(adherentData);
+    const adherents = Adherent.fromDataBaseDetails(adherentData);
 
     console.log(`✅ [SERVICE] ${adherents.length} adhérent(s) récupéré(s) pour l'utilisateur ${user.numero_licence}`);
     return adherents;

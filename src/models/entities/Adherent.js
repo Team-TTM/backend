@@ -162,6 +162,36 @@ class Adherent {
             adherentData.mobile || null,
             adherentData.email || null,
             adherentData.urgency_telephone || null,
+            null,
+        );
+    }
+
+    static fromDataBaseDetails(adherentData) {
+        return new Adherent(
+            adherentData.licence_id,
+            calculetStatut(adherentData.saisons),
+            adherentData.type || null,
+            adherentData.demi_tarif || false,
+            adherentData.hors_club || false,
+            adherentData.categorie || null,
+            adherentData.annee_blanche || false,
+            adherentData.pratique || null,
+            adherentData.prenom || null,
+            adherentData.nom || null,
+            adherentData.nom_usage || null,
+            adherentData.date_naissance || null, // Conversion en Date
+            adherentData.sexe || null,
+            adherentData.profession || null,
+            adherentData.principale || null,
+            adherentData.details || null,
+            adherentData.lieu_dit || null,
+            adherentData.code_postale || null,
+            adherentData.ville || null,
+            adherentData.pays || null,
+            adherentData.telephone || null,
+            adherentData.mobile || null,
+            adherentData.email || null,
+            adherentData.urgency_telephone || null,
             adherentData.saisons.split(',') || null,
         );
     }

@@ -1,4 +1,5 @@
-const pool = require('../../config/database'); // Connexion à la base de données
+const pool = require('../../config/database');
+const {fromDataBase} = require("../entities/Adherent"); // Connexion à la base de données
 
 
 /**
@@ -188,8 +189,7 @@ const getAdherent = async (numeroLicence) => {
     `;
     try {
         const [rows] = await pool.execute(query, [numeroLicence]);
-        console.log(rows);
-        return rows[0];
+        return fromDataBase(rows[0]);
     } catch (err) {
         console.error('Erreur lors de la récupération des informations de l\'adhérent:', err);
         throw err;

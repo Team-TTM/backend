@@ -63,7 +63,7 @@ const updateAdherent = async (req, res) => {
             });
         }
 
-        const adherent = await adherantService.getAdherent(userId)
+        const adherent = await adherantService.recupAdherent(userId)
 
         ;
         if (!adherent) {
